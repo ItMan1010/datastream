@@ -1,0 +1,83 @@
+/.cursor/
+
+# 编译产物
+*.class
+*.jar
+*.war
+*.ear
+
+# 构建工具目录
+target/
+build/
+out/
+
+# IDE
+.idea/
+*.iml
+*.iws
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+
+# 环境配置
+local.properties
+/logs/
+/datastream-admin/pom-xml-flattened
+/datastream-common/pom-xml-flattened
+/pom-xml-flattened
+/datastream-starter/pom-xml-flattened
+/datastream-security/pom-xml-flattened
+/datastream-engine/pom-xml-flattened
+/datastream-connectors/pom-xml-flattened
+/datastream-connectors/connector-postgres/pom-xml-flattened
+/datastream-connectors/connector-oracle/pom-xml-flattened
+/datastream-connectors/connector-mysql/pom-xml-flattened
+/datastream-connectors/connector-kafka/pom-xml-flattened
+/datastream-connectors/connector-h2/pom-xml-flattened
+/datastream-connectors/connector-file/pom-xml-flattened
+/datastream-connectors/connector-common/pom-xml-flattened
+/datastream-ui/package-lock.json
+/h2db/testdb.trace.db
+datastream-admin/.classpath
+datastream-admin/.factorypath
+datastream-admin/.project
+datastream-admin/.settings/org.eclipse.core.resources.prefs
+datastream-admin/.settings/org.eclipse.jdt.apt.core.prefs
+datastream-admin/.settings/org.eclipse.jdt.core.prefs
+datastream-admin/.settings/org.eclipse.m2e.core.prefs
+datastream-common/.classpath
+datastream-common/.factorypath
+datastream-common/.project
+datastream-common/.settings/org.eclipse.core.resources.prefs
+datastream-common/.settings/org.eclipse.jdt.apt.core.prefs
+datastream-common/.settings/org.eclipse.jdt.core.prefs
+datastream-common/.settings/org.eclipse.m2e.core.prefs
+datastream-connectors/connector-common/.classpath
+datastream-connectors/connector-common/.factorypath
+datastream-connectors/connector-common/.project
+datastream-connectors/connector-common/.settings/org.eclipse.core.resources.prefs
+datastream-connectors/connector-common/.settings/org.eclipse.jdt.apt.core.prefs
+datastream-connectors/connector-common/.settings/org.eclipse.jdt.core.prefs
+datastream-connectors/connector-common/.settings/org.eclipse.m2e.core.prefs
+datastream-starter/.classpath
+datastream-starter/.factorypath
+datastream-starter/.project
+datastream-starter/.settings/org.eclipse.core.resources.prefs
+datastream-starter/.settings/org.eclipse.jdt.apt.core.prefs
+datastream-starter/.settings/org.eclipse.jdt.core.prefs
+datastream-starter/.settings/org.eclipse.m2e.core.prefs
+/datastream-starter/src/main/resources/static/
+datastream-dist/pom-xml-flattened
+datastream-ui/pom-xml-flattened
+h2db/testdb.lock.db
+
+# Claude Code 配置
+.claude/settings.local.json
+
+# 临时/无效文件
+nul
+*.mv.db

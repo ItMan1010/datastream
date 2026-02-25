@@ -1,0 +1,378 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*.location{*/
+/*  box-shadow:0px 0px 8px #ddd;*/
+/*  padding:0 15px;*/
+/*  line-height: 45px;*/
+/*  margin-bottom: 10px;*/
+/*  background: #fff;*/
+/*  height: 95%;*/
+/*}*/
+.location  h1{
+  font-size:14px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  color:#66b1ff;
+  line-height:10px;
+}
+.m-10 {
+  margin: 10px;
+}
+.mt-10 {
+  margin-top: 10px;
+}
+.mt-20 {
+  margin-top: 20px;
+}
+.mt-60 {
+  margin-top: 60px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
+.pd-20 {
+  padding-top: 20px;
+}
+.pd-0 {
+  padding-top: 0;
+}
+.p20 {
+  padding: 20px;
+}
+.pt-20 {
+  padding-top: 20px;
+}
+.pt-40 {
+  padding-top: 40px;
+}
+.pb-10 {
+  padding-bottom: 10px;
+}
+.ml-10 {
+  margin-left: 10px;
+}
+.ml-20 {
+  margin-left: 20px;
+}
+.pl-20 {
+  padding-left: 20px;
+}
+.pb-20 {
+  padding-bottom: 20px;
+}
+.pr-10 {
+  padding-right: 10px;
+}
+.title1 {
+  font-weight: bold !important;
+  font-size: 16px;
+}
+.width100 {
+  width: 100%;
+}
+.bcFFF {
+  background-color: #ffffff;
+}
+.h50 {
+  height: 60px;
+}
+.search-nav {
+  background-color: #ffffff;
+  height: 50px;
+  padding-left: 20px;
+  padding-top: 20px;
+  padding-right: 20px;
+}
+.content {
+  background-color: #ffffff;
+  position: absolute;
+  top: 140px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+}
+.table-height {
+  position: relative;
+  top: 0;
+  bottom: 50px;
+}
+.colRed {
+  color: red;
+}
+.fontWeight {
+  font-weight: bold;
+}
+.margin-10 {
+  margin: 10px;
+}
+.main-content {
+  min-height: 100%;
+  background-color: #fff;
+}
+.el-table__header tr th {
+  background-color: #EFF1F5 !important;
+}
+/** 抽屉弹出窗，不遮挡菜单栏*/
+.menu-is-collapse .el-drawer {
+  position: absolute !important;
+  left: 85px !important;
+  width: calc(100% - 85px) !important;
+}
+.menu-is-not-collapse .el-drawer {
+  position: absolute !important;
+  left: 260px !important;
+  width: calc(100% - 260px) !important;
+}
+.select-none {
+  user-select: none;
+}
+/** 节点创建弹窗表单样式*/
+.node-create-form .el-input {
+  float: left !important;
+}
+.node-create-form .el-select {
+  float: left !important;
+}
+.node-create-form .el-form-item__content {
+  margin-left: 0px !important;
+  display: flex;
+  justify-content: center;
+}
+.node-desc {
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 5px;
+}
+/** 自定义弹窗*/
+.my-modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .5;
+  background: #000;
+  z-index: 3002;
+  display: block;
+}
+.my-dialog__wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+  margin: 0;
+  z-index: 3013;
+  display: block;
+}
+.my-dialog {
+  position: relative;
+  margin: 0 auto 50px;
+  background: #FFF;
+  border-radius: 2px;
+  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.my-dialog__body {
+  padding: 30px 20px;
+  color: #606266;
+  font-size: 14px;
+  word-break: break-all;
+}
+.my-dialog__header {
+  padding: 20px 20px 10px;
+}
+.el-dialog__title {
+  line-height: 24px;
+  font-size: 18px;
+  color: #303133;
+}
+.exceed-line-feed {
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.component-fade-enter-active, .component-fade-leave-active {
+  transition: opacity .3s ease;
+}
+.component-fade-enter, .component-fade-leave-to {
+  opacity: 0;
+}
+.node-create-form .el-form-item__error {
+  margin-left: 30px !important;
+}
+.el-select-dropdown {
+  z-index: 9999 !important;
+}
+/**端点显示隐藏*/
+.show-endpoint:hover .jtk-endpoint {
+  opacity: 1 !important;
+}
+.jtk-endpoint {
+  opacity: 0;
+}
+.jtk-endpoint:hover {
+  opacity: 1 !important;
+}
+.jdk-drag-active {
+  opacity: 1 !important;
+}
+/** 表格中明细展示*/
+.detail-table-expand {
+  max-width: 1200px !important;
+  font-size: 0;
+}
+.detail-table-expand label {
+  min-width: 200px !important;
+  color: rgb(0, 0, 0, 0.6) !important;
+}
+.detail-table-expand .el-form-item {
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+  width: 50% !important;
+}
+
+/* ====== Element Plus Message 优化样式 ====== */
+
+/* Message 容器 - 确保显示在最上层 */
+.el-message-container {
+  z-index: 5000 !important;
+}
+
+.el-message {
+  min-width: 320px;
+  max-width: 480px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.12),
+    0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 确保登录页消息在卡片上方显示 */
+  z-index: 5000;
+}
+
+.el-message__content {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1e293b;
+}
+
+.el-message__icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.el-message__closeBtn {
+  font-size: 18px;
+  color: #94a3b8;
+  transition: color 0.2s ease;
+}
+
+.el-message__closeBtn:hover {
+  color: #64748b;
+}
+
+/* Success Message */
+.el-message--success {
+  background: rgba(241, 245, 249, 0.95);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.el-message--success .el-message__icon {
+  color: #22c55e;
+}
+
+.el-message--success .el-icon svg {
+  fill: #22c55e;
+}
+
+/* Error Message */
+.el-message--error {
+  background: rgba(254, 242, 242, 0.95);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.el-message--error .el-message__icon {
+  color: #ef4444;
+}
+
+.el-message--error .el-icon svg {
+  fill: #ef4444;
+}
+
+/* Warning Message */
+.el-message--warning {
+  background: rgba(255, 251, 235, 0.95);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.el-message--warning .el-message__icon {
+  color: #f59e0b;
+}
+
+.el-message--warning .el-icon svg {
+  fill: #f59e0b;
+}
+
+/* Info Message */
+.el-message--info {
+  background: rgba(241, 245, 249, 0.95);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.el-message--info .el-message__icon {
+  color: #3b82f6;
+}
+
+.el-message--info .el-icon svg {
+  fill: #3b82f6;
+}
+
+/* 动画优化 */
+.el-message.el-message-fade-enter-from,
+.el-message.el-message-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.el-message.el-message-fade-enter-to,
+.el-message.el-message-fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.el-message-fade-enter-active,
+.el-message-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 多行消息优化 */
+.el-message.is-closable .el-message__content {
+  padding-right: 20px;
+}
+
+.el-message .el-message__badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+}

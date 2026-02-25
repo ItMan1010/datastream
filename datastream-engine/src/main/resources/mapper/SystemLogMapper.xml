@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itman.datastream.engine.mapper.SystemLogMapper">
+    <sql id="systemLogColumnList">
+        system_log_id
+        ,type,username,ip_address,module_name,content,url_path,user_agent,request_info,response_info,create_date
+    </sql>
+
+    <insert id="insertSystemLog" parameterType="com.itman.datastream.common.entity.SystemLogEntity">
+        insert into data_stream_system_log (
+        <include refid="systemLogColumnList"/>
+        )
+        values (#{systemLog.systemLogId},
+        #{systemLog.type},
+        #{systemLog.username},
+        #{systemLog.ipAddress},
+        #{systemLog.moduleName},
+        #{systemLog.content},
+        #{systemLog.urlPath},
+        #{systemLog.userAgent},
+        #{systemLog.requestInfo},
+        #{systemLog.responseInfo},
+        ${sysdate})
+    </insert>
+
+    <select id="querySystemLog" resultType="com.itman.datastream.common.entity.SystemLogEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="systemLogColumnList"/>
+        from data_stream_system_log
+        <where>
+            type=#{type}
+        </where>
+        order by create_date desc
+        ${sqlLimit}
+    </select>
+
+    <select id="querySystemLogLikeOracle"
+            resultType="com.itman.datastream.common.entity.SystemLogEntity">
+        select *
+        from (
+        select
+        <include refid="systemLogColumnList"/>
+        ,row_number() over (order by create_date desc) as rn
+        from data_stream_system_log
+        <where>
+            type=#{type}
+        </where>
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <select id="querySystemLogCount" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        count(1)
+        from data_stream_system_log
+        <where>
+            type=#{type}
+        </where>
+    </select>
+
+    <insert id="insertSystemSession">
+        insert into data_stream_session (token_key, username, create_date, expire_date, state)
+        values (#{tokenKey},
+                #{username},
+                ${createDate},
+                ${expireDate},
+                #{state})
+    </insert>
+
+    <update id="updateSystemSessionState">
+        update data_stream_session
+        set state=#{state}
+        where token_key = #{tokenKey}
+    </update>
+
+    <select id="selectSystemSession" resultType="com.itman.datastream.common.entity.SessionEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select token_key, username, create_date, ${expireDateColumn}, state
+        from data_stream_session
+        where token_key = #{tokenKey}
+          and state = #{state}
+    </select>
+
+    <update id="updateSystemSessionExpireDate">
+        update data_stream_session
+        set expire_date=${expireDate}
+        where token_key = #{tokenKey}
+    </update>
+
+    <insert id="insertSystemJobLogback" parameterType="com.itman.datastream.common.entity.JobLogbackEntity">
+        insert into data_stream_job_logback (job_logback_id,
+                                         job_type,
+                                         job_id,
+                                         content,
+                                         create_date)
+        values (#{jobLogback.jobLogbackId},
+                #{jobLogback.jobType},
+                #{jobLogback.jobId},
+                #{jobLogback.content},
+                ${sysdate})
+    </insert>
+
+    <select id="querySystemJobLogback" resultType="com.itman.datastream.common.entity.JobLogbackEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select job_logback_id,job_type,job_id,content,create_date
+        from data_stream_job_logback
+        <where>
+            job_type=#{jobType} and job_id=#{jobId}
+        </where>
+        order by create_date desc,job_logback_id desc
+        ${sqlLimit}
+    </select>
+
+    <select id="querySystemJobLogbackLikeOracle"
+            resultType="com.itman.datastream.common.entity.JobLogbackEntity">
+        select *
+        from (
+        select job_logback_id,job_type,job_id,content,create_date,row_number() over (order by create_date
+        desc,job_logback_id desc) as rn
+        from data_stream_job_logback
+        <where>
+            job_type=#{jobType} and job_id=#{jobId}
+        </where>
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+</mapper>

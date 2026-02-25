@@ -1,0 +1,1249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itman.datastream.engine.mapper.DataStreamMapper">
+    <select id="getMoveTaskCount" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1) from data_stream_move_task
+        where 1=1
+        <if test="state!=null and state!=''">
+            and state=#{state}
+        </if>
+        <if test="beginDate!=null and endDate!=''">
+            and create_date between ${beginDate} and ${endDate}
+        </if>
+    </select>
+
+    <select id="getMoveTaskCountByBatchTaskId" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1)
+        from data_stream_move_task
+        where batch_task_id = #{batchTaskId}
+    </select>
+
+    <select id="getMoveTaskCountByCopyTaskId" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1)
+        from data_stream_move_task
+        where task_id = #{copyTaskId}
+        or copy_task_id = #{copyTaskId}
+    </select>
+
+    <select id="getMoveTaskCountByTaskType" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1)
+        from data_stream_move_task
+        where task_type = #{taskType}
+    </select>
+
+    <select id="getMoveTaskCountByTableName" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1)
+        from data_stream_move_task
+        where source_table_name = #{tableName}
+    </select>
+
+    <select id="statMoveTaskCount" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1) from data_stream_move_task
+        where 1=1
+        <if test="state!=null">
+            and state in (${state})
+        </if>
+    </select>
+
+    <select id="statLinkTaskCount" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1) from data_stream_link_task
+        where 1=1
+        <if test="state!=null">
+            and state in (${state})
+        </if>
+    </select>
+
+    <sql id="dataMoveTaskColumnList">
+        task_id
+        ,task_type,source_object_name,source_object_id,source_object_condition,source_object_count,source_data_node,source_data_set,
+        target_object_name,target_object_id,target_object_begin_count,target_object_end_count,
+        create_date,state,state_date,priority,system_user_code,error_code,error_msg,task_disc,target_insert_mode,
+        source_load_strategy,copy_task_id,send_mode,source_object_keys,source_keys_begin,source_keys_end,source_object_type,target_object_type
+    </sql>
+
+    <sql id="dataMoveInfoColumnList">
+        info_id
+        ,info_flag,task_id,table_name,data_node,create_date,state_date,virtual_id,
+        thread_name,data_count,data_actual_count,loop_count,max_cost,min_cost,sum_cost,lately_cost,page_row_start,page_row_end,page_loop_count,state,error_code,error_msg
+    </sql>
+
+    <select id="queryDataMoveTaskByState" resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        from data_stream_move_task
+        where state = #{state}
+        order by priority,create_date, source_object_name
+        ${sqlLimit}
+    </select>
+
+    <select id="queryDataMoveTaskByStateLikeOracle"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        select *
+        from (
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        ,row_number() over (order by priority,create_date, source_object_name) as rn
+        from data_stream_move_task
+        where state = #{state}
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <select id="queryDataMoveTaskByBatchTaskId"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        from data_stream_move_task
+        where batch_task_id = #{batchTaskId}
+        order by create_date desc
+        ${sqlLimit}
+    </select>
+
+    <select id="queryDataMoveTaskByBatchTaskIdLikeOracle"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        select *
+        from (
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        ,row_number() over (order by create_date desc) as rn
+        from data_stream_move_task
+        where batch_task_id = #{batchTaskId}
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <select id="queryDataMoveTaskByCopyTaskId"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        from data_stream_move_task
+        where task_id=#{copyTaskId} or copy_task_id=#{copyTaskId}
+        order by create_date desc
+        ${sqlLimit}
+    </select>
+
+    <select id="queryDataMoveTaskByCopyTaskIdLikeOracle"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        select *
+        from (
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        ,row_number() over (order by create_date desc) as rn
+        from data_stream_move_task
+        where task_id=#{copyTaskId} or copy_task_id=#{copyTaskId}
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <select id="queryDataMoveTaskByTaskType"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        from data_stream_move_task
+        where task_type=#{taskType} order by create_date desc
+        ${sqlLimit}
+    </select>
+
+    <select id="queryDataMoveTaskByTaskTypeLikeOracle"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        select *
+        from (
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        ,row_number() over (order by create_date desc) as rn
+        from data_stream_move_task
+        where task_type=#{taskType}
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <select id="queryDataMoveTaskByDate" resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        from data_stream_move_task
+        <where>
+            create_date between ${beginDate} and ${endDate}
+        </where>
+        order by create_date desc
+        ${sqlLimit}
+    </select>
+
+    <select id="queryDataMoveTaskByDateLikeOracle"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        select *
+        from (
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        ,row_number() over (order by create_date desc) as rn
+        from data_stream_move_task
+        <where>
+            create_date between ${beginDate} and ${endDate}
+        </where>
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <select id="queryTaskByTaskId" resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        from data_stream_move_task
+        where task_id = #{taskId}
+    </select>
+
+    <select id="queryDataMoveTaskByTableName"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        from data_stream_move_task
+        where source_object_name = #{tableName}
+        order by create_date desc
+        ${sqlLimit}
+    </select>
+
+    <select id="queryDataMoveTaskByTableNameLikeOracle"
+            resultType="com.itman.datastream.common.entity.DataMoveTaskEntity">
+        select *
+        from (
+        select
+        <include refid="dataMoveTaskColumnList"/>
+        ,row_number() over (order by create_date desc) as rn
+        from data_stream_move_task
+        where source_object_name = #{tableName}
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <update id="updateDataMoveTaskState">
+        update data_stream_move_task
+        set state=#{state},
+        <if test="sendMode != null">
+            send_mode=#{sendMode},
+        </if>
+        <if test="state == 0">
+            error_code=null,error_msg=null,
+        </if>
+        state_date=${sysdate}
+        where task_id = #{taskId}
+        and state = #{oldState}
+    </update>
+
+    <update id="updateDataMoveTaskLoadStrategy">
+        update data_stream_move_task
+        set source_load_strategy=#{loadStrategy}
+        where task_id = #{taskId}
+    </update>
+
+    <update id="updateDataMoveInfoState">
+        update data_stream_move_info
+        set state=#{state}
+        where task_id = #{taskId}
+        <if test='oldState != null'>
+            and state = #{oldState}
+        </if>
+    </update>
+
+    <update id="updateDataMoveTaskErrorInfo">
+        update data_stream_move_task
+        set state=#{state},
+            error_code=#{errorCode},
+            error_msg=#{errorMsg},
+            state_date=${sysdate}
+        where task_id = #{taskId}
+          and state = #{oldState}
+    </update>
+
+
+    <update id="updateTaskExecuteErrorInfo">
+        update data_stream_task_execute
+        set state=#{state},
+            error_code=#{errorCode},
+            error_msg=#{errorMsg},
+            state_date=${sysdate}
+        where task_execute_id = #{taskExecuteId}
+          and state = #{oldState}
+    </update>
+
+
+    <update id="updateDataMoveTaskTableCount">
+        update data_stream_move_task
+        set
+        <if test="tableCountFlag == 1">
+            source_object_count=#{tableCount}
+        </if>
+        <if test="tableCountFlag == 2">
+            target_object_begin_count=#{tableCount}
+        </if>
+        <if test="tableCountFlag == 3">
+            target_object_end_count=#{tableCount}
+        </if>
+        where task_id = #{taskId}
+    </update>
+
+    <update id="updateDataMoveTaskTableCountMinMaxValue">
+        update data_stream_move_task
+        set source_object_count=#{sourceObjectCount},
+            source_object_keys=#{sourceTableKeys},
+            source_keys_begin=#{sourceKeysBegin},
+            source_keys_end=#{sourceKeysEnd}
+        where task_id = #{taskId}
+    </update>
+
+    <update id="updateDataMoveInfoPageRowEnd">
+        update data_stream_move_info
+        set data_count=data_count + #{dataCount},
+        data_actual_count=data_actual_count + #{dataActualCount},
+        loop_count=loop_count + 1,
+        <if test="maxCost != 0">
+            max_cost=#{maxCost},
+        </if>
+        <if test="minCost != 0">
+            min_cost=#{minCost},
+        </if>
+        <if test="currentCost != 0">
+            lately_cost=#{currentCost},
+            sum_cost=sum_cost + #{currentCost},
+        </if>
+        page_row_end=#{pageRowEnd}
+        where info_id = #{infoId}
+    </update>
+
+    <update id="updateDataMoveInfoPageRowStart">
+        update data_stream_move_info
+        set page_row_start=#{pageRowStart}, page_loop_count=#{pageLoopCount}
+        where info_id = #{infoId}
+    </update>
+
+    <sql id="insertDataMoveInfoColumnValueList">
+        #{dataMoveInfo.infoId}
+        ,
+        #{dataMoveInfo.infoFlag},
+        #{dataMoveInfo.taskId},
+        #{dataMoveInfo.tableName},
+        #{dataMoveInfo.dataNode},
+        ${sysdate},
+        ${sysdate},
+        #{dataMoveInfo.virtualId},
+        #{dataMoveInfo.threadName},
+        #{dataMoveInfo.dataCount},
+        #{dataMoveInfo.dataActualCount},
+        #{dataMoveInfo.loopCount},
+        #{dataMoveInfo.maxCost},
+        #{dataMoveInfo.minCost},
+        #{dataMoveInfo.sumCost},
+        #{dataMoveInfo.latelyCost},
+        #{dataMoveInfo.pageRowStart},
+        #{dataMoveInfo.pageRowEnd},
+        #{dataMoveInfo.pageLoopCount},
+        #{dataMoveInfo.state},
+        #{dataMoveInfo.errorCode},
+        #{dataMoveInfo.errorMsg}
+    </sql>
+
+    <insert id="insertDataMoveInfo">
+        insert into data_stream_move_info
+        (
+        <include refid="dataMoveInfoColumnList"/>
+        )
+        values
+        <foreach collection="dataMoveInfoList" item="dataMoveInfo" index="index" separator=",">
+            (
+            <include refid="insertDataMoveInfoColumnValueList"/>
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertOneDataMoveInfo">
+        insert into data_stream_move_info
+        (
+        <include refid="dataMoveInfoColumnList"/>
+        )
+        values
+        (
+        <include refid="insertDataMoveInfoColumnValueList"/>
+        )
+    </insert>
+
+    <select id="querySequence" resultType="java.lang.Long" flushCache="true">
+        ${sqlSequence}
+    </select>
+
+    <insert id="insertDataMoveTask">
+        insert into data_stream_move_task (
+        task_id,
+        task_type,
+        source_object_type,
+        source_object_name,
+        target_object_type,
+        target_object_name,
+        source_data_node,
+        source_data_set,
+        create_date,
+        state_date,
+        state,
+        priority,
+        system_user_code,
+        source_object_condition,
+        task_disc,
+        target_insert_mode,
+        source_object_id,
+        target_object_id,
+        source_load_strategy,
+        copy_task_id,
+        send_mode
+        )
+        values
+        <foreach collection="dataMoveTaskList" item="dataMoveTask" index="index" separator=",">
+            (#{dataMoveTask.taskId},
+            #{dataMoveTask.taskType},
+            #{dataMoveTask.sourceObjectType},
+            #{dataMoveTask.sourceObjectName},
+            #{dataMoveTask.targetObjectType},
+            #{dataMoveTask.targetObjectName},
+            #{dataMoveTask.sourceDataNode},
+            #{dataMoveTask.sourceDataSet},
+            ${sysdate},
+            ${sysdate},
+            #{dataMoveTask.state},
+            #{dataMoveTask.priority},
+            #{dataMoveTask.systemUserCode},
+            #{dataMoveTask.sourceObjectCondition},
+            #{dataMoveTask.taskDisc},
+            #{dataMoveTask.targetInsertMode},
+            #{dataMoveTask.sourceObjectId},
+            #{dataMoveTask.targetObjectId},
+            #{dataMoveTask.sourceLoadStrategy},
+            #{dataMoveTask.copyTaskId},
+            #{dataMoveTask.sendMode}
+            )
+        </foreach>
+    </insert>
+
+
+    <insert id="insertTaskExtend">
+        insert into data_stream_task_extend (
+        task_extend_id,
+        task_id,
+        create_date,
+        parameter_name,
+        parameter_value
+        )
+        values
+        <foreach collection="dataTaskExtendList" item="iterator" index="index" separator=",">
+            (#{iterator.taskExtendId},
+            #{iterator.taskId},
+            ${sysdate},
+            #{iterator.parameterName},
+            #{iterator.parameterValue}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryDataMoveInfoProgress"
+            resultType="com.itman.datastream.common.entity.DataMoveProgressEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select info_flag, count(1) thread_count, sum(data_count) data_count, sum(data_actual_count) data_actual_count
+        from data_stream_move_info
+        where task_id = #{taskId}
+        group by info_flag
+    </select>
+
+    <select id="queryDataMoveInfo" resultType="com.itman.datastream.common.entity.DataMoveInfoEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveInfoColumnList"/>
+        from data_stream_move_info
+        where task_id = #{taskId}
+        <if test="infoFlag != null">
+            and info_flag = #{infoFlag}
+        </if>
+        order by info_flag,data_node,virtual_id
+    </select>
+
+    <select id="queryDataMoveInfoByInfoId" resultType="com.itman.datastream.common.entity.DataMoveInfoEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveInfoColumnList"/>
+        from data_stream_move_info
+        where info_id = #{infoId}
+    </select>
+
+    <select id="queryDataMoveInfoByTaskIdAndVirtualId"
+            resultType="com.itman.datastream.common.entity.DataMoveInfoEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataMoveInfoColumnList"/>
+        from data_stream_move_info
+        where task_id = #{taskId} and virtual_id = #{virtualId} and info_flag = #{infoFlag}
+        <if test="dataNode != null">
+            and data_node = #{dataNode}
+        </if>
+    </select>
+
+    <update id="updateDataMoveInfoErrorInfo">
+        update data_stream_move_info
+        set state=#{state},
+            error_code=#{errorCode},
+            error_msg=#{errorMsg},
+            state_date=${sysdate}
+        where info_id = #{infoId}
+          and state = #{oldState}
+    </update>
+
+    <update id="updateDataMoveInfoById">
+        update data_stream_move_info
+        set state=#{dataMoveInfo.state},
+            error_code=#{dataMoveInfo.errorCode},
+            error_msg=#{dataMoveInfo.errorMsg},
+            state_date=${sysdate},
+            data_count=#{dataMoveInfo.dataCount},
+            data_actual_count=#{dataMoveInfo.dataActualCount},
+            loop_count=#{dataMoveInfo.loopCount},
+            max_cost=#{dataMoveInfo.maxCost},
+            min_cost=#{dataMoveInfo.minCost},
+            lately_cost=#{dataMoveInfo.latelyCost},
+            sum_cost=#{dataMoveInfo.sumCost},
+            page_row_start=#{dataMoveInfo.pageRowStart},
+            page_row_end=#{dataMoveInfo.pageRowEnd}
+        where info_id = #{dataMoveInfo.infoId}
+          and state = #{dataMoveInfo.oldState}
+    </update>
+
+        <update id="updateDataMoveInfoRunningById">
+        update data_stream_move_info
+        set data_count=#{dataMoveInfo.dataCount},
+            data_actual_count=#{dataMoveInfo.dataActualCount},
+            loop_count=#{dataMoveInfo.loopCount},
+            max_cost=#{dataMoveInfo.maxCost},
+            min_cost=#{dataMoveInfo.minCost},
+            lately_cost=#{dataMoveInfo.latelyCost},
+            sum_cost=#{dataMoveInfo.sumCost},
+            page_row_start=#{dataMoveInfo.pageRowStart},
+            page_row_end=#{dataMoveInfo.pageRowEnd}
+        where info_id = #{dataMoveInfo.infoId}
+    </update>
+
+    <sql id="tableLinkTaskColumnList">
+        link_task_id
+        ,table_link_id,create_date,state_date,
+        system_user_code,business_id,error_code,error_msg,host_name,host_ip,state,source_data_base_id,target_data_base_id,task_disc
+    </sql>
+
+    <select id="queryTableLinkTaskByState" resultType="com.itman.datastream.common.entity.TableLinkTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="tableLinkTaskColumnList"/>
+        from data_stream_link_task
+        where state = #{state}
+        order by create_date
+        ${sqlLimit}
+    </select>
+
+    <select id="queryTableLinkTaskByStateCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_link_task
+        where state = #{state}
+    </select>
+
+    <select id="queryTableLinkTaskByStateLikeOracle"
+            resultType="com.itman.datastream.common.entity.TableLinkTaskEntity">
+        select *
+        from (
+        select
+        <include refid="tableLinkTaskColumnList"/>
+        ,row_number() over (order by create_date) as rn
+        from
+        data_stream_link_task
+        where
+        state = #{state}
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <select id="queryTableLinkTaskByTaskId" resultType="com.itman.datastream.common.entity.TableLinkTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="tableLinkTaskColumnList"/>
+        from data_stream_link_task
+        where link_task_id = #{linkTaskId}
+    </select>
+
+    <select id="queryTableLinkTaskByTableLinkId" resultType="com.itman.datastream.common.entity.TableLinkTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="tableLinkTaskColumnList"/>
+        from data_stream_link_task
+        where table_link_id = #{tableLinkId} and state in (0,1)
+    </select>
+
+    <select id="queryTableLinkTaskByDate" resultType="com.itman.datastream.common.entity.TableLinkTaskEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="tableLinkTaskColumnList"/>
+        from data_stream_link_task
+        <where>
+            create_date between ${beginDate} and ${endDate}
+        </where>
+        order by create_date desc
+        ${sqlLimit}
+    </select>
+
+        <select id="queryTableLinkTaskByDateCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_link_task
+        <where>
+            create_date between ${beginDate} and ${endDate}
+        </where>
+    </select>
+
+    <select id="queryDataBackTaskByDateLikeOracle"
+            resultType="com.itman.datastream.common.entity.TableLinkTaskEntity">
+        select *
+        from (
+        select
+        <include refid="tableLinkTaskColumnList"/>
+        ,row_number() over (order by create_date desc) as rn
+        from data_stream_link_task
+        <where>
+            create_date between ${beginDate} and ${endDate}
+        </where>
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <update id="updateTableLinkTask">
+        update data_stream_link_task
+        set state=#{state},
+        <if test="hostName != null">
+            host_name=#{hostName},
+        </if>
+        <if test="hostIp != null">
+            host_ip=#{hostIp},
+        </if>
+        state_date=${sysdate}
+        where link_task_id = #{linkTaskId}
+        and state = #{oldState}
+    </update>
+
+    <update id="updateTableLinkErrorTask">
+        update data_stream_link_task
+        set state=#{state},
+        <if test="errorCode != null">
+            error_code=#{errorCode},
+        </if>
+        <if test="errorMsg != null">
+            error_msg=#{errorMsg},
+        </if>
+        state_date=${sysdate}
+        where link_task_id = #{linkTaskId}
+        and state = #{oldState}
+    </update>
+
+    <insert id="insertLinkTaskTable">
+        insert into data_stream_link_task_table (link_task_table_id,
+                                                 link_task_id,
+                                                 select_table_name,
+                                                 insert_table_name,
+                                                 select_count,
+                                                 insert_count,
+                                                 create_date)
+        values (#{linkTable.linkTaskTableId},
+                #{linkTable.linkTaskId},
+                #{linkTable.selectTableName},
+                #{linkTable.insertTableName},
+                #{linkTable.selectCount},
+                #{linkTable.insertCount},
+                ${sysdate})
+    </insert>
+
+    <insert id="insertTableLinkTask" parameterType="com.itman.datastream.common.entity.TableLinkTaskEntity">
+        insert into data_stream_link_task (link_task_id,
+                                           table_link_id,
+                                           state,
+                                           system_user_code,
+                                           business_id,
+                                           create_date,
+                                           state_date,
+                                           task_disc,
+                                           source_data_base_id,
+                                           target_data_base_id)
+        values (#{tableLinkTask.linkTaskId},
+                #{tableLinkTask.tableLinkId},
+                #{tableLinkTask.state},
+                #{tableLinkTask.systemUserCode},
+                #{tableLinkTask.businessId},
+                ${sysdate},
+                ${sysdate},
+                #{tableLinkTask.taskDisc},
+                #{tableLinkTask.sourceDataBaseId},
+                #{tableLinkTask.targetDataBaseId})
+    </insert>
+
+    <sql id="dataBaseColumnList">
+        data_base_id
+        ,data_base_type,data_base_name,url,user_name,pass_word,state,create_date,state_date,
+        table_key_not_supported
+    </sql>
+
+    <select id="getDataBaseById"
+            resultType="com.itman.datastream.common.entity.DataBaseEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataBaseColumnList"/>
+        from data_stream_data_base
+        where data_base_id = #{dataBaseId}
+    </select>
+
+    <select id="testDataBase" resultType="java.lang.Integer">
+        ${testSql}
+    </select>
+
+    <sql id="dataBaseCondition">
+        <if test="queryFlag == @com.itman.datastream.common.constant.DataStreamConstant@DATA_BASE_QUERY_FLAG_ALL">
+            where state!=3
+        </if>
+        <if test="queryFlag == @com.itman.datastream.common.constant.DataStreamConstant@DATA_BASE_QUERY_FLAG_TYPE">
+            where data_base_type=#{queryValue} and state!=3
+        </if>
+        <if test="queryFlag == @com.itman.datastream.common.constant.DataStreamConstant@DATA_BASE_QUERY_FLAG_ID">
+            where data_base_id=#{queryValue} and state!=3
+        </if>
+        <if test="state == 1 or state == 2">
+            and state=#{state}
+        </if>
+    </sql>
+
+    <select id="getDataBaseCount"
+            resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1)
+        from data_stream_data_base
+        <include refid="dataBaseCondition"/>
+    </select>
+
+    <select id="queryDataBase"
+            resultType="com.itman.datastream.common.entity.DataBaseEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="dataBaseColumnList"/>
+        from data_stream_data_base
+        <include refid="dataBaseCondition"/>
+        order by data_base_id desc
+        ${sqlLimit}
+    </select>
+
+    <select id="queryDataBaseLikeOracle"
+            resultType="com.itman.datastream.common.entity.DataBaseEntity">
+        select *
+        from (
+        select
+        <include refid="dataBaseColumnList"/>
+        ,row_number() over (order by data_base_id) as rn
+        from data_stream_data_base
+        <include refid="dataBaseCondition"/>
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <insert id="insertDataBase" parameterType="com.itman.datastream.common.entity.DataBaseEntity">
+        insert into data_stream_data_base (
+        <include refid="dataBaseColumnList"/>
+        )
+        values (#{dataBase.dataBaseId},
+        #{dataBase.dataBaseType},
+        #{dataBase.dataBaseName},
+        #{dataBase.url},
+        #{dataBase.userName},
+        #{dataBase.passWord},
+        #{dataBase.state},
+        ${sysdate},
+        ${sysdate},
+        #{dataBase.tableKeyNotSupported})
+    </insert>
+
+    <update id="updateDataBase" parameterType="com.itman.datastream.common.entity.DataBaseEntity">
+        update data_stream_data_base
+        set data_base_type=#{dataBase.dataBaseType},
+            data_base_name=#{dataBase.dataBaseName},
+            url=#{dataBase.url},
+            user_name=#{dataBase.userName},
+            pass_word=#{dataBase.passWord},
+            state_date = ${sysdate},
+            table_key_not_supported=#{dataBase.tableKeyNotSupported}
+        where data_base_id = #{dataBase.dataBaseId}
+    </update>
+
+    <update id="updateDataBaseState">
+        update data_stream_data_base
+        set state=#{state},
+            state_date=${sysdate}
+        where data_base_id = #{dataBaseId}
+    </update>
+
+    <select id="statMoveTaskCountGroupByDay"
+            resultType="com.itman.datastream.common.entity.StatDayCountEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        date (create_date) as taskDate,
+        count(1) as taskCount
+        from
+        data_stream_move_task
+        where create_date >= (now() - ${intervalDay})
+        group by taskDate
+        order by taskDate
+    </select>
+
+    <select id="statMoveTaskCountGroupByDayLikeOracle"
+            resultType="com.itman.datastream.common.entity.StatDayCountEntity">
+        select trunc(create_date) as taskDate,
+               count(1)           as taskCount
+        from data_stream_move_task
+        where create_date >= ${intervalDay}
+        group by trunc(create_date)
+        order by trunc(create_date)
+    </select>
+
+
+    <select id="statLinkTaskCountGroupByDay"
+            resultType="com.itman.datastream.common.entity.StatDayCountEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        date (create_date) as taskDate,
+        count(1) as taskCount
+        from
+        data_stream_link_task
+        where create_date >= (now() - ${intervalDay})
+        group by taskDate
+        order by taskDate
+    </select>
+
+    <select id="statLinkTaskCountGroupByDayLikeOracle"
+            resultType="com.itman.datastream.common.entity.StatDayCountEntity">
+        select trunc(create_date) as taskDate,
+               count(1)           as taskCount
+        from data_stream_link_task
+        where create_date >= ${intervalDay}
+        group by trunc(create_date)
+        order by trunc(create_date)
+    </select>
+
+
+    <select id="getBatchTaskCountByDate" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        count(1)
+        from data_stream_batch_task
+        <where>
+            create_date between ${beginDate} and ${endDate}
+        </where>
+    </select>
+
+
+    <select id="queryTableMap" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select table_type
+        from data_stream_table_map
+        where table_name = #{tableName}
+    </select>
+
+    <select id="queryTableMapALL" resultType="com.itman.datastream.common.entity.TableMapEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select table_name, table_type
+        from data_stream_table_map
+    </select>
+
+    <update id="executeMetaDbSql">
+        ${metaDbSql}
+    </update>
+
+    <insert id="insertMoveTrace" parameterType="com.itman.datastream.common.entity.DataMoveTraceEntity">
+        insert into data_stream_move_trace
+        (trace_id, info_id, task_id, create_date, page_row_start, page_row_end, data_count, data_actual_count)
+        values (#{dataMoveTrace.traceId},
+                #{dataMoveTrace.infoId},
+                #{dataMoveTrace.taskId},
+                ${sysdate},
+                #{dataMoveTrace.pageRowStart},
+                #{dataMoveTrace.pageRowEnd},
+                #{dataMoveTrace.dataCount},
+                #{dataMoveTrace.dataActualCount})
+    </insert>
+
+    <insert id="insertMetrics">
+        insert into data_stream_metrics
+        (metrics_id,task_id,metrics_time,metrics_value)
+        values
+        <foreach collection="metricsList" item="iterator" index="index" separator=",">
+            (
+            #{iterator.metricsId},
+            #{iterator.taskId},
+            #{iterator.metricsTime},
+            #{iterator.metricsValue}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryMetrics"
+            resultType="com.itman.datastream.common.entity.MetricsEntity">
+        select metrics_id, task_id, metrics_time, metrics_value
+        from data_stream_metrics
+        where task_id = #{taskId}
+        order by metrics_time
+    </select>
+
+    <insert id="insertTaskExecute" parameterType="com.itman.datastream.common.entity.TaskExecuteEntity">
+        insert into data_stream_task_execute (task_execute_id, task_id, create_date, state, state_date, host_name,
+                                              host_ip)
+        values (#{taskExecute.taskExecuteId},
+                #{taskExecute.taskId},
+                ${sysdate},
+                #{taskExecute.state},
+                ${sysdate},
+                #{taskExecute.hostName},
+                #{taskExecute.hostIp})
+    </insert>
+
+    <select id="queryTaskExecute"
+            resultType="com.itman.datastream.common.entity.TaskExecuteEntity">
+        select task_execute_id, task_id, create_date, state, state_date, host_name, host_ip
+        from data_stream_task_execute
+        where task_id = #{taskId}
+        order by task_execute_id desc
+    </select>
+
+    <update id="updateTaskExecuteState">
+        update data_stream_task_execute
+        set state=#{state},
+            state_date=${sysdate}
+        where task_execute_id = #{taskExecuteId}
+          and state = #{oldState}
+    </update>
+
+    <select id="queryDataNodesByTableName" resultType="java.lang.String">
+        /* !HINT({'getDataNodes':'${tableName}'})*/
+    </select>
+
+    <select id="executeSelectMapListSql" resultType="java.util.Map">
+        ${selectSql}
+    </select>
+
+    <insert id="insertDataList">
+        ${insertSql}
+    </insert>
+
+    <insert id="insertDataListBindVar">
+        ${insertSqlColumns}
+        <foreach collection="dataListTarget" item="item" separator=",">
+            (
+            <foreach collection="item" item="item2" separator=",">
+                #{item2}
+            </foreach>
+            )
+        </foreach>
+    </insert>
+
+    <select id="executeSelectRecordCountSql" resultType="java.lang.Long">
+        ${selectSql}
+    </select>
+
+    <select id="executeSelectStringValueSql" resultType="java.lang.String">
+        ${selectSql}
+    </select>
+
+    <update id="updateDataList">
+        ${updateSql}
+    </update>
+
+    <delete id="executeDeleteRecordSql">
+        ${deleteSql}
+    </delete>
+
+    <resultMap id="minMaxMap" type="java.util.HashMap">
+        <result property="max_value" column="max_value" javaType="String"/>
+        <result property="min_value" column="min_value" javaType="String"/>
+    </resultMap>
+    <select id="executeSelectMapMaxMinSql" resultMap="minMaxMap">
+        ${selectSql}
+    </select>
+
+
+    <select id="queryTaskExtend"
+            resultType="com.itman.datastream.common.entity.TaskExtendEntity">
+        select task_extend_id, task_id, create_date, parameter_name, parameter_value
+        from data_stream_task_extend
+        where task_id = #{taskId}
+    </select>
+
+    <insert id="insertMoveTableRecord">
+        insert into data_stream_move_table (move_table_id, task_id, source_table_name, create_date, state, state_date,
+                                            error_code, error_msg)
+        values (#{moveTable.moveTableId},
+                #{moveTable.taskId},
+                #{moveTable.sourceTableName},
+                ${sysdate},
+                #{moveTable.state},
+                ${sysdate},
+                #{moveTable.errorCode},
+                #{moveTable.errorMsg})
+    </insert>
+
+    <select id="queryMoveTable"
+            resultType="com.itman.datastream.common.entity.MoveTableEntity">
+        select move_table_id,
+               task_id,
+               source_table_name,
+               create_date,
+               state,
+               state_date,
+               error_code,
+               error_msg,
+               table_sql
+        from data_stream_move_table
+        where task_id = #{taskId}
+        order by move_table_id desc
+    </select>
+
+    <update id="updateMoveTableErrorInfo">
+        update data_stream_move_table
+        set state=#{state},
+            error_code=#{errorCode},
+            error_msg=#{errorMsg},
+            state_date=${sysdate}
+        where move_table_id = #{moveTableId}
+          and state = #{oldState}
+    </update>
+
+        <update id="updateMoveTableSQL">
+        update data_stream_move_table
+        set table_sql=#{tableSql}
+        where move_table_id = #{moveTableId}
+    </update>
+
+
+    <sql id="dataCheckColumnList">
+        data_check_id
+        ,task_id,create_date,state,state_date,check_result,check_keys,error_code,error_msg
+    </sql>
+
+    <insert id="insertDataCheck">
+        insert into data_stream_data_check (
+        <include refid="dataCheckColumnList"/>
+        )
+        values
+        <foreach collection="dataCheckList" item="iterator" index="index" separator=",">
+            (
+            #{iterator.dataCheckId},
+            #{iterator.taskId},
+            ${sysdate},
+            #{iterator.state},
+            ${sysdate},
+            #{iterator.checkResult},
+            #{iterator.checkKeys},
+            #{iterator.errorCode},
+            #{iterator.errorMsg}
+            )
+        </foreach>
+    </insert>
+
+    <select id="queryDataCheck"
+            resultType="com.itman.datastream.common.entity.DataCheckEntity">
+        select
+        <include refid="dataCheckColumnList"/>
+        from data_stream_data_check
+        where task_id = #{taskId}
+        order by data_check_id desc
+    </select>
+
+    <select id="queryDataCheckById"
+            resultType="com.itman.datastream.common.entity.DataCheckEntity">
+        select
+        <include refid="dataCheckColumnList"/>
+        from data_stream_data_check
+        where data_check_id = #{dataCheckId}
+    </select>
+
+    <update id="updateDataCheck">
+        update data_stream_data_check
+        set state=#{state},
+            error_code=#{errorCode},
+            error_msg=#{errorMsg},
+            state_date=${sysdate}
+        where data_check_id = #{dataCheckId}
+          and state = #{oldState}
+    </update>
+
+    <select id="queryColumnTypeDefine"
+            resultType="com.itman.datastream.common.entity.ColumnTypeDefineEntity">
+        select column_type_define_id,
+               database_type,
+               column_type_classify,
+               column_type_name,
+               column_standard_size,
+               remark,
+               type_category,
+               max_precision,
+               max_scale,
+               character_max_length,
+               min_value,
+               max_value,
+               is_national_flag,
+               require_length_param
+        from data_stream_column_type_define
+        where database_type = #{databaseType}
+        order by column_type_define_id
+    </select>
+
+    <select id="queryColumnTypeMap"
+            resultType="com.itman.datastream.common.entity.ColumnTypeMapEntity">
+        select a.column_type_map_id,
+               a.column_type_define_id_a,
+               b.database_type    database_type_a,
+               b.column_type_name column_type_name_a,
+               a.column_type_define_id_b,
+               c.database_type    database_type_b,
+               c.column_type_name column_type_name_b,
+               a.match_level,
+               a.precision_conversion_rule,
+               a.length_conversion_rule,
+               a.conversion_warning,
+               a.is_reversible
+        from data_stream_column_type_map a,
+             data_stream_column_type_define b,
+             data_stream_column_type_define c
+        where a.column_type_define_id_a = b.column_type_define_id
+          and a.column_type_define_id_b = c.column_type_define_id
+          and b.database_type = #{databaseTypeA}
+          and c.database_type = #{databaseTypeB}
+        order by a.match_level, a.column_type_map_id
+    </select>
+
+    <insert id="insertColumnTypeTest">
+        insert into data_stream_column_type_test (
+        column_type_test_id,database_type,table_name,column_name,column_type_name,column_standard_size,remark
+        )
+        values
+        <foreach collection="columnTypeTestList" item="iterator" index="index" separator=",">
+            (
+            #{iterator.columnTypeTestId},
+            #{iterator.databaseType},
+            #{iterator.tableName},
+            #{iterator.columnName},
+            #{iterator.columnTypeName},
+            #{iterator.columnStandardSize},
+            #{iterator.remark}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findOffsets" resultType="com.itman.datastream.common.entity.DebeziumOffsetEntity">
+        select offset_key, offset_value
+        from data_stream_debezium_offsets
+        where offset_key = #{offsetKey}
+    </select>
+
+    <insert id="insertOffsets">
+        insert into data_stream_debezium_offsets
+            (offset_key, offset_value, offset_count, create_time, update_time)
+        values (#{offsetkey}, #{offsetValue}, 1, ${sysdate}, ${sysdate})
+    </insert>
+
+    <update id="updateOffsets">
+        update data_stream_debezium_offsets
+        set offset_value=#{offsetValue},
+            offset_count=offset_count + 1,
+            update_time=${sysdate}
+        where offset_key = #{offsetkey}
+    </update>
+
+    <insert id="insertDebeziumHistory">
+        insert into data_stream_debezium_history
+            (debezium_history_id, server, history_data, create_time)
+        values (#{debeziumHistoryId}, #{server}, #{historyData}, ${sysdate})
+    </insert>
+
+    <select id="selectDebeziumHistory" resultType="com.itman.datastream.common.entity.DebeziumHistoryEntity">
+        select
+            debezium_history_id as debeziumHistoryId,
+            server,
+            history_data as historyData
+        from data_stream_debezium_history
+        <where>
+            server = #{server}
+        </where>
+        order by create_time
+    </select>
+</mapper>

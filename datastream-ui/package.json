@@ -1,0 +1,70 @@
+{
+  "name": "datastream-ui",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "DataStream UI - Vue 3 + Vite",
+  "author": "DataStream Team",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "build-simple": "node build-simple.js",
+    "build-basic": "node build-basic.js",
+    "build-test": "node test-build.js",
+    "build-minimal": "node build-minimal.js",
+    "build-debug": "node debug-build.js",
+    "build-copy": "vite build && node src/utils/deployStatic.js",
+    "build-copy-simple": "node build-simple.js && node src/utils/deployStatic.js",
+    "preview": "vite preview",
+    "lint": "eslint --ext .js,.vue src",
+    "clean": "node src/utils/cleanup.js",
+    "check-deps": "node check-deps.js",
+    "install-deps": "node install-deps.js"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.6.0",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.10",
+    "echarts": "^5.5.1",
+    "element-plus": "^2.4.0",
+    "jquery": "^3.7.1",
+    "jsplumb": "^2.15.6",
+    "marked": "^9.1.6",
+    "mitt": "^3.0.1",
+    "pinia": "^2.1.7",
+    "qs": "^6.11.2",
+    "typescript": "^5.9.2",
+    "uuid": "^9.0.1",
+    "vue": "^3.3.8",
+    "vue-clipboard3": "^2.0.0",
+    "vue-router": "^4.2.5",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.0",
+    "@vue/test-utils": "^2.4.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.53.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-standard": "^5.0.0",
+    "eslint-plugin-vue": "^9.18.1",
+    "postcss": "^8.4.31",
+    "postcss-import": "^15.1.0",
+    "postcss-url": "^10.1.3",
+    "vite": "^6.3.5"
+  },
+  "engines": {
+    "node": ">= 16.0.0",
+    "npm": ">= 8.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 11"
+  ]
+}

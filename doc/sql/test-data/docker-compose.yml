@@ -1,0 +1,114 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# ====================================================================
+# DataStream 测试环境 Docker Compose 配置
+# 日期: 2026-01-08
+# 说明: 快速搭建测试数据库环境，支持 MySQL、PostgreSQL、Oracle
+# ====================================================================
+
+version: '3.8'
+
+services:
+  # MySQL 8.0 测试数据库
+  mysql-test:
+    image: mysql:8.0
+    container_name: datastream-mysql-test
+    environment:
+      MYSQL_ROOT_PASSWORD: test123
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql-test-data.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ptest123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL 14 测试数据库
+  postgres-test:
+    image: postgres:14
+    container_name: datastream-postgres-test
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgres-test-data.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Oracle 21c XE 测试数据库
+  oracle-test:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: datastream-oracle-test
+    environment:
+      ORACLE_PASSWORD: test123
+      ORACLE_DATABASE: XE
+    ports:
+      - "1521:1521"
+    volumes:
+      - ./oracle-test-data.sql:/docker-entrypoint-initdb.d/init.sql
+      - oracle_data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD-SHELL", "sqlplus -s system/test123@localhost/XE <<EOF\nSELECT 1 FROM DUAL;\nEOF\n"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  # pgAdmin (PostgreSQL 管理工具 - 可选)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: datastream-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@test.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres-test
+
+  # Adminer (通用数据库管理工具 - 可选)
+  adminer:
+    image: adminer:latest
+    container_name: datastream-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-test
+      - postgres-test
+
+volumes:
+  mysql_data:
+  postgres_data:
+  oracle_data:
+
+networks:
+  default:
+    name: datastream-test-net

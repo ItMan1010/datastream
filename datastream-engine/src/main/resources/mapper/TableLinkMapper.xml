@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itman.datastream.engine.mapper.TableLinkMapper">
+    <select id="queryTableLinkCount" resultType="java.lang.Integer">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        SELECT count(1) from data_stream_table_link
+        where 1=1
+        <include refid="tableLinkWhereCon"/>
+    </select>
+
+    <sql id="tableLinkColumns">
+        table_link_id
+        ,table_link_name,table_link_des,create_date,state,state_date
+    </sql>
+
+    <sql id="tableLinkWhereCon">
+        <if test="queryFlag == @com.itman.datastream.common.constant.DataStreamConstant@TABLE_LINK_QUERY_FLAG_ALL">
+            and state!=3
+        </if>
+        <if test="queryFlag==@com.itman.datastream.common.constant.DataStreamConstant@TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID">
+            and table_link_id=#{queryValue2} and state!=3
+        </if>
+        <if test="queryFlag==@com.itman.datastream.common.constant.DataStreamConstant@TABLE_LINK_QUERY_FLAG_LINK_NAME">
+            and table_link_name like #{queryValue} and state!=3
+        </if>
+        <if test="queryFlag==@com.itman.datastream.common.constant.DataStreamConstant@TABLE_LINK_QUERY_FLAG_TABLE_NAME">
+            and table_link_id in (select table_link_id from data_stream_link_node where table_name like
+            #{queryValue}) and state!=3
+        </if>
+        <if test="queryFlag==@com.itman.datastream.common.constant.DataStreamConstant@TABLE_LINK_QUERY_FLAG_STATE">
+            and state=#{queryValue2}
+        </if>
+    </sql>
+
+    <select id="queryTableLink" resultType="com.itman.datastream.common.entity.TableLinkEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="tableLinkColumns"/>
+        from data_stream_table_link
+        where 1=1
+        <include refid="tableLinkWhereCon"/>
+        order by create_date desc
+        ${sqlLimit}
+    </select>
+
+    <select id="queryTableLinkLikeOracle" resultType="com.itman.datastream.common.entity.TableLinkEntity">
+        select *
+        from (
+        select
+        <include refid="tableLinkColumns"/>
+        ,row_number() over (order by create_date desc) as rn
+        from data_stream_table_link
+        where 1=1
+        <include refid="tableLinkWhereCon"/>
+        )
+        where rn between #{pageBeginRow} and #{pageEndRow}
+    </select>
+
+    <insert id="insertTableLink" parameterType="com.itman.datastream.common.entity.TableLinkEntity">
+        insert into data_stream_table_link (
+        <include refid="tableLinkColumns"/>
+        )
+        values (#{tableLink.tableLinkId},
+        #{tableLink.tableLinkName},
+        #{tableLink.tableLinkDes},
+        ${sysdate},
+        #{tableLink.state},
+        ${sysdate})
+    </insert>
+
+    <sql id="linkNodeColumnList">
+        link_node_id
+        ,table_link_id,table_name,field_name,parent_field_name,parent_link_node_id,pos_x,pos_y,create_date
+    </sql>
+
+    <insert id="insertLinkNode" parameterType="com.itman.datastream.common.entity.LinkNodeEntity">
+        insert into data_stream_link_node (
+        <include refid="linkNodeColumnList"/>
+        )
+        values (#{linkNode.linkNodeId},
+        #{linkNode.tableLinkId},
+        #{linkNode.tableName},
+        #{linkNode.fieldName},
+        #{linkNode.parentFieldName},
+        #{linkNode.parentLinkNodeId},
+        #{linkNode.posX},
+        #{linkNode.posY},
+        ${sysdate})
+    </insert>
+
+    <update id="updateTableLinkInfo">
+        update data_stream_table_link
+        set table_link_name=#{linkName},
+            table_link_des=#{linkDes},
+            state_date = ${sysdate}
+        where table_link_id = #{tableLinkId}
+    </update>
+
+    <delete id="deleteTableLinkNode">
+        delete
+        from data_stream_link_node
+        where table_link_id = #{tableLinkId}
+    </delete>
+
+    <update id="updateTableLinkState">
+        update data_stream_table_link
+        set state=#{state},
+            state_date = ${sysdate}
+        where table_link_id = #{tableLinkId}
+    </update>
+
+    <select id="queryTableLinkNode" resultType="com.itman.datastream.common.entity.LinkNodeEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select
+        <include refid="linkNodeColumnList"/>
+        from data_stream_link_node
+        where table_link_id=#{tableLinkId}
+    </select>
+</mapper>

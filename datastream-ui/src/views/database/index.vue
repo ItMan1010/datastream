@@ -1,0 +1,200 @@
+<!--Licensed to the Apache Software Foundation (ASF) under one or more-->
+<!--contributor license agreements.  See the NOTICE file distributed with-->
+<!--this work for additional information regarding copyright ownership.-->
+<!--The ASF licenses this file to You under the Apache License, Version 2.0-->
+<!--(the "License"); you may not use this file except in compliance with-->
+<!--the License.  You may obtain a copy of the License at-->
+
+<!--http://www.apache.org/licenses/LICENSE-2.0-->
+
+<!--Unless required by applicable law or agreed to in writing, software-->
+<!--distributed under the License is distributed on an "AS IS" BASIS,-->
+<!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.-->
+<!--See the License for the specific language governing permissions and-->
+<!--limitations under the License.-->
+<template>
+  <div class="main-content">
+    <!-- 搜索区域 -->
+    <div class="search-nav">
+      <el-form :label-position="'left'" :inline="true" :model="queryForm">
+        <el-row style="line-height: 30px;">
+          <el-col :span="18">
+            <el-form-item label="数据库类型:" label-width="100px">
+              <el-select v-model="queryForm.dataBaseType" style="width: 100px;" @change="queryDataBaseRows">
+                <el-option v-for="opt in databaseTypeOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button class="ml-20" type="primary" :loading="loading" @click="queryDataBaseRows">
+                <el-icon><Search /></el-icon>
+                查询
+              </el-button>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-button style="float: right; margin-right: 300px;" type="primary" plain @click="addDataBase">
+              <el-icon><Plus /></el-icon>
+              新增
+            </el-button>
+          </el-col>
+        </el-row>
+      </el-form>
+    </div>
+
+    <el-divider />
+
+    <!-- 数据表格 -->
+    <div class="mt-10 pl-20 pr-20">
+      <el-table :data="dataBaseListData" fit stripe highlight-current-row style="width: 100%;">
+        <el-table-column prop="dataBaseId" label="数据库ID" width="100" :show-overflow-tooltip="true" />
+        <el-table-column label="数据库类型" width="110">
+          <template #default="scope">
+            <span>{{ getDatabaseTypeName(scope.row.dataBaseType) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dataBaseName" label="数据库名称" width="160" />
+        <el-table-column prop="addr" label="地址" width="160" />
+        <el-table-column prop="userName" label="用户名" width="110" />
+        <el-table-column prop="showPassWord" label="密码" width="110" />
+        <el-table-column label="状态" width="80">
+          <template #default="scope">
+            <el-tag v-if="scope.row.state === 2" type="success" effect="dark">上线</el-tag>
+            <el-tag v-if="scope.row.state === 1" type="info" effect="dark">下线</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createDate" label="创建时间" width="140" />
+        <el-table-column prop="stateDate" label="状态时间" width="140" />
+        <el-table-column fixed="right" label="操作" width="380">
+          <template #default="scope">
+            <div class="datasource-opt">
+              <el-button type="primary" size="small" @click="showDataBaseDetail(scope.row)" plain>
+                <el-icon><Search /></el-icon>
+                详情
+              </el-button>
+              <el-button v-if="scope.row.state === 1" type="success" size="small" @click="execEff(scope.row)" plain>
+                <el-icon><Switch /></el-icon>
+                上线
+              </el-button>
+              <el-button v-if="scope.row.state === 2" type="info" size="small" @click="execExp(scope.row)" plain>
+                <el-icon><Switch /></el-icon>
+                下线
+              </el-button>
+              <el-button type="warning" size="small" @click="modifyDataBase(scope.row)" plain>
+                <el-icon><Edit /></el-icon>
+                修改
+              </el-button>
+              <el-button type="danger" size="small" @click="deleteDataBase(scope.row)" plain>
+                <el-icon><Delete /></el-icon>
+                删除
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页 -->
+      <div class="pt-20" style="text-align: center">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          v-model:current-page="pagination.pageNum.value"
+          :page-sizes="[10, 20, 50]"
+          :page-size="pagination.pageSize.value"
+          :pager-count="7"
+          :total="pagination.total.value"
+          layout="total, sizes, prev, pager, next, jumper" />
+      </div>
+    </div>
+
+    <!-- 数据库详情弹窗 -->
+    <DataBaseDetail
+      v-if="dataBaseDetailVisible"
+      :dataBaseDetailVisible="dataBaseDetailVisible"
+      :mode="mode"
+      :dataBaseInfo="dataBaseInfo" />
+  </div>
+</template>
+
+<script>
+import { onMounted, onBeforeUnmount } from 'vue'
+import { Search, Plus, Switch, Edit, Delete } from '@element-plus/icons-vue'
+import DataBaseDetail from '@/views/components/DataBaseDetail.vue'
+import { useDatabaseManage } from '@/composables/useDatabaseManage'
+import { useEventBus } from '@/composables/useEventBus'
+import { DATABASE_TYPE_OPTIONS, getDatabaseTypeName } from '@/constants/databaseConstants'
+
+export default {
+  name: 'DataBaseConfig',
+  components: {
+    DataBaseDetail,
+    Search,
+    Plus,
+    Switch,
+    Edit,
+    Delete
+  },
+  setup() {
+    const databaseManage = useDatabaseManage()
+    const { on } = useEventBus()
+
+    const databaseTypeOptions = DATABASE_TYPE_OPTIONS
+
+    onMounted(() => {
+      // 强制重置状态
+      databaseManage.dataBaseDetailVisible.value = false
+      databaseManage.mode.value = 'add'
+
+      // 监听事件
+      on('changeDataBaseDetailVisible', (data) => {
+        databaseManage.dataBaseDetailVisible.value = data
+      })
+      on('refreshDataSourceList', () => {
+        databaseManage.refreshList()
+      })
+
+      // 查询数据
+      databaseManage.queryDataBaseRows()
+    })
+
+    return {
+      ...databaseManage,
+      databaseTypeOptions,
+      getDatabaseTypeName
+    }
+  }
+}
+</script>
+
+<style scoped>
+.search-nav {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.ml-20 {
+  margin-left: 20px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.pl-20 {
+  padding-left: 20px;
+}
+
+.pr-20 {
+  padding-right: 20px;
+}
+
+.pt-20 {
+  padding-top: 20px;
+}
+
+.datasource-opt {
+  display: flex;
+  justify-content: space-around;
+}
+</style>
+

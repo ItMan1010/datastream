@@ -1,0 +1,238 @@
+<!--Licensed to the Apache Software Foundation (ASF) under one or more-->
+<!--contributor license agreements.  See the NOTICE file distributed with-->
+<!--this work for additional information regarding copyright ownership.-->
+<!--The ASF licenses this file to You under the Apache License, Version 2.0-->
+<!--(the "License"); you may not use this file except in compliance with-->
+<!--the License.  You may obtain a copy of the License at-->
+
+<!--http://www.apache.org/licenses/LICENSE-2.0-->
+
+<!--Unless required by applicable law or agreed to in writing, software-->
+<!--distributed under the License is distributed on an "AS IS" BASIS,-->
+<!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.-->
+<!--See the License for the specific language governing permissions and-->
+<!--limitations under the License.-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate DataStream ICO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .step {
+            background: #f0f9ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .download-area {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 10px;
+        }
+        .preview {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .cmd-box {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 DataStream ICO 生成器</h1>
+
+    <div class="preview">
+        <h3>图标预览</h3>
+        <canvas id="preview32" width="32" height="32" style="width: 64px; height: 64px;"></canvas>
+        <canvas id="preview16" width="16" height="16" style="width: 32px; height: 32px;"></canvas>
+        <p>左：32x32像素，右：16x16像素</p>
+    </div>
+
+    <div class="download-area">
+        <h3>📁 下载图标文件</h3>
+        <button class="btn" onclick="downloadSVG()">下载 SVG</button>
+        <button class="btn" onclick="downloadPNG32()">下载 PNG (32x32)</button>
+        <button class="btn" onclick="downloadPNG16()">下载 PNG (16x16)</button>
+    </div>
+
+    <div class="step">
+        <h3>🔧 快速替换方法（推荐）</h3>
+        <p><strong>方法1：使用在线转换器</strong></p>
+        <ol>
+            <li>点击上方"下载 PNG (32x32)"按钮</li>
+            <li>访问 <a href="https://www.icoconverter.com/" target="_blank">ICO Converter</a></li>
+            <li>上传PNG文件，选择32x32尺寸</li>
+            <li>下载生成的favicon.ico</li>
+            <li>替换项目文件</li>
+        </ol>
+    </div>
+
+    <div class="step">
+        <h3>📂 文件替换</h3>
+        <p>将下载的favicon.ico文件复制到以下位置：</p>
+        <div class="cmd-box">
+            datastream-ui-v3/static/favicon.ico
+        </div>
+        <p><strong>Windows命令：</strong></p>
+        <div class="cmd-box">
+            copy favicon.ico datastream-ui-v3\\static\\favicon.ico
+        </div>
+    </div>
+
+    <div class="step">
+        <h3>✅ 验证替换</h3>
+        <ol>
+            <li>重新启动开发服务器</li>
+            <li>刷新浏览器页面</li>
+            <li>查看浏览器标签页图标是否已更新</li>
+        </ol>
+    </div>
+
+    <script>
+        function drawDataStreamIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const scale = size / 32;
+
+            // 清除画布
+            ctx.clearRect(0, 0, size, size);
+
+            // 背景
+            ctx.fillStyle = '#667eea';
+            ctx.fillRect(0, 0, size, size);
+
+            // 圆角效果（简化）
+            ctx.fillStyle = '#667eea';
+            ctx.fillRect(0, 0, size, size);
+
+            // 左侧数据库
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(size * 0.25, size * 0.4, size * 0.125, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // 右侧数据库
+            ctx.beginPath();
+            ctx.arc(size * 0.75, size * 0.4, size * 0.125, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // 箭头
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = Math.max(1, size * 0.06);
+            ctx.lineCap = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(size * 0.4, size * 0.5);
+            ctx.lineTo(size * 0.6, size * 0.5);
+            ctx.stroke();
+
+            // 箭头头部
+            ctx.beginPath();
+            ctx.moveTo(size * 0.55, size * 0.45);
+            ctx.lineTo(size * 0.6, size * 0.5);
+            ctx.lineTo(size * 0.55, size * 0.55);
+            ctx.stroke();
+
+            if (size >= 24) {
+                // 数据流点
+                ctx.fillStyle = '#ffffff';
+                ctx.globalAlpha = 0.8;
+                ctx.beginPath();
+                ctx.arc(size * 0.45, size * 0.5, size * 0.03, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.globalAlpha = 0.6;
+                ctx.beginPath();
+                ctx.arc(size * 0.52, size * 0.5, size * 0.025, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.globalAlpha = 1;
+            }
+
+            if (size >= 32) {
+                // DS文字
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `bold ${size * 0.18}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('DS', size * 0.5, size * 0.8);
+            }
+        }
+
+        function downloadSVG() {
+            const svgContent = `<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="5" fill="#667eea"/>
+  <circle cx="8" cy="13" r="4" fill="#ffffff"/>
+  <circle cx="24" cy="13" r="4" fill="#ffffff"/>
+  <path d="M13 16 L19 16 M16 13 L19 16 L16 19" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="14.5" cy="16" r="0.8" fill="#ffffff" opacity="0.8"/>
+  <circle cx="16" cy="16" r="0.6" fill="#ffffff" opacity="0.6"/>
+  <circle cx="17.5" cy="16" r="0.4" fill="#ffffff" opacity="0.4"/>
+  <text x="16" y="27" font-family="Arial, sans-serif" font-size="6" fill="#ffffff" text-anchor="middle" font-weight="bold">DS</text>
+</svg>`;
+
+            const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'datastream-favicon.svg';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadPNG32() {
+            const canvas = document.getElementById('preview32');
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL();
+            link.download = 'datastream-favicon-32x32.png';
+            link.click();
+        }
+
+        function downloadPNG16() {
+            const canvas = document.getElementById('preview16');
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL();
+            link.download = 'datastream-favicon-16x16.png';
+            link.click();
+        }
+
+        // 初始化
+        window.onload = function() {
+            drawDataStreamIcon(document.getElementById('preview32'), 32);
+            drawDataStreamIcon(document.getElementById('preview16'), 16);
+        }
+    </script>
+</body>
+</html>

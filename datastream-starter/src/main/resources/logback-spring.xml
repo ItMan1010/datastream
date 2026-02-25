@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration debug="false" scan="true" scanPeriod="15 second">
+    <!--工程名若为外部读取，则需要将日志配置文件重新命名，如：logback-logstash.xml，因为logback-spring.xml是系统默认的一种命名，加载优先级高，会取不到该变量 -->
+    <springProperty scope="context" name="application.name"     source="spring.application.name"     defaultValue="data-stream"/>
+    <!-- 设置缓冲日志数，如果设置成0，日志发送是同步的，如果设置成大于0的值，会将日志放入队列，队列长度到达指定值，在统一发送, 可以加大服务吞吐量。 这个值只能配置2的N次幂（2,4,8,16...），默认8192，单位是B -->
+    <springProperty scope="context" name="logback.queue.size"   source="logback.queue.size"          defaultValue="8192" />
+    <!-- file info -->
+    <springProperty scope="context" name="file.size"            source="logback.file.size"           defaultValue="300MB" />
+    <springProperty scope="context" name="file.max.history"     source="logback.file.max.history"    defaultValue="30" />
+    <springProperty scope="context" name="file.total.size.cap"  source="logback.file.total.size.cap" defaultValue="2048MB" />
+
+    <property name="file.path"   value="logs/${application.name}/" />
+    <property name="file.name"   value="${application.name}" />
+    <property name="date_format" value="yyyy-MM-dd HH:mm:ss.SSS" />
+
+    <!-- This is the ConsoleAppender -->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="utf-8">
+            <pattern>[%-5level] %d{${date_format}} [%thread] [%X{traceId}] [%logger{36}#%M:%L] - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 输入到文件，按日期和文件大小 -->
+    <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder charset="utf-8">
+            <pattern>[%-5level] %d{${date_format}} [%thread] [%X{traceId}] [%logger{36}#%M:%L] - %m%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${file.path}%d/${file.name}.%i.log</fileNamePattern>
+            <maxHistory>${file.max.history}</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${file.size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <totalSizeCap>${file.total.size.cap}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="asyncFileAppender" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>${logback.queue.size}</queueSize>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="fileAppender" />
+    </appender>
+
+    <!-- 通过grpc上报日志到 skywalking oap-->
+<!--    <appender name="skywalkingGrpc" class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.log.GRPCLogClientAppender">-->
+<!--        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
+<!--            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.mdc.TraceIdMDCPatternLogbackLayout">-->
+<!--                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{tid}] [%thread] %-5level %logger{36} -%msg%n</Pattern>-->
+<!--            </layout>-->
+<!--        </encoder>-->
+<!--    </appender>-->
+
+    <!-- 屏蔽ctg-cache日志 -->
+    <logger level="warn" name="com.ctg.itrdc.cache"/>
+    <!-- 屏蔽Kafka日志收集信息-->
+    <logger level="error" name="org.apache.kafka.clients"/>
+    <!-- 屏蔽zookeeper心跳  -->
+    <logger level="error" name="org.apache.zookeeper.ClientCnxn"/>
+    <!-- 屏蔽dubbo心跳日志  -->
+    <logger level="error" name="org.apache.dubbo.remoting.exchange.support.header"/>
+    <!-- 屏蔽dubbo反序列化  -->
+    <logger level="error" name="org.apache.dubbo.remoting.transport.DecodeHandler"/>
+    <!-- 屏蔽hikari数据源连接池管理日志  -->
+    <logger level="error" name="com.zaxxer.hikari.pool"/>
+    <!-- 屏蔽druid日志 -->
+    <logger level="error" name="com.alibaba.druid"/>
+    <!-- 屏蔽spring数据源jdbc日志  -->
+    <logger level="error" name="org.springframework.jdbc"/>
+    <!-- 屏蔽mybatis事务管理-->
+    <logger level="error" name="org.mybatis.spring.transaction.SpringManagedTransaction"/>
+    <!-- 屏蔽mybatis会话管理工具-->
+    <logger level="error" name="org.mybatis.spring.SqlSessionUtils"/>
+    <!-- 屏蔽http相关-->
+    <logger level="error" name="sun.net.www.protocol.http"/>
+    <!-- 屏蔽shiro相关-->
+    <logger level="error" name="org.apache.shiro"/>
+    <!-- 屏蔽tomcat会话相关-->
+    <logger level="error" name="org.apache.catalina.session"/>
+    <!-- 屏蔽netty通信日志 -->
+    <logger level="error" name="io.netty.channel.nio.NioEventLoop"/>
+    <!-- 屏蔽tomcatEndpoint日志-->
+    <logger level="error" name="org.apache.tomcat.util.net.NioEndpoint"/>
+
+    <!--
+        Log level is divided from low to high: TRACE < DEBUG < INFO < WARN < ERROR < FATAL
+        If set to WARN, information below WARN will not be output.
+    -->
+    <root level="DEBUG">
+        <appender-ref ref="consoleAppender" />
+        <appender-ref ref="asyncFileAppender" />
+<!--        <appender-ref ref="skywalkingGrpc" />-->
+    </root>
+</configuration>

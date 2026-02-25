@@ -1,0 +1,561 @@
+<!--Licensed to the Apache Software Foundation (ASF) under one or more-->
+<!--contributor license agreements.  See the NOTICE file distributed with-->
+<!--this work for additional information regarding copyright ownership.-->
+<!--The ASF licenses this file to You under the Apache License, Version 2.0-->
+<!--(the "License"); you may not use this file except in compliance with-->
+<!--the License.  You may obtain a copy of the License at-->
+
+<!--http://www.apache.org/licenses/LICENSE-2.0-->
+
+<!--Unless required by applicable law or agreed to in writing, software-->
+<!--distributed under the License is distributed on an "AS IS" BASIS,-->
+<!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.-->
+<!--See the License for the specific language governing permissions and-->
+<!--limitations under the License.-->
+<template>
+  <div class="main-content" style="height: 100%; background-color: #E9EEF3;">
+    <div class="busi-config-class">
+      <div v-if="mode !== 'view'" class="node-left-regional">
+        <el-tabs v-model="activeName">
+          <el-tab-pane label="节点模版" name="nodeWarehouse">
+            <div style="height: 300px;">
+              <root-node style="position: absolute; top: 0;"/>
+              <child-basic-node style="position: absolute; top: 85px;"/>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+      <div id="busi-config-canvas" class="busi-config-canvas">
+        <div class="title">
+          <span>{{ titleDesc[mode] }}</span>
+        </div>
+        <div ref="myCanvas" id="my-canvas" class="my-canvas" :class="{'show-endpoint': showEndpoint}">
+          <root-node v-for="item in rootArr" :key="item.idx" :idx="item.idx" :type="item.type" :is-canvas="true"
+                     :nodeInfo="item.nodeInfo"/>
+          <child-basic-node v-for="item in childArr" :key="item.idx" :idx="item.idx" :seq="item.seq" :type="item.type" :is-canvas="true"
+                            :nodeInfo="item.nodeInfo"/>
+        </div>
+        <div class="flow-define-form">
+          <div>
+            <el-form ref="form" :model="form" inline style="margin-top: 18px;">
+              <el-form-item label="链接名称：">
+                <el-input :disabled="mode === 'view'" ref="flowNameRef" v-model="form.tableLinkName" clearable
+                          style="width: 200px;"></el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+        </div>
+        <div class="flow-define-opt">
+          <div>
+            <el-button :loading="loading" type="warning" style="width: 80px;" @click="goBack">返回</el-button>
+            <el-button v-if="mode !== 'view'" type="success" :loading="loading" style="width: 80px;" @click="testFlow">
+              校验
+            </el-button>
+            <el-button v-if="mode !== 'view'" type="primary" :loading="loading" style="width: 80px;" @click="confirm">
+              确认
+            </el-button>
+            <el-button v-if="mode !== 'view'" type="danger" :loading="loading" style="width: 80px;" @click="cancle">取消</el-button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <el-dialog
+      title="数据源选择"
+      v-model="dataSelectVisible"
+      width="800px"
+      :close-on-click-modal="false"
+      destroy-on-close
+      append-to-body
+      custom-class="data-source-select-dialog">
+      <data-source-select :unique-id="uniqueId" :data-source-types-filter="['database']"></data-source-select>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import ChildBasicNode from './TableLinkeChildNode.vue';
+import RootNode from './TableLinkRootNode.vue';
+import * as jsPlumbFun from '../../utils/flowUtil.js'
+import http from '@/utils/request.js'
+import constant from '@/comm/constants.js'
+import DataSourceSelect from './DataSourceSelect.vue';
+import {getCurrentInstance} from 'vue'
+
+export default {
+  name: 'TableLinkTemplate',
+  components: {RootNode, ChildBasicNode, DataSourceSelect},
+  setup() {
+    const instance = getCurrentInstance()
+    return {
+      $bus: instance?.appContext.config.globalProperties.$bus
+    }
+  },
+  props: {
+    // add modify view
+    mode: {
+      type: String,
+      default() {
+        return 'add'
+      }
+    },
+    flowDetail: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
+  },
+  data() {
+    return {
+      titleDesc: {
+        add: '新增',
+        modify: '修改',
+        view: '详情',
+      },
+      sequence: 1,
+      activeName: 'nodeWarehouse',
+      rootArr: [],
+      childArr: [],
+      copyNodeClassName: 'copy-node-class',
+      clickOffsetX: 0,
+      clickOffsetY: 0,
+      nodeType: '',
+      configCanvasOffsetX: 0,
+      configCanvasOffsetY: 0,
+      initCanvasOffsetX: 0,
+      initCanvasOffsetY: 0,
+      form: {
+        flowDefineId: '',
+        state: '',
+        tableLinkName: '',
+        tableLinkDes: '',
+      },
+      loading: false,
+      jsPlumbInst: null,
+      uniqueId: '_busiConfig',
+      dataSelectVisible: false,
+      canvas: null,
+      isDragging: false,
+      offsetX: 0,
+      offsetY: 0,
+      showEndpoint: false, // 是否展示端点
+    }
+  },
+  created() {
+    // 最早初始化，全部使用同一实例
+    this.jsPlumbInst = jsPlumbFun.getInstance(this, 'my-canvas')
+    if (this.mode !== 'view') {
+      this.addGlobalEventListeners();
+      this.$bus.$on('initPosition', (offset) => {
+        this.clickOffsetX = offset.x;
+        this.clickOffsetY = offset.y;
+        this.nodeType = offset.type
+      })
+      this.$bus.$on('removeNode', (idx) => {
+        let indexToRemove = this.rootArr.findIndex(item => item.idx === idx);
+        this.rootArr.splice(indexToRemove, 1);
+      })
+      this.$bus.$on('removeChildNode', (idx) => {
+        let indexToRemove = this.childArr.findIndex(item => item.idx === idx);
+        this.childArr.splice(indexToRemove, 1);
+      })
+    }
+    this.$bus.$on('showEndpoint', (flag) => {
+      this.showEndpoint = flag
+    })
+  },
+  mounted() {
+    this.addDragListeners();
+    this.initData();
+    this.$nextTick(() => {
+      let configCanvas = $('.my-canvas').eq(0);
+      let configCanvasOffset = configCanvas.offset();
+      this.configCanvasOffsetX = configCanvasOffset.left;
+      this.initCanvasOffsetX = configCanvasOffset.left;
+      this.configCanvasOffsetY = configCanvasOffset.top;
+      this.initCanvasOffsetY = configCanvasOffset.top;
+    })
+    this.$bus.$on('confirmSelectDataSource' + this.uniqueId, (dataSourceRow) => {
+      this.dataSelectVisible = false;
+      this.testFlowOpt(dataSourceRow.dataBaseId);
+    })
+  },
+  beforeUnmount() {
+    this.removeGlobalEventListeners();
+    this.$bus.$off('initPosition');
+    this.$bus.$off('removeNode');
+    this.$bus.$off('removeChildNode');
+    jsPlumbFun.resetNodeInfo();
+    this.$bus.$off('confirmSelectDataSource' + this.uniqueId)
+  },
+  methods: {
+    testFlowOpt(dataSourceId) {
+      // 流程校验
+      let req = {
+        dataBaseId: dataSourceId,
+        tableLinkName: this.form.tableLinkName,
+        tableLinkDes: this.form.tableLinkDes,
+        linkNode: jsPlumbFun.buildTableLinkNode(this.mode),
+      }
+      this.loading = true;
+      http(constant.TEST_TABLE_LINK, 'post', req).then(res => {
+        this.loading = false
+        if (res.errorCode !== '0') {
+          this.$message.error(`校验失败：${res.errorMsg}`)
+          return
+        }
+        this.$message.success({
+          message: `校验成功！`
+        })
+      }).catch(err => {
+        this.loading = false
+        this.$message.error(`校验失败：${err}`)
+      })
+    },
+    // 初始化流程数据
+    initData() {
+      if (this.flowDetail) {
+        this.form.state = this.flowDetail.state
+        this.form.tableLinkId = this.flowDetail.tableLinkId
+        this.form.tableLinkName = this.flowDetail.tableLinkName
+        this.form.tableLinkDes = this.flowDetail.tableLinkDes
+        let root = null;
+        let children = [];
+        if (this.flowDetail.linkNode) {
+          root = {
+            linkNodeId: this.flowDetail.linkNode.linkNodeId,
+            tableLinkId: this.flowDetail.linkNode.tableLinkId,
+            tableName: this.flowDetail.linkNode.tableName,
+            fieldName: this.flowDetail.linkNode.fieldName,
+            parentFieldName: this.flowDetail.linkNode.parentFieldName,
+            left: this.flowDetail.linkNode.posX,
+            top: this.flowDetail.linkNode.posY,
+          }
+          this.getChildrenNode(children, this.flowDetail.linkNode.linkNodeList, root.linkNodeId)
+        }
+        this.initNode(root, children)
+        jsPlumbFun.setInitNodeCount((this.rootArr.length || 0) + (this.childArr.length || 0))
+      }
+    },
+    initNode(root, children) {
+      this.rootArr = []
+      let idx = new Date().getTime();
+      this.children = []
+      if (root) {
+        this.rootArr.push({
+          type: this.mode,
+          idx: idx++,
+          nodeInfo: root
+        })
+      }
+      children.forEach(item => {
+        this.childArr.push({
+          type: this.mode,
+          idx: idx++,
+          seq: this.sequence++,
+          nodeInfo: item,
+        })
+      })
+    },
+    getChildrenNode(children, tableLinkNodeList, rootId) {
+      if (tableLinkNodeList) {
+        tableLinkNodeList.forEach(item => {
+          children.push({
+            linkNodeId: item.linkNodeId,
+            tableLinkId: item.tableLinkId,
+            tableName: item.tableName,
+            fieldName: item.fieldName,
+            parentLinkNodeId: item.parentLinkNodeId,
+            parentFieldName: item.parentFieldName,
+            left: item.posX,
+            top: item.posY,
+          })
+          if (item.linkNodeList) {
+            this.getChildrenNode(children, item.linkNodeList, item.linkNodeId)
+          }
+        })
+      }
+    },
+    addGlobalEventListeners() {
+      document.addEventListener('mouseup', this.handleMouseUp);
+      document.addEventListener('mousemove', this.handleMouseMove);
+      document.addEventListener('mousedown', this.handleMouseDown);
+    },
+    removeGlobalEventListeners() {
+      document.removeEventListener('mouseup', this.handleMouseUp);
+      document.removeEventListener('mousemove', this.handleMouseMove);
+      this.canvas.removeEventListener('mousedown', this.canvasMouseDown);
+      document.removeEventListener('mousemove', this.canvasMouseMove);
+      document.removeEventListener('mouseup', this.canvasMouseup);
+      document.removeEventListener('mousedown', this.handleMouseDown);
+    },
+    handleMouseUp(event) {
+      let dragNodeArr = $('.' + this.copyNodeClassName);
+      if (dragNodeArr && dragNodeArr.length > 0) {
+        this.addConfigItem(event.pageX, event.pageY)
+        this.clickOffsetX = 0;
+        this.clickOffsetY = 0;
+        this.nodeType = '';
+        dragNodeArr.eq(0).remove()
+      }
+      this.showEndpoint = false;
+    },
+    // 添加配置项
+    addConfigItem(x, y) {
+      // 判断释放鼠标时，拖拽的组件是否完全在画布中，是才添加组件
+      let left = x - this.clickOffsetX;
+      let top = y - this.clickOffsetY;
+      if (left > this.configCanvasOffsetX && top > this.configCanvasOffsetY) {
+        if (this.nodeType === 'root') {
+          if ($('#my-canvas').eq(0).find('[class*="root-node-class"]').length >= 1) {
+            this.$message.error(`每条规则最多只能配置一个根节点！`)
+            return
+          }
+          this.rootArr.push({
+            type: 'add',
+            idx: new Date().getTime(),
+            nodeInfo: {
+              top: top - this.configCanvasOffsetY,
+              left: left - this.configCanvasOffsetX,
+            }
+          })
+        } else {
+          this.childArr.push({
+            type: 'add',
+            idx: new Date().getTime(),
+            seq: this.sequence++,
+            nodeInfo: {
+              top: top - this.configCanvasOffsetY,
+              left: left - this.configCanvasOffsetX,
+            }
+          })
+        }
+      }
+    },
+    handleMouseMove(event) {
+      let dragNodeArr = $('.' + this.copyNodeClassName);
+      if (!dragNodeArr || dragNodeArr.length === 0) {
+        return
+      }
+      let dragNode = dragNodeArr.eq(0);
+      if (!dragNode) {
+        return
+      }
+      let top = event.pageY - this.clickOffsetY;
+      let left = event.pageX - this.clickOffsetX
+      dragNode.css('top', top + 'px');
+      dragNode.css('left', left + 'px');
+    },
+    addDragListeners() {
+      this.isDragging = false;
+      this.canvas = this.$refs.myCanvas;
+      this.canvas.addEventListener('mousedown', this.canvasMouseDown);
+      document.addEventListener('mousemove', this.canvasMouseMove);
+      document.addEventListener('mouseup', this.canvasMouseup);
+    },
+    canvasMouseDown(e) {
+      // 防止默认行为（例如文本选择)
+      // e.preventDefault();
+      this.canvas.style.cursor = 'move'
+      // 开始拖拽
+      this.isDragging = true;
+      this.offsetX = e.clientX - this.canvas.offsetLeft;
+      this.offsetY = e.clientY - this.canvas.offsetTop;
+    },
+    canvasMouseMove(e) {
+      if (this.isDragging) {
+        // 更新画布位置
+        this.canvas.style.left = `${e.clientX - this.offsetX}px`;
+        this.canvas.style.top = `${e.clientY - this.offsetY}px`;
+        this.configCanvasOffsetX = this.initCanvasOffsetX + e.clientX - this.offsetX;
+        this.configCanvasOffsetY = this.initCanvasOffsetY + e.clientY - this.offsetY;
+      }
+    },
+    handleMouseDown() {
+      this.showEndpoint = true;
+    },
+    canvasMouseup(e) {
+      this.canvas.style.cursor = ''
+      // 结束拖拽
+      this.isDragging = false;
+    },
+    goBack() {
+      this.$emit('go-back')
+    },
+    checkFlow() {
+      if (!this.form.tableLinkName) {
+        this.$message.error(`请输入名称！`)
+        this.$refs['flowNameRef'].focus();
+        return false;
+      }
+      if (this.form.tableLinkName.length > 30) {
+        this.$message.error(`名称最多30个字符！`)
+        this.$refs['flowNameRef'].focus();
+        return false;
+      }
+      if (!jsPlumbFun.checkFlowDefine(this)) {
+        return false;
+      }
+      if (!jsPlumbFun.checkFlowData(this)) {
+        return false;
+      }
+      return true;
+    },
+    confirm() {
+      if (!this.checkFlow()) {
+        return;
+      }
+      let desc = this.mode === 'add' ? '新增' : '修改'
+      let AddTableLinkRequest = {
+        tableLinkName: this.form.tableLinkName,
+        tableLinkDes: this.form.tableLinkDes,
+        linkNode: jsPlumbFun.buildTableLinkNode(this.mode),
+      }
+      let url = constant.ADD_TABLE_LINK
+      if (this.mode === 'modify') {
+        url = constant.MODIFY_TABLE_LINK
+        AddTableLinkRequest.tableLinkId = this.form.tableLinkId
+      }
+      this.loading = true
+      http(url, 'post', AddTableLinkRequest).then(res => {
+        this.loading = false
+        if (res.errorCode !== '0') {
+          this.$message.error(`${desc}配置失败：${res.errorMsg}`)
+          return
+        }
+        this.$message.success({
+          message: `${desc}配置成功！`,
+          duration: 1000,
+          onClose: (e) => {
+            this.$emit('go-back')
+          }
+        })
+      }).catch(err => {
+        this.loading = false
+        this.$message.error(`${desc}配置失败：${err}`)
+      })
+    },
+    testFlow() {
+      if (!this.checkFlow()) {
+        return;
+      }
+      this.dataSelectVisible = true;
+    },
+    cancle() {
+      this.goBack()
+    }
+  }
+}
+</script>
+
+<style>
+.main-content {
+  padding: 20px;
+  background-color: #f5f7fa;
+}
+
+.busi-config-class {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.busi-config-class .node-left-regional {
+  width: 106px;
+  padding: 20px;
+  border: 1px solid #e4e7ec;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.busi-config-class .busi-config-canvas {
+  flex: 1;
+  border: 1px solid #e4e7ec;
+  margin-left: 20px;
+  background-color: #fff;
+  position: relative;
+  overflow: visible;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.my-canvas {
+  width: 2000px;
+  height: 2000px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background-color: #f8f9fa;
+  background-image: url('../../assets/images/grid.png');
+  background-repeat: repeat;
+  border-left: 1px solid #e4e7ec;
+  border-bottom: 1px solid #e4e7ec;
+  overflow: hidden;
+}
+
+.flow-define-form {
+  position: absolute;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  width: auto;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+}
+
+.flow-define-form .title {
+  font-size: 16px !important;
+  font-weight: bold !important;
+  color: #333 !important;
+}
+
+.flow-define-form > div {
+  z-index: 2;
+  margin: auto;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.flow-define-opt {
+  position: absolute;
+  bottom: 20px;
+  display: flex;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.flow-define-opt > div {
+  margin: auto;
+  z-index: 2;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+
+.busi-config-canvas .title {
+  position: absolute;
+  font-weight: 600;
+  z-index: 2;
+  padding: 12px 20px;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  color: #333 !important;
+  text-shadow: 0.5px 0.5px 0.5px rgba(0, 0, 0, 0.5);
+  left: 20px;
+  top: 12px;
+}
+</style>

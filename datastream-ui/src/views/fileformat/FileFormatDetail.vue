@@ -1001,7 +1001,7 @@ body .file-config-dialog-custom .el-dialog__body {
 .special-block-title {
   font-size: 13px;
   font-weight: 600;
-  color: #409eff;
+  color: var(--primary-color);
 }
 
 .dialog-footer {
@@ -1043,7 +1043,7 @@ body .file-config-dialog-custom .el-dialog__body {
 }
 
 .help-icon-btn:hover {
-  color: #409eff;
+  color: var(--primary-color);
 }
 
 /* FTP配置说明Popover样式 */
@@ -1055,7 +1055,7 @@ body .file-config-dialog-custom .el-dialog__body {
 
 .ftp-help-icon {
   font-size: 20px;
-  color: #409eff;
+  color: var(--primary-color);
   flex-shrink: 0;
   margin-top: 2px;
 }

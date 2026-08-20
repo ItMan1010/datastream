@@ -33,12 +33,12 @@
             <span v-if="!isExpanded(scope.row.taskId)">
               {{ scope.row.sourceObjectName.substring(0, 20) }}
               <el-button type="text" size="small" @click="toggleExpand(scope.row.taskId)"
-                style="color: #409eff; padding: 0; margin-left: 5px;">...</el-button>
+                style="color: var(--primary-color); padding: 0; margin-left: 5px;">...</el-button>
             </span>
             <span v-else>
               {{ scope.row.sourceObjectName }}
               <el-button type="text" size="small" @click="toggleExpand(scope.row.taskId)"
-                style="color: #409eff; padding: 0; margin-left: 5px;">...</el-button>
+                style="color: var(--primary-color); padding: 0; margin-left: 5px;">...</el-button>
             </span>
           </div>
           <span v-else>{{ scope.row.sourceObjectName }}</span>

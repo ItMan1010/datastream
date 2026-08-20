@@ -45,7 +45,7 @@ export function getInstance (_this, id) {
   busiConfigCanvasId = id
   jsPlumbInst = _this.$jsPlumb.getInstance({
     Container: id, // 选择器id
-    EndpointStyle: { radius: 0.11, fill: '#409EFF' }, // 端点样式
+    EndpointStyle: { radius: 0.11, fill: '#2563EB' }, // 端点样式
     PaintStyle: { stroke: '#80d4f6', strokeWidth: 2 }, // 绘画样式，默认8px线宽  #456
     HoverPaintStyle: { stroke: '#1E90FF' }, // 默认悬停样式  默认为null
     Connector: ['Bezier'],
@@ -136,7 +136,7 @@ export const sourceConfig = {
     radius: 6,
     lineWidth: 1
   }, // 端点的颜色样式
-  hoverPaintStyle: { stroke: '#409EFF' }, // 鼠标悬停时的样式
+  hoverPaintStyle: { stroke: '#2563EB' }, // 鼠标悬停时的样式
   // connector: ["Bezier", { curviness: 80 }],  // 连接线的样式种类有[Bezier],[Flowchart],[StateMachine ],[Straight ]
   connector: ['Flowchart', { stub: [0, 0], gap: 0, cornerRadius: 5, alwaysRespectStubs: true }],
   maxConnections: 20 // 设置连接点最多可以连接几条线
@@ -162,7 +162,7 @@ export const targetConfig = {
     radius: 6, // 半径
     lineWidth: 1
   }, // 端点的颜色样式
-  hoverPaintStyle: { stroke: '#409EFF' }, // 鼠标悬停时的样式
+  hoverPaintStyle: { stroke: '#2563EB' }, // 鼠标悬停时的样式
   // connector: ["Bezier", { curviness: 80 }],  // 连接线的样式种类有[Bezier],[Flowchart],[StateMachine ],[Straight ]
   connector: ['Flowchart', { stub: [0, 0], gap: 0, cornerRadius: 5, alwaysRespectStubs: true }],
   maxConnections: 20 // 设置连接点最多可以连接几条线

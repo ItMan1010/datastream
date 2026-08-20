@@ -44,7 +44,7 @@ export const TASK_STATE_MAP = {
   1: { text: '运行中', color: '#67C23A', animate: true },
   2: { text: '运行结束', color: '#909399' },
   3: { text: '运行失败', color: '#F56C6C' },
-  4: { text: '运行暂停', color: '#409EFF' }
+  4: { text: '运行暂停', color: '#2563EB' }
 }
 
 // 任务状态选项

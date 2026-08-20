@@ -396,7 +396,7 @@ export default {
 
 .title-icon {
   font-size: 28px;
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .page-description {
@@ -448,7 +448,7 @@ export default {
 }
 
 .source-icon {
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .target-icon {
@@ -556,7 +556,7 @@ export default {
 
 .node-icon {
   font-size: 16px;
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .node-label {
@@ -591,7 +591,7 @@ export default {
 .loading-icon {
   font-size: 32px;
   margin-bottom: 12px;
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .loading-text {
@@ -654,7 +654,7 @@ export default {
 }
 
 .preview-card {
-  border: 2px solid #409EFF;
+  border: 2px solid var(--primary-color);
 }
 
 .preview-content {

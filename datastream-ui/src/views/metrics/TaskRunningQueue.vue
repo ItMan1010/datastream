@@ -147,7 +147,7 @@ const drawMonitorTaskRunningQueue = async (yAxisMax) => {
           });
           return `
             <div style="padding: 8px;">
-              <div style="font-weight: bold; margin-bottom: 8px; color: #409EFF;">
+              <div style="font-weight: bold; margin-bottom: 8px; color: var(--primary-color);">
                 任务运行队列指标
               </div>
               <div style="margin: 4px 0;">
@@ -156,7 +156,7 @@ const drawMonitorTaskRunningQueue = async (yAxisMax) => {
               </div>
               <div style="margin: 4px 0;">
                 <span style="color: #666;">队列值：</span>
-                <span style="color: #409EFF; font-weight: 500; font-size: 16px;">${value}</span>
+                <span style="color: var(--primary-color); font-weight: 500; font-size: 16px;">${value}</span>
               </div>
             </div>
           `;
@@ -187,7 +187,7 @@ const drawMonitorTaskRunningQueue = async (yAxisMax) => {
         borderColor: '#e4e7ed',
         fillerColor: 'rgba(64, 158, 255, 0.1)',
         handleStyle: {
-          color: '#409EFF'
+          color: '#2563EB'
         }
       }
     ],
@@ -255,7 +255,7 @@ const drawMonitorTaskRunningQueue = async (yAxisMax) => {
         emphasis: {
           focus: 'series',
           itemStyle: {
-            color: '#409EFF',
+            color: '#2563EB',
             borderColor: '#fff',
             borderWidth: 3,
             shadowBlur: 10,
@@ -263,11 +263,11 @@ const drawMonitorTaskRunningQueue = async (yAxisMax) => {
           }
         },
         lineStyle: {
-          color: '#409EFF',
+          color: '#2563EB',
           width: 3
         },
         itemStyle: {
-          color: '#409EFF',
+          color: '#2563EB',
           borderColor: '#fff',
           borderWidth: 2
         },

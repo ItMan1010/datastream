@@ -79,7 +79,7 @@
         <el-table-column label="状态" width="120">
           <template #default="scope">
             <span v-if="scope.row.state === 0" style="color: #0099CC;">等待中</span>
-            <span v-else-if="scope.row.state === 1" style="color: #409eff">处理中</span>
+            <span v-else-if="scope.row.state === 1" style="color: var(--primary-color)">处理中</span>
             <span v-else-if="scope.row.state === 2" style="color: #67C23A;">处理成功</span>
             <span v-else-if="scope.row.state === 3" style="color: #FF0000;">处理失败</span>
             <span v-else-if="scope.row.state === 4" style="color: #ffa07a;">处理暂停</span>
@@ -139,7 +139,7 @@
     <el-drawer v-model="createDataBackDrawer" :direction="newTaskDrawerDir" :modal-append-to-body="false" size="85%"
                class="newTaskClass">
       <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #EBEEF5;">
-        <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: #409EFF;">
+        <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: var(--primary-color);">
           <label class="fontWeight">链接任务管理</label> > 创建任务
         </div>
         <div class="pt-10 margin-10 bcFFF pb-20"
@@ -229,7 +229,7 @@
                size="85%"
                class="newTaskClass">
       <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #EBEEF5;">
-        <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: #409EFF;">
+        <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: var(--primary-color);">
           <label class="fontWeight">回迁任务</label> > 回迁执行日志
           <el-button type="text" style="float: right; font-size: 18px;" circle @click="taskLogDrawer = false">
             <el-icon>

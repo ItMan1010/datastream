@@ -95,7 +95,7 @@ const cards = computed(() => {
       key: 'runningTask',
       label: '运行中任务',
       value: systemMetrics.runningTaskCount || 0,
-      color: '#409EFF',
+      color: '#2563EB',
       bgColor: 'rgba(64, 158, 255, 0.1)',
       icon: 'FolderOpened',
       status: 'normal',

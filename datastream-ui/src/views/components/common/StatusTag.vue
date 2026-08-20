@@ -86,7 +86,7 @@ export default {
       if (!color) return 'info'
       const colorMap = {
         '#0099CC': 'primary',
-        '#409eff': 'primary',
+        '#2563EB': 'primary',
         '#67C23A': 'success',
         '#FF0000': 'danger',
         '#ffa07a': 'warning'

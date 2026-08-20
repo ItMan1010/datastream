@@ -15,7 +15,7 @@
 <template>
   <el-drawer v-model="visible" direction="btt" :modal-append-to-body="false" size="85%">
     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #EBEEF5;">
-      <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: #409EFF;">
+      <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: var(--primary-color);">
         <label class="fontWeight">迁移任务</label> >
         <span v-if="currentTaskType === 4">表结构迁移观测</span>
         <span v-else>数据迁移观测</span>
@@ -241,7 +241,7 @@ export default {
     const getMigrationStateColor = (state) => {
       const colorMap = {
         0: '#0099CC',
-        1: '#409eff',
+        1: '#2563EB',
         2: '#67C23A',
         3: '#FF0000',
         4: '#FF6600'

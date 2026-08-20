@@ -44,25 +44,28 @@ export default {
 /* CSS 变量定义 */
 :root {
   /* 浅色模式 */
-  --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --bg-secondary: rgba(255, 255, 255, 0.95);
-  --text-primary: #2c3e50;
-  --text-secondary: #606266;
-  --border-color: #e4e7ed;
-  --header-bg: #409EFF;
-  --card-bg: #ffffff;
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border-color: #E2E8F0;
+  --header-bg: #1E3A5F;
+  --sidebar-bg: #1E3A5F;
+  --primary-color: #2563EB;
+  --card-bg: #FFFFFF;
   --shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 /* 暗黑模式变量 */
 .dark-mode {
-  --bg-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  --bg-secondary: rgba(52, 73, 94, 0.95);
-  --text-primary: #ffffff;
-  --text-secondary: #bdc3c7;
-  --border-color: #4a5568;
-  --header-bg: #2c5aa0;
-  --card-bg: #34495e;
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --text-primary: #E2E8F0;
+  --text-secondary: #94A3B8;
+  --border-color: #334155;
+  --header-bg: #0F172A;
+  --sidebar-bg: #0F172A;
+  --card-bg: #1E293B;
   --shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -78,26 +81,6 @@ export default {
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: all 0.3s ease;
-}
-
-.app-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background:
-    radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.05) 0%, transparent 50%);
-  z-index: 1;
-  transition: opacity 0.3s ease;
-}
-
-.dark-mode::before {
-  background:
-    radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.03) 0%, transparent 50%);
 }
 
 .app-container > * {
@@ -201,8 +184,8 @@ div[data-name='mojs-shape'] {
 }
 
 .dark-mode .el-button--primary {
-  background-color: #409EFF !important;
-  border-color: #409EFF !important;
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
 }
 
 .dark-mode .el-pagination {

@@ -28,8 +28,8 @@
           <defs>
             <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stop-color="#67C23A" />
-              <stop offset="50%" stop-color="#409EFF" />
-              <stop offset="100%" stop-color="#409EFF" />
+              <stop offset="50%" stop-color="var(--primary-color)" />
+              <stop offset="100%" stop-color="var(--primary-color)" />
             </linearGradient>
           </defs>
           <!-- 背景弧线 -->
@@ -165,7 +165,7 @@ export default {
 .incremental-value {
   font-size: 42px;
   font-weight: bold;
-  color: #409eff;
+  color: var(--primary-color);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -203,7 +203,7 @@ export default {
 .percentage-text {
   font-size: 32px;
   font-weight: bold;
-  fill: #409eff;
+  fill: var(--primary-color);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -252,7 +252,7 @@ export default {
 }
 
 .stat-sync {
-  border-left: 3px solid #409eff;
+  border-left: 3px solid var(--primary-color);
 }
 
 .stat-actual {

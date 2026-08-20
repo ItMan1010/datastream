@@ -15,7 +15,7 @@
 <template>
   <el-drawer v-model="visible" direction="btt" :modal-append-to-body="false" size="85%">
     <template #header>
-      <div style="color: #409EFF; font-weight: bold;">
+      <div style="color: var(--primary-color); font-weight: bold;">
         <label>迁移任务</label> > 创建任务
       </div>
     </template>
@@ -429,10 +429,10 @@ export default {
 .section-title {
   font-size: 16px;
   font-weight: 600;
-  color: #409eff;
+  color: var(--primary-color);
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .form-tip {
@@ -447,7 +447,7 @@ export default {
 }
 
 .form-column-left .form-section {
-  border-left: 3px solid #409eff;
+  border-left: 3px solid var(--primary-color);
 }
 
 .form-column-center .form-section {
@@ -491,7 +491,7 @@ export default {
 }
 
 .help-icon-btn:hover {
-  color: #409eff;
+  color: var(--primary-color);
 }
 
 /* task-base配置说明Popover样式 */
@@ -503,7 +503,7 @@ export default {
 
 .task-base-help-icon {
   font-size: 20px;
-  color: #409eff;
+  color: var(--primary-color);
   flex-shrink: 0;
   margin-top: 2px;
 }

@@ -15,7 +15,7 @@
 <template>
   <el-drawer v-model="visible" direction="btt" :modal-append-to-body="false" size="85%">
     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #EBEEF5;">
-      <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: #409EFF;">
+      <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: var(--primary-color);">
         <label class="fontWeight">稽核任务</label> >
         <span>数据稽核差异</span>
         <el-button type="text" style="float: right; font-size: 18px;" circle @click="visible = false">

@@ -120,7 +120,7 @@
             <el-col :span="6">
               <div style="text-align: center; padding: 10px; background: #f5f7fa; border-radius: 4px;">
                 <div style="font-size: 14px; color: #606266; margin-bottom: 5px;">当前任务ID</div>
-                <div style="font-size: 18px; font-weight: bold; color: #409EFF;">{{ currentTaskId }}</div>
+                <div style="font-size: 18px; font-weight: bold; color: var(--primary-color);">{{ currentTaskId }}</div>
               </div>
             </el-col>
             <el-col :span="4">

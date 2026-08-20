@@ -841,7 +841,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #409eff;
+  color: var(--primary-color);
   padding: 20px;
 }
 
@@ -939,7 +939,7 @@ export default {
 }
 
 .data-source-select-dialog .el-dialog__headerbtn:hover .el-dialog__close {
-  color: #409eff;
+  color: var(--primary-color);
 }
 
 /* 响应式调整 */

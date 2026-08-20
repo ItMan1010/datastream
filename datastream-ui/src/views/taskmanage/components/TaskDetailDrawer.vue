@@ -15,7 +15,7 @@
 <template>
   <el-drawer v-model="visible" direction="btt" :modal-append-to-body="false" size="85%">
     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #EBEEF5;">
-      <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: #409EFF;">
+      <div class="bcFFF margin-10 pl-20" style="line-height: 40px; color: var(--primary-color);">
         <label class="fontWeight">迁移任务</label> > 迁移详情
       </div>
       <div class="pt-10 margin-10 bcFFF progress-container"
@@ -199,7 +199,7 @@ export default {
 .title1 {
   font-size: 18px;
   font-weight: bold;
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .detail-card {

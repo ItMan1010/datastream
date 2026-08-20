@@ -318,7 +318,7 @@ export default {
 }
 
 .chart-title .el-icon {
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .cycle-select {

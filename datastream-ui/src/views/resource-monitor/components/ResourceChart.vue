@@ -174,17 +174,17 @@ const updateChart = () => {
         areaStyle: props.type === 'line' ? getGradientColor() : undefined,
         lineStyle: {
           width: 2.5,
-          color: '#409EFF'
+          color: '#2563EB'
         },
         itemStyle: {
-          color: '#409EFF',
+          color: '#2563EB',
           borderColor: '#fff',
           borderWidth: 2
         },
         emphasis: {
           focus: 'series',
           itemStyle: {
-            color: '#409EFF',
+            color: '#2563EB',
             borderColor: '#fff',
             borderWidth: 3,
             shadowBlur: 10,

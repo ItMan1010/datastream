@@ -113,7 +113,7 @@ const formatNumber = (num) => {
 .data-value {
   font-family: 'Monaco', 'Consolas', monospace;
   font-weight: 600;
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .empty-data {

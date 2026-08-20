@@ -392,7 +392,7 @@ export default {
   position: relative;
   transition: width 0.3s ease;
   overflow: visible;
-  background: linear-gradient(180deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
+  background: linear-gradient(180deg, #1E3A5F 0%, #16324F 50%, #1E3A5F 100%);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -412,9 +412,9 @@ export default {
   line-height: 60px;
   text-align: center;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-bottom: 1px solid rgba(102, 126, 234, 0.3);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  background: #1E3A5F;
+  border-bottom: 1px solid rgba(30, 58, 95, 0.3);
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.2);
 }
 
 .el-header {
@@ -439,7 +439,7 @@ export default {
 
 .el-menu {
   border: none !important;
-  background: linear-gradient(180deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%) !important;
+  background: linear-gradient(180deg, #1E3A5F 0%, #16324F 50%, #1E3A5F 100%) !important;
 }
 
 .el-menu--collapse {
@@ -540,27 +540,27 @@ export default {
 }
 
 .el-menu .is-active {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+  background: #2563EB !important;
   color: #fff !important;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
   border-radius: 4px;
   margin: 2px 8px;
 }
 
 .el-menu .is-active:hover {
-  background: linear-gradient(90deg, #8b7dd8 0%, #8b7dd8 100%) !important;
+  background: #3B82F6 !important;
   color: #fff !important;
 }
 
 .el-menu-item:hover {
-  background: rgba(102, 126, 234, 0.15) !important;
+  background: rgba(37, 99, 235, 0.15) !important;
   color: #fff !important;
   border-radius: 4px;
   margin: 2px 8px;
 }
 
 .el-submenu__title:hover {
-  background: rgba(102, 126, 234, 0.15) !important;
+  background: rgba(37, 99, 235, 0.15) !important;
   color: #fff !important;
   border-radius: 4px;
   margin: 2px 8px;
@@ -591,10 +591,10 @@ export default {
   top: 0;
   min-width: 200px;
   z-index: 999;
-  background: linear-gradient(180deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%) !important;
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: linear-gradient(180deg, #1E3A5F 0%, #16324F 50%, #1E3A5F 100%) !important;
+  border: 1px solid rgba(30, 58, 95, 0.3);
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 20px rgba(30, 58, 95, 0.2);
 }
 
 .data-stream-menu-aside {
@@ -639,13 +639,13 @@ export default {
 }
 
 .main-tabs .el-tabs__item.is-active {
-  color: #409EFF;
+  color: #2563EB;
   background: #fff;
-  border-color: #409EFF;
+  border-color: #2563EB;
 }
 
 .main-tabs .el-tabs__item:hover {
-  color: #409EFF;
+  color: #2563EB;
 }
 
 .tab-label {

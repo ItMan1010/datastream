@@ -155,7 +155,7 @@ const formatNumber = (num) => {
 
 .active-value {
   font-weight: 600;
-  color: #409EFF;
+  color: var(--primary-color);
 }
 
 .progress-wrapper {

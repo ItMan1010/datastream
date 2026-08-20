@@ -231,7 +231,7 @@ export default {
 .login-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #1E3A5F 0%, #0F172A 100%);
   z-index: 0;
 }
 
@@ -240,9 +240,9 @@ export default {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(102, 126, 234, 0.2) 0%, transparent 40%);
+    radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(30, 58, 95, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
 }
 
 /* Floating decorative shapes */
@@ -401,7 +401,7 @@ export default {
 }
 
 .custom-input :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
   background: white;
 }
 
@@ -421,7 +421,7 @@ export default {
 }
 
 .custom-input :deep(.is-focus .input-icon) {
-  color: #667eea;
+  color: #2563EB;
 }
 
 /* Submit button */
@@ -432,25 +432,25 @@ export default {
   font-weight: 600;
   border-radius: 12px;
   margin-top: 0.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563EB;
   border: none;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
   transition: all 0.2s ease;
 }
 
 .submit-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .submit-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .submit-button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3), 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3), 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 /* Card footer */

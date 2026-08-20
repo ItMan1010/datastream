@@ -1,0 +1,46 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+context: |
+  DataStream 数据处理平台（Apache 2.0），提供数据迁移、数据清理、数据稽核、结构迁移、增量迁移(CDC)、链表迁移、数据检索、配置管理等核心功能。
+  Tech stack:
+  - 后端: Spring Boot 2.1.4, MyBatis + Druid, JWT 认证, Debezium 1.9.5 (CDC), JDK 1.8, Maven 多模块
+  - 前端: Vue 3.3 + Vite 6, Element Plus, Pinia, Vue Router 4
+  - 数据源: 数据库 MySQL/Oracle/PostgreSQL/H2/Doris, 文件 Text/Excel, 消息队列 Kafka/RocketMQ/RabbitMQ/ActiveMQ
+  Modules:
+  - datastream-admin (管理后台 Controller/Service/Handler)
+  - datastream-common (公共工具、领域实体、常量、异常)
+  - datastream-engine (核心迁移引擎: 连接池、路由、Debezium CDC、事件监听)
+  - datastream-connectors (数据源适配器/连接器: mysql/oracle/postgres/h2/kafka/file)
+  - datastream-security (JWT 认证 + 日志切面)
+  - datastream-starter (Spring Boot 启动入口 + 配置)
+  - datastream-ui (Vue 3 前端)
+  - datastream-dist (打包发布)
+  Conventions:
+  - 连接器模式扩展新数据源（SPI / auto-service）
+  - Handler/Executor 分层处理任务，线程池控制并发
+  - 元数据库默认 H2（可切换 MySQL），端口 9199，context-path /datastream，默认账号 admin/admin
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

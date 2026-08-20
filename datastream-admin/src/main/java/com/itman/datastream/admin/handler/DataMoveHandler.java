@@ -1329,13 +1329,7 @@ public class DataMoveHandler extends AbstractHandler {
         dataBase.setUserName(dataBaseList.get(0).getUserName());
         dataBase.setPassWord(dataBaseList.get(0).getPassWord());
 
-        if (!dataBase.getUrl().contains("?")) {
-            dataBase.setUrl(dataBase.getUrl() + "?");
-        }
-
-        if (!dataBase.getUrl().contains("socketTimeout")) {
-            dataBase.setUrl(dataBase.getUrl() + "&socketTimeout=5000");
-        }
+        dataBase.setUrl(appendUrlParam(dataBase.getUrl(), "socketTimeout", "5000"));
 
         dataBase.setSqlValidationQuery(matchDataBase(dataBase.getDataBaseType()).makeSqlValidationQuery());
         dataBase.setDriverClass(matchDataBase(dataBase.getDataBaseType()).getDriverClass());

@@ -96,6 +96,34 @@ public class CommUtils {
         return dataSourceCategoryMap.get(dataSourceType).equals(DATA_SOURCE_CATEGORY_MQ);
     }
 
+    /**
+     * 向 JDBC URL 追加查询参数，自动处理分隔符：
+     * URL 以 ? 或 & 结尾时直接追加；已含 ? 时补 &；不含 ? 时补 ?；
+     * URL 中已存在同名参数（paramName=）时不重复追加。
+     *
+     * @param url         JDBC URL
+     * @param paramName   参数名
+     * @param paramValue  参数值
+     * @return 追加参数后的 URL；url 为 null 或空串时原样返回
+     */
+    public static String appendUrlParam(String url, String paramName, String paramValue) {
+        if (url == null || url.isEmpty()) {
+            return url;
+        }
+
+        if (url.contains(paramName + "=")) {
+            return url;
+        }
+
+        String param = paramName + "=" + paramValue;
+        char lastChar = url.charAt(url.length() - 1);
+        if (lastChar == '?' || lastChar == '&') {
+            return url + param;
+        }
+
+        return url + (url.contains("?") ? "&" : "?") + param;
+    }
+
     public static String parseJdbcUrl(String url) {
         for (DataBaseEnum type : DataBaseEnum.values()) {
             Pattern namePattern = Pattern.compile(type.getUrlPattern());

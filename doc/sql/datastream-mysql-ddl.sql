@@ -47,7 +47,7 @@ create table if not exists `data_stream_data_base` (
     `data_base_id` bigint(18) not null comment '主键标识，序列名称：seq_data_base_id',
     `data_base_type` int(2) not null comment '数据库类型',
     `data_base_name` varchar(128) not null comment '数据库名称',
-    `url` varchar(128) not null comment '数据库链接',
+    `url` varchar(512) not null comment '数据库链接',
     `user_name` varchar(128) not null comment '数据库用户名',
     `pass_word` varchar(128) not null comment '数据库密码',
     `table_key_not_supported` int(2) default null comment '数据不支持表主键：1:不支持，其他默认支持',

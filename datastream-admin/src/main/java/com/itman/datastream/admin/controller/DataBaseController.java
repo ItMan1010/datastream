@@ -100,12 +100,8 @@ public class DataBaseController {
 
             DataBaseEntity dataBase = new DataBaseEntity();
             BeanUtils.copyProperties(testDataBaseRequest, dataBase);
-            if (!testDataBaseRequest.getDataBaseType().equals(DATA_SOURCE_TYPE_ORACLE) && !dataBase.getUrl().contains("?")) {
-                dataBase.setUrl(dataBase.getUrl() + "?");
-            }
-
-            if (!testDataBaseRequest.getDataBaseType().equals(DATA_SOURCE_TYPE_ORACLE) && !dataBase.getUrl().contains("socketTimeout")) {
-                dataBase.setUrl(dataBase.getUrl() + ((dataBase.getUrl().charAt(dataBase.getUrl().length() - 1) != '?' && !dataBase.getUrl().contains("&")) ? "&" : "") + "socketTimeout=5000");
+            if (!testDataBaseRequest.getDataBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) {
+                dataBase.setUrl(CommUtils.appendUrlParam(dataBase.getUrl(), "socketTimeout", "5000"));
             }
 
             if (log.isDebugEnabled()) {

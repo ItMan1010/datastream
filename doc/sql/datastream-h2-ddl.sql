@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS data_stream_data_base (
     data_base_id BIGINT NOT NULL COMMENT '主键标识，序列名称：seq_data_base_id',
     data_base_type INT NOT NULL COMMENT '数据库类型',
     data_base_name VARCHAR(128) NOT NULL COMMENT '数据库名称',
-    url VARCHAR(128) NOT NULL COMMENT '数据库链接',
+    url VARCHAR(512) NOT NULL COMMENT '数据库链接',
     user_name VARCHAR(128) NOT NULL COMMENT '数据库用户名',
     pass_word VARCHAR(128) NOT NULL COMMENT '数据库密码',
     table_key_not_supported INT DEFAULT NULL COMMENT '数据不支持表主键：1:不支持，其他默认支持',

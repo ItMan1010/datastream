@@ -53,11 +53,8 @@ public class TableLinkHandler {
         dataBase.setDataPoolCount(1);
         dataBase.setKeyName(SOURCE_DATA_TEST_FLOW_KEY_NAME);
         dataBase.setSchemaName(parseSchemaNameJdbcUrl(dataBase.getUrl()));
-        if (!dataBase.getDataBaseType().equals(DATA_SOURCE_TYPE_ORACLE) && !dataBase.getUrl().contains("?")) {
-            dataBase.setUrl(dataBase.getUrl() + "?");
-        }
-        if (!dataBase.getDataBaseType().equals(DATA_SOURCE_TYPE_ORACLE) && !dataBase.getUrl().contains("socketTimeout")) {
-            dataBase.setUrl(dataBase.getUrl() + (!dataBase.getUrl().contains("&") ? "&" : "") + "socketTimeout=5000");
+        if (!dataBase.getDataBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) {
+            dataBase.setUrl(CommUtils.appendUrlParam(dataBase.getUrl(), "socketTimeout", "5000"));
         }
 
         List<DataBaseEntity> dataBaseList = new ArrayList<>();

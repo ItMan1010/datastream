@@ -128,18 +128,19 @@ fetch.interceptors.response.use(res => {
     const stateCode = error.response.status
     // 这里只添加了401状态码，如有需求可自行添加更多状态码
     if (stateCode === 401) {
-      // 这里记得清除token
-      Message.closeAll()
+      // 清除token
+      sessionStorage.removeItem('token')
+      ElMessage.closeAll()
       router.push({name: 'login'})
       if (error.response.data && error.response.data.resultMsg) {
         return Promise.reject(error.response.data.resultMsg)
       } else {
-        Message.error('登录已失效，请重新登录！')
+        ElMessage.error('登录已失效，请重新登录！')
       }
       return Promise.reject(error)
     } else {
       // 清除多余失败提示框
-      Message.closeAll()
+      ElMessage.closeAll()
       return Promise.reject(error)
     }
   }

@@ -99,7 +99,7 @@ public class SystemLogServiceImpl implements ISystemLogService {
         try {
             SessionEntity systemSession = systemLogDao.selectSystemSession(tokenKey, 1, getMetaDbObject().dateToString3("expire_date"));
             if (Objects.isNull(systemSession)) {
-                return false;
+                return true;
             }
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");

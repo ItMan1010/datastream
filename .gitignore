@@ -1,5 +1,6 @@
 /.cursor/
-/.trae/
+/.trae/*
+!/.trae/rules/
 
 # 编译产物
 *.class

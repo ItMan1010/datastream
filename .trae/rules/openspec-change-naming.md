@@ -16,3 +16,12 @@
 ## 适用范围
 
 适用于本项目所有通过 `openspec new change` 创建的变更目录命名。
+
+## 注意事项
+1:  所有新开发的代码必须保持当前前端或后端代码的命名规范、包结构、类名、方法名等。
+（如：`com.itman.datastream.ui.*`、`com.itman.datastream.service.*` 等）
+
+2: 新增页面风格时，必须保持当前页面的布局、颜色、字体等样式。
+（如：`data_stream_column_type_map` 页面）
+
+3: 能复用当前系统组件，避免重复开发。

@@ -100,6 +100,8 @@ public class DataStreamConstant {
     public static final String SEQ_FILE_FIELD_ID = "SEQ_FILE_FIELD_ID";
     public static final String SEQ_DEBEZIUM_HISTORY_ID = "SEQ_DEBEZIUM_HISTORY_ID";
     public static final String SEQ_MQ_CONFIG_ID = "SEQ_MQ_CONFIG_ID";
+    public static final String SEQ_COLUMN_TYPE_DEFINE_ID = "SEQ_COLUMN_TYPE_DEFINE_ID";
+    public static final String SEQ_COLUMN_TYPE_MAP_ID = "SEQ_COLUMN_TYPE_MAP_ID";
 
     public static final String SQL_FORMAT_HINT_DATANODE = "/* !HINT({\"dn\":[\"%s\"]})*/ ";
 

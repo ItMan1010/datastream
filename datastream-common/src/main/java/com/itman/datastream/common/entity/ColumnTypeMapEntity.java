@@ -30,6 +30,11 @@ public class ColumnTypeMapEntity {
     private Long columnTypeMapId;
 
     /**
+     * 源字段类型定义ID
+     */
+    private Long columnTypeDefineIdA;
+
+    /**
      * 源数据库类型
      */
     private String databaseTypeA;

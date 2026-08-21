@@ -98,6 +98,12 @@ const router = createRouter({
           path: '/datastream/config/mqConfig',
           component: () => import('@/views/mq-manage/index.vue')
         },
+        // 字段类型配置
+        {
+          name: 'columnTypeConfig',
+          path: '/datastream/config/columnTypeConfig',
+          component: () => import('@/views/column-type/index.vue')
+        },
         // 登录日志
         {
           name: 'loginLogs',

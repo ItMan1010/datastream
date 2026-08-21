@@ -96,6 +96,19 @@ export default {
   RESOURCE_METRICS_CONNECTION: '/api/metrics/resource/connection',
   RESOURCE_METRICS_THREADPOOL: '/api/metrics/resource/threadpool',
 
+  // ============ 字段类型配置 ============
+  QUERY_TYPE_DEFINE_ROWS: '/api/columnTypeConfig/queryTypeDefineRows',
+  QUERY_ALL_TYPE_DEFINE: '/api/columnTypeConfig/queryAllTypeDefine',
+  QUERY_TYPE_DEFINE_INFO: '/api/columnTypeConfig/queryTypeDefineInfo',
+  ADD_TYPE_DEFINE: '/api/columnTypeConfig/addTypeDefine',
+  MODIFY_TYPE_DEFINE: '/api/columnTypeConfig/modifyTypeDefine',
+  DEL_TYPE_DEFINE: '/api/columnTypeConfig/delTypeDefine',
+  QUERY_TYPE_MAP_ROWS: '/api/columnTypeConfig/queryTypeMapRows',
+  QUERY_TYPE_MAP_INFO: '/api/columnTypeConfig/queryTypeMapInfo',
+  ADD_TYPE_MAP: '/api/columnTypeConfig/addTypeMap',
+  MODIFY_TYPE_MAP: '/api/columnTypeConfig/modifyTypeMap',
+  DEL_TYPE_MAP: '/api/columnTypeConfig/delTypeMap',
+
   // ============ 其他配置 ============
   ENCRYPT_KEY: '1234567812345678'
 }

@@ -94,6 +94,10 @@
             <el-icon><Message/></el-icon>
             <template #title>{{ menuDescArr[18] }}</template>
           </el-menu-item>
+          <el-menu-item index="20">
+            <el-icon><Grid/></el-icon>
+            <template #title>{{ menuDescArr[20] }}</template>
+          </el-menu-item>
         </el-sub-menu>
 
         <!-- 资源监控 -->

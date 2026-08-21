@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itman.datastream.engine.mapper.ColumnTypeConfigMapper">
+
+    <!-- 类型定义通用查询条件 -->
+    <sql id="defineQueryCondition">
+        <where>
+            <if test="queryFlag == 1">
+                and 1 = 1
+            </if>
+            <if test="queryFlag == 2 and queryValue != null and queryValue != ''">
+                and database_type = #{queryValue}
+            </if>
+            <if test="queryFlag == 3 and queryValue != null and queryValue != ''">
+                and column_type_name like concat('%', #{queryValue}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectTypeDefineList" resultType="com.itman.datastream.common.entity.ColumnTypeDefineEntity">
+        select t.column_type_define_id,
+               t.database_type,
+               t.column_type_classify,
+               t.column_type_name,
+               t.column_standard_size,
+               t.remark,
+               t.type_category,
+               t.max_precision,
+               t.max_scale,
+               t.character_max_length,
+               t.min_value,
+               t.max_value,
+               t.is_national_flag,
+               t.require_length_param
+        from data_stream_column_type_define t
+        <include refid="defineQueryCondition"/>
+        order by t.column_type_define_id
+        <if test="sqlLimit != null and sqlLimit != ''">
+            ${sqlLimit}
+        </if>
+    </select>
+
+    <select id="selectTypeDefineListCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_column_type_define t
+        <include refid="defineQueryCondition"/>
+    </select>
+
+    <select id="selectTypeDefineById" resultType="com.itman.datastream.common.entity.ColumnTypeDefineEntity">
+        select column_type_define_id,
+               database_type,
+               column_type_classify,
+               column_type_name,
+               column_standard_size,
+               remark,
+               type_category,
+               max_precision,
+               max_scale,
+               character_max_length,
+               min_value,
+               max_value,
+               is_national_flag,
+               require_length_param
+        from data_stream_column_type_define
+        where column_type_define_id = #{columnTypeDefineId}
+    </select>
+
+    <select id="selectTypeDefineByDbTypeAndName" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_column_type_define
+        where database_type = #{databaseType}
+          and column_type_name = #{columnTypeName}
+        <if test="excludeId != null">
+            and column_type_define_id &lt;&gt; #{excludeId}
+        </if>
+    </select>
+
+    <insert id="insertTypeDefine">
+        insert into data_stream_column_type_define (
+            column_type_define_id,
+            database_type,
+            column_type_classify,
+            column_type_name,
+            column_standard_size,
+            remark,
+            type_category,
+            max_precision,
+            max_scale,
+            character_max_length,
+            min_value,
+            max_value,
+            is_national_flag,
+            require_length_param
+        ) values (
+            #{define.columnTypeDefineId},
+            #{define.databaseType},
+            #{define.columnTypeClassify},
+            #{define.columnTypeName},
+            #{define.columnStandardSize},
+            #{define.remark},
+            #{define.typeCategory},
+            #{define.maxPrecision},
+            #{define.maxScale},
+            #{define.characterMaxLength},
+            #{define.minValue},
+            #{define.maxValue},
+            #{define.isNationalFlag},
+            #{define.requireLengthParam}
+        )
+    </insert>
+
+    <update id="updateTypeDefine">
+        update data_stream_column_type_define
+        set database_type            = #{define.databaseType},
+            column_type_classify     = #{define.columnTypeClassify},
+            column_type_name         = #{define.columnTypeName},
+            column_standard_size     = #{define.columnStandardSize},
+            remark                   = #{define.remark},
+            type_category            = #{define.typeCategory},
+            max_precision            = #{define.maxPrecision},
+            max_scale                = #{define.maxScale},
+            character_max_length     = #{define.characterMaxLength},
+            min_value                = #{define.minValue},
+            max_value                = #{define.maxValue},
+            is_national_flag         = #{define.isNationalFlag},
+            require_length_param     = #{define.requireLengthParam}
+        where column_type_define_id = #{define.columnTypeDefineId}
+    </update>
+
+    <delete id="deleteTypeDefine">
+        delete from data_stream_column_type_define
+        where column_type_define_id = #{columnTypeDefineId}
+    </delete>
+
+    <select id="countTypeDefineReferenced" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_column_type_map
+        where column_type_define_id_a = #{columnTypeDefineId}
+           or column_type_define_id_b = #{columnTypeDefineId}
+    </select>
+
+    <!-- 类型映射查询（关联出可读的源/目标类型信息） -->
+    <select id="selectTypeMapList" resultType="com.itman.datastream.common.entity.ColumnTypeMapEntity">
+        select a.column_type_map_id,
+               a.column_type_define_id_a,
+               b.database_type    database_type_a,
+               b.column_type_name column_type_name_a,
+               a.column_type_define_id_b,
+               c.database_type    database_type_b,
+               c.column_type_name column_type_name_b,
+               a.match_level,
+               a.precision_conversion_rule,
+               a.length_conversion_rule,
+               a.conversion_warning,
+               a.is_reversible
+        from data_stream_column_type_map a,
+             data_stream_column_type_define b,
+             data_stream_column_type_define c
+        where a.column_type_define_id_a = b.column_type_define_id
+          and a.column_type_define_id_b = c.column_type_define_id
+        <if test="queryFlag == 2 and queryValue != null and queryValue != ''">
+            and b.database_type = #{queryValue}
+        </if>
+        <if test="queryFlag == 3 and queryValue != null and queryValue != ''">
+            and c.database_type = #{queryValue}
+        </if>
+        order by a.column_type_map_id
+        <if test="sqlLimit != null and sqlLimit != ''">
+            ${sqlLimit}
+        </if>
+    </select>
+
+    <select id="selectTypeMapListCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_column_type_map a,
+             data_stream_column_type_define b,
+             data_stream_column_type_define c
+        where a.column_type_define_id_a = b.column_type_define_id
+          and a.column_type_define_id_b = c.column_type_define_id
+        <if test="queryFlag == 2 and queryValue != null and queryValue != ''">
+            and b.database_type = #{queryValue}
+        </if>
+        <if test="queryFlag == 3 and queryValue != null and queryValue != ''">
+            and c.database_type = #{queryValue}
+        </if>
+    </select>
+
+    <select id="selectTypeMapById" resultType="com.itman.datastream.common.entity.ColumnTypeMapEntity">
+        select a.column_type_map_id,
+               a.column_type_define_id_a,
+               b.database_type    database_type_a,
+               b.column_type_name column_type_name_a,
+               a.column_type_define_id_b,
+               c.database_type    database_type_b,
+               c.column_type_name column_type_name_b,
+               a.match_level,
+               a.precision_conversion_rule,
+               a.length_conversion_rule,
+               a.conversion_warning,
+               a.is_reversible
+        from data_stream_column_type_map a,
+             data_stream_column_type_define b,
+             data_stream_column_type_define c
+        where a.column_type_define_id_a = b.column_type_define_id
+          and a.column_type_define_id_b = c.column_type_define_id
+          and a.column_type_map_id = #{columnTypeMapId}
+    </select>
+
+    <insert id="insertTypeMap">
+        insert into data_stream_column_type_map (
+            column_type_map_id,
+            column_type_define_id_a,
+            column_type_define_id_b,
+            match_level,
+            precision_conversion_rule,
+            length_conversion_rule,
+            conversion_warning,
+            is_reversible
+        ) values (
+            #{map.columnTypeMapId},
+            #{map.columnTypeDefineIdA},
+            #{map.columnTypeDefineIdB},
+            #{map.matchLevel},
+            #{map.precisionConversionRule},
+            #{map.lengthConversionRule},
+            #{map.conversionWarning},
+            #{map.isReversible}
+        )
+    </insert>
+
+    <update id="updateTypeMap">
+        update data_stream_column_type_map
+        set column_type_define_id_a  = #{map.columnTypeDefineIdA},
+            column_type_define_id_b  = #{map.columnTypeDefineIdB},
+            match_level              = #{map.matchLevel},
+            precision_conversion_rule = #{map.precisionConversionRule},
+            length_conversion_rule   = #{map.lengthConversionRule},
+            conversion_warning       = #{map.conversionWarning},
+            is_reversible            = #{map.isReversible}
+        where column_type_map_id = #{map.columnTypeMapId}
+    </update>
+
+    <delete id="deleteTypeMap">
+        delete from data_stream_column_type_map
+        where column_type_map_id = #{columnTypeMapId}
+    </delete>
+
+</mapper>

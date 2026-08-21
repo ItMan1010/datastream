@@ -26,7 +26,7 @@ import { ref, computed } from 'vue'
  */
 export function useMenuConfig() {
   // 菜单名称数组（路由名称）
-  // 索引: 0    1          2                3                4                   5           6           7                 8                9            10               11               12                 13          14         15             16        17              18              19
+  // 索引: 0    1          2                3                4                   5           6           7                 8                9            10               11               12                 13          14         15             16        17              18              19                20
   const menuNameArr = ref([
     '',           // 0: 空
     '',           // 1: 任务管理（父菜单）
@@ -47,7 +47,8 @@ export function useMenuConfig() {
     '',           // 16: 系统管理（父菜单）
     'fileFormatConfig', // 17: 文件配置
     'mqConfig', // 18: MQ配置
-    'resourceMonitor' // 19: 资源监控
+    'resourceMonitor', // 19: 资源监控
+    'columnTypeConfig' // 20: 字段类型配置
   ])
 
   // 菜单描述数组
@@ -71,7 +72,8 @@ export function useMenuConfig() {
     '系统管理',   // 16
     '文件配置',   // 17
     'MQ配置',   // 18
-    '资源监控'    // 19
+    '资源监控',    // 19
+    '字段类型配置' // 20
   ])
 
   // 菜单图标数组
@@ -95,7 +97,8 @@ export function useMenuConfig() {
     '',             // 16
     'Notebook',     // 17
     'Message',      // 18: MQ配置图标
-    'DataAnalysis'  // 19: 资源监控图标
+    'DataAnalysis',  // 19: 资源监控图标
+    'Grid'          // 20: 字段类型配置图标
   ])
 
   // 面包屑配置
@@ -114,6 +117,7 @@ export function useMenuConfig() {
     '12': ['14', '12'],
     '17': ['14', '17'],
     '18': ['14', '18'], // MQ配置
+    '20': ['14', '20'], // 字段类型配置
     // 系统管理
     '9': ['16', '9'],
     '10': ['16', '10'],

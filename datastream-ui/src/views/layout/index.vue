@@ -41,7 +41,7 @@
         active-text-color="#fff">
 
         <!-- 系统概览 -->
-        <el-menu-item index="5">
+        <el-menu-item v-if="hasMenu('overview')" index="5">
           <el-icon><Menu/></el-icon>
           <template #title>{{ menuDescArr[5] }}</template>
         </el-menu-item>
@@ -342,8 +342,8 @@ export default {
         return
       }
 
-      // 初始化Tab系统
-      tabManage.initTabs('overview', '系统概览', 'Menu')
+      // 初始化Tab系统（根据当前路由，路由重定向已按权限确定落地页）
+      tabManage.checkInitialSync()
 
       // 设置事件监听
       $bus?.$on('gotoPage', (pageNameIndex) => {

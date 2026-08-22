@@ -22,6 +22,7 @@ import { useMainStore } from '../store'
 
 // 受菜单权限控制的路由名称（与 useMenuConfig 的 menuNameArr 对应）
 const PROTECTED_ROUTE_NAMES = [
+  'overview',
   'taskManage',
   'tableLinkTask',
   'tableManage',
@@ -41,6 +42,38 @@ const PROTECTED_ROUTE_NAMES = [
   'permissionManage'
 ]
 
+// 侧边栏菜单展示顺序（路由名称，用于确定默认落地页）
+const MENU_ORDER = [
+  'overview',
+  'taskManage',
+  'tableLinkTask',
+  'tableManage',
+  'DataSearch',
+  'dataBaseConfig',
+  'tableLinkConfig',
+  'fileFormatConfig',
+  'mqConfig',
+  'columnTypeConfig',
+  'resourceMonitor',
+  'loginLogs',
+  'operationLogs',
+  'aboutTheSystem',
+  'h2Manage',
+  'userManage',
+  'roleManage',
+  'permissionManage'
+]
+
+// 获取当前用户有权限访问的第一个菜单（用于默认落地页重定向）
+function getFirstAvailableMenuName() {
+  const store = useMainStore()
+  if (store.getIsAdmin) return 'overview'
+  for (const name of MENU_ORDER) {
+    if (store.getLoginMenus.includes(name)) return name
+  }
+  return 'overview'
+}
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
@@ -55,10 +88,10 @@ const router = createRouter({
       // 使用重构后的布局组件
       component: () => import('@/views/layout/index.vue'),
       children: [
-        // 默认重定向到概览页面
+        // 默认重定向到当前用户有权限访问的第一个菜单
         {
           path: '',
-          redirect: '/datastream/overview'
+          redirect: () => ({ name: getFirstAvailableMenuName() })
         },
         // 概述 - 使用重构后的组件
         {
@@ -193,12 +226,25 @@ router.beforeEach((to, from, next) => {
     })
   }
 
+  // 默认落地页：访问 homePage 时按权限重定向到首个有权限菜单
+  if (to.name === 'homePage') {
+    const target = getFirstAvailableMenuName()
+    next({ name: target, replace: true })
+    return
+  }
+
   // 菜单权限校验：无权限路由拦截并提示
   if (to.name && PROTECTED_ROUTE_NAMES.includes(to.name)) {
     const store = useMainStore()
     if (!store.getIsAdmin && !store.getLoginMenus.includes(to.name)) {
       ElMessage.warning('无权限访问该页面')
-      next({ name: 'overview' })
+      // 重定向到当前用户有权限的第一个菜单；若不存在可用菜单则回登录页，避免死循环
+      const fallback = getFirstAvailableMenuName()
+      if (store.getLoginMenus.includes(fallback)) {
+        next({ name: fallback })
+      } else {
+        next({ name: 'login' })
+      }
       return
     }
   }

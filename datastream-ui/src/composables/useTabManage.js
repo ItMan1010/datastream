@@ -44,7 +44,9 @@ export function useTabManage(options = {}) {
   // 状态
   const activeTab = ref('')
   const tabs = ref([])
-  const activeMenuIndex = ref('5')
+  // 初值按当前路由计算，确保 el-menu 首次渲染即高亮正确菜单（default-active 非响应式）
+  const initialMenuIndex = menuNameArr.indexOf(route.name)
+  const activeMenuIndex = ref(initialMenuIndex > 0 ? initialMenuIndex.toString() : '5')
   const breadcrumb = ref([])
 
   // 计算属性：Tab显示
@@ -188,6 +190,7 @@ export function useTabManage(options = {}) {
       const title = menuDescArr[menuIndex]
       const icon = menuIconArr[menuIndex]
       addTab(routeName, title, icon)
+      updateMenuState(routeName)
     } else {
       activeTab.value = routeName
     }
@@ -280,9 +283,8 @@ export function useTabManage(options = {}) {
       if (tabIndex > 0) {
         activeMenuIndex.value = tabIndex.toString()
       }
-    } else {
-      activeTab.value = 'overview'
-      handleMenuSelect(activeMenuIndex.value, ['5'])
+    } else if (route.name) {
+      forceSyncTabWithRoute(route.name)
     }
 
     // 再次检查状态同步

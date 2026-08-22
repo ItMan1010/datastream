@@ -131,6 +131,7 @@
             :data="menuTreeData"
             node-key="permissionId"
             show-checkbox
+            check-strictly
             default-expand-all
             :default-checked-keys="assignedMenuIds"
             :props="{ label: 'permissionName', children: 'children' }" />

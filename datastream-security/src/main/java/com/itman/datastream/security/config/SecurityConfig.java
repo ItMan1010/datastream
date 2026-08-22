@@ -19,6 +19,7 @@ package com.itman.datastream.security.config;
 import com.itman.datastream.security.jwt.DsJwtToken;
 import com.itman.datastream.security.filter.JWTAuthLoginFilter;
 import com.itman.datastream.security.filter.JWTAuthorizationFilter;
+import com.itman.datastream.security.exception.PermissionDeniedException;
 import com.itman.datastream.security.handler.LogoutSuccessHandlerImpl;
 import com.itman.datastream.security.handler.UserDetailsServiceImpl;
 import com.itman.datastream.security.utils.DsResponseUtils;
@@ -115,7 +116,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
                     response.setStatus(HttpStatus.FORBIDDEN.value());
-                    DsResponseUtils.write("-1", "无权限执行该操作", response);
+                    String message = accessDeniedException instanceof PermissionDeniedException
+                            ? accessDeniedException.getMessage()
+                            : "无权限执行该操作";
+                    DsResponseUtils.write("-1", message, response);
                 })
                 .and()
                 .addFilter(new JWTAuthLoginFilter(authenticationManager(), userDetailsServiceImpl, dsJwtToken, loginPath))

@@ -274,6 +274,13 @@
         </if>
     </select>
 
+    <select id="selectPermissionNameByCode" resultType="java.lang.String">
+        select permission_name
+        from data_stream_permission
+        where permission_code = #{permissionCode}
+        limit 1
+    </select>
+
     <insert id="insertPermission">
         insert into data_stream_permission (
             permission_id, permission_code, permission_name, permission_type,

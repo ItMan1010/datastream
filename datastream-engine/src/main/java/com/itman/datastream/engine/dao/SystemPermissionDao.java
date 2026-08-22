@@ -318,6 +318,15 @@ public class SystemPermissionDao {
         }
     }
 
+    public String selectPermissionNameByCode(String permissionCode) throws DataStreamException {
+        try {
+            return systemPermissionMapper.selectPermissionNameByCode(permissionCode);
+        } catch (Exception e) {
+            log.error("按编码查询权限名称失败", e);
+            throw new DataStreamException("RBAC_PERM_DB_010", "按编码查询权限名称失败：" + e.getMessage());
+        }
+    }
+
     public Integer insertPermission(PermissionEntity permission) throws DataStreamException {
         try {
             return systemPermissionMapper.insertPermission(permission);

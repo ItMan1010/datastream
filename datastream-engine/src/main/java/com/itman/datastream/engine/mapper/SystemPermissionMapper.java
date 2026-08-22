@@ -115,6 +115,8 @@ public interface SystemPermissionMapper {
     Integer selectPermissionCodeCount(@Param("permissionCode") String permissionCode,
                                       @Param("excludeId") Long excludeId) throws DataAccessException;
 
+    String selectPermissionNameByCode(@Param("permissionCode") String permissionCode) throws DataAccessException;
+
     Integer insertPermission(@Param("permission") PermissionEntity permission) throws DataAccessException;
 
     Integer updatePermission(@Param("permission") PermissionEntity permission) throws DataAccessException;

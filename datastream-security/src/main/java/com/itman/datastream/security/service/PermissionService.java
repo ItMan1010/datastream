@@ -16,27 +16,61 @@
  */
 package com.itman.datastream.security.service;
 
+import com.itman.datastream.engine.dao.SystemPermissionDao;
 import com.itman.datastream.security.constant.SecurityConstant;
+import com.itman.datastream.security.exception.PermissionDeniedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.Collection;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 数据权限校验服务。
  * 供 {@code @PreAuthorize} 调用，系统管理员与兼容的 SSO 全量角色直接放行，
- * 否则校验当前认证是否含 {@code PERM_<code>} 权限。
+ * 否则校验当前认证是否含 {@code PERM_<code>} 权限。无权限时抛出
+ * {@link PermissionDeniedException}，携带缺失权限的中文名称与编码。
  */
+@Slf4j
 @Component("permissionService")
 public class PermissionService {
 
     private static final String SYSTEM_ADMIN_AUTHORITY = SecurityConstant.ROLE_PREFIX + SecurityConstant.SYSTEM_ADMIN_ROLE_CODE;
     private static final String LEGACY_TASK_ALL_AUTHORITY = "ROLE_TASK_ALL";
+    private static final String FALLBACK_PERMISSION_NAME = "该操作";
+
+    @Resource
+    private SystemPermissionDao systemPermissionDao;
+
+    private final Map<String, String> permissionNameCache = new ConcurrentHashMap<>();
 
     public boolean hasPermission(String permissionCode) {
+        if (!checkPermission(permissionCode)) {
+            throw new PermissionDeniedException(buildSingleDeniedMessage(permissionCode));
+        }
+        return true;
+    }
+
+    public boolean hasAnyPermission(String... permissionCodes) {
+        if (permissionCodes == null || permissionCodes.length == 0) {
+            throw new PermissionDeniedException("无权限执行该操作，请联系管理员");
+        }
+        for (String code : permissionCodes) {
+            if (checkPermission(code)) {
+                return true;
+            }
+        }
+        throw new PermissionDeniedException(buildAnyDeniedMessage(permissionCodes));
+    }
+
+    private boolean checkPermission(String permissionCode) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getAuthorities() == null) {
             return false;
@@ -57,15 +91,36 @@ public class PermissionService {
         return false;
     }
 
-    public boolean hasAnyPermission(String... permissionCodes) {
-        if (permissionCodes == null) {
-            return false;
-        }
+    private String buildSingleDeniedMessage(String permissionCode) {
+        return "无【" + resolvePermissionName(permissionCode) + "（" + permissionCode + "）】权限，请联系管理员";
+    }
+
+    private String buildAnyDeniedMessage(String[] permissionCodes) {
+        List<String> parts = new ArrayList<>();
         for (String code : permissionCodes) {
-            if (hasPermission(code)) {
-                return true;
-            }
+            parts.add("【" + resolvePermissionName(code) + "（" + code + "）】");
         }
-        return false;
+        return "无" + String.join("或", parts) + "权限，请联系管理员";
+    }
+
+    private String resolvePermissionName(String permissionCode) {
+        if (StringUtils.isEmpty(permissionCode)) {
+            return FALLBACK_PERMISSION_NAME;
+        }
+        String cached = permissionNameCache.get(permissionCode);
+        if (cached != null) {
+            return cached;
+        }
+        String name = null;
+        try {
+            name = systemPermissionDao.selectPermissionNameByCode(permissionCode);
+        } catch (Exception e) {
+            log.warn("查询权限名称失败，permissionCode={}", permissionCode, e);
+        }
+        if (StringUtils.isEmpty(name)) {
+            name = FALLBACK_PERMISSION_NAME;
+        }
+        permissionNameCache.put(permissionCode, name);
+        return name;
     }
 }

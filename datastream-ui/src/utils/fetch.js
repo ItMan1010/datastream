@@ -138,6 +138,13 @@ fetch.interceptors.response.use(res => {
         ElMessage.error('登录已失效，请重新登录！')
       }
       return Promise.reject(error)
+    } else if (stateCode === 403) {
+      // 无权限：提取后端返回的中文提示（含缺失权限信息），替代原始 AxiosError
+      ElMessage.closeAll()
+      const msg = error.response.data && error.response.data.resultMsg
+        ? error.response.data.resultMsg
+        : '无权限执行该操作，请联系管理员'
+      return Promise.reject(msg)
     } else {
       // 清除多余失败提示框
       ElMessage.closeAll()

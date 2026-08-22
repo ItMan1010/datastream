@@ -28,14 +28,24 @@ export const TASK_TYPE_MAP = {
   6: '增量迁移'
 }
 
+// 任务类型与数据权限编码映射（与后端 PermissionService.TASK_TYPE_PERMISSION_CODE 保持一致）
+export const TASK_TYPE_PERMISSION_MAP = {
+  '1': 'task:type:migrate',
+  '2': 'task:type:clean',
+  '3': 'task:type:migrate-clean',
+  '4': 'task:type:structure',
+  '5': 'task:type:data-check',
+  '6': 'task:type:cdc'
+}
+
 // 任务类型选项
 export const TASK_TYPE_OPTIONS = [
-  { label: '数据迁移', value: '1' },
-  { label: '数据清理', value: '2' },
-  { label: '迁移清理', value: '3' },
-  { label: '结构迁移', value: '4' },
-  { label: '数据稽核', value: '5' },
-  { label: '增量迁移', value: '6' }
+  { label: '数据迁移', value: '1', permission: 'task:type:migrate' },
+  { label: '数据清理', value: '2', permission: 'task:type:clean' },
+  { label: '迁移清理', value: '3', permission: 'task:type:migrate-clean' },
+  { label: '结构迁移', value: '4', permission: 'task:type:structure' },
+  { label: '数据稽核', value: '5', permission: 'task:type:data-check' },
+  { label: '增量迁移', value: '6', permission: 'task:type:cdc' }
 ]
 
 // 任务状态映射

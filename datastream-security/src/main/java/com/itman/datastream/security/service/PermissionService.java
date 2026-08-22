@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +48,21 @@ public class PermissionService {
     private static final String SYSTEM_ADMIN_AUTHORITY = SecurityConstant.ROLE_PREFIX + SecurityConstant.SYSTEM_ADMIN_ROLE_CODE;
     private static final String LEGACY_TASK_ALL_AUTHORITY = "ROLE_TASK_ALL";
     private static final String FALLBACK_PERMISSION_NAME = "该操作";
+
+    /**
+     * 任务类型（1~6）与数据权限编码的映射，与前端 taskConstants.js 的
+     * TASK_TYPE_PERMISSION_MAP 保持一致。
+     */
+    private static final Map<Integer, String> TASK_TYPE_PERMISSION_CODE = new HashMap<>();
+
+    static {
+        TASK_TYPE_PERMISSION_CODE.put(1, "task:type:migrate");
+        TASK_TYPE_PERMISSION_CODE.put(2, "task:type:clean");
+        TASK_TYPE_PERMISSION_CODE.put(3, "task:type:migrate-clean");
+        TASK_TYPE_PERMISSION_CODE.put(4, "task:type:structure");
+        TASK_TYPE_PERMISSION_CODE.put(5, "task:type:data-check");
+        TASK_TYPE_PERMISSION_CODE.put(6, "task:type:cdc");
+    }
 
     @Resource
     private SystemPermissionDao systemPermissionDao;
@@ -70,6 +86,22 @@ public class PermissionService {
             }
         }
         throw new PermissionDeniedException(buildAnyDeniedMessage(permissionCodes));
+    }
+
+    /**
+     * 按任务类型校验数据权限。
+     * 系统管理员放行；任务类型为空或无法映射到权限编码时拒绝；
+     * 否则校验对应的 task:type:* 权限，无权限时抛出携带中文名称与编码的异常。
+     */
+    public boolean hasTaskTypePermission(Integer taskType) {
+        if (isAdmin()) {
+            return true;
+        }
+        String permissionCode = TASK_TYPE_PERMISSION_CODE.get(taskType);
+        if (StringUtils.isEmpty(permissionCode)) {
+            throw new PermissionDeniedException("无权限执行该操作，请联系管理员");
+        }
+        return hasPermission(permissionCode);
     }
 
     /**

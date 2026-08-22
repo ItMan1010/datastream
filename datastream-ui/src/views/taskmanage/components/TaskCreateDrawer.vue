@@ -53,12 +53,11 @@
               </div>
               <el-form-item label="任务类型：">
                 <el-select v-model="form.taskType" style="width: 100%;">
-                  <el-option label="数据迁移" value="1"/>
-                  <el-option label="数据清理" value="2"/>
-                  <el-option label="迁移清理" value="3"/>
-                  <el-option label="数据稽核" value="5"/>
-                  <el-option label="结构迁移" value="4"/>
-                  <el-option label="增量迁移" value="6"/>
+                  <el-option
+                    v-for="opt in taskTypeOptions"
+                    :key="opt.value"
+                    :label="opt.label"
+                    :value="opt.value"/>
                 </el-select>
               </el-form-item>
               <el-form-item label="任务描述：">
@@ -265,6 +264,8 @@
 import {computed} from 'vue'
 import {Search} from '@element-plus/icons-vue'
 import {DATASOURCE_TYPE_DESC} from "@/constants/index.js";
+import {TASK_TYPE_OPTIONS} from '@/constants/taskConstants'
+import {usePermission} from '@/composables/usePermission'
 
 export default {
   name: 'TaskCreateDrawer',
@@ -294,6 +295,13 @@ export default {
     const visible = computed({
       get: () => props.modelValue,
       set: (val) => emit('update:modelValue', val)
+    })
+
+    const {hasPermission} = usePermission()
+
+    // 任务类型选项：按当前用户已授权的任务类型权限过滤（管理员可见全部）
+    const taskTypeOptions = computed(() => {
+      return TASK_TYPE_OPTIONS.filter(opt => hasPermission(opt.permission))
     })
 
     // 显示源表数据过滤
@@ -378,6 +386,7 @@ export default {
 
     return {
       visible,
+      taskTypeOptions,
       showSourceTableCondition,
       showDebeziumConfig,
       showTableStructureConfig,

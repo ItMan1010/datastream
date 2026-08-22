@@ -52,6 +52,14 @@ INSERT INTO data_stream_permission (permission_id, permission_code, permission_n
 INSERT INTO data_stream_permission (permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in) VALUES (203, 'task:stop',                '停止迁移任务', 2, NULL, 3, NULL, 1);
 INSERT INTO data_stream_permission (permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in) VALUES (204, 'task:delete',              '删除迁移任务', 2, NULL, 4, NULL, 1);
 
+-- 任务类型数据权限（permission_type = 2，与任务类型一一对应）
+INSERT INTO data_stream_permission (permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in) VALUES (205, 'task:type:migrate',        '数据迁移',     2, NULL, 5, NULL, 1);
+INSERT INTO data_stream_permission (permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in) VALUES (206, 'task:type:clean',          '数据清理',     2, NULL, 6, NULL, 1);
+INSERT INTO data_stream_permission (permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in) VALUES (207, 'task:type:migrate-clean',  '迁移清理',     2, NULL, 7, NULL, 1);
+INSERT INTO data_stream_permission (permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in) VALUES (208, 'task:type:structure',      '结构迁移',     2, NULL, 8, NULL, 1);
+INSERT INTO data_stream_permission (permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in) VALUES (209, 'task:type:data-check',     '数据稽核',     2, NULL, 9, NULL, 1);
+INSERT INTO data_stream_permission (permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in) VALUES (210, 'task:type:cdc',            '增量迁移',     2, NULL, 10, NULL, 1);
+
 -- 系统管理员角色授予全部菜单与数据权限
 INSERT INTO data_stream_role_permission (role_permission_id, role_id, permission_id)
 SELECT 1000 + permission_id, 1, permission_id FROM data_stream_permission;

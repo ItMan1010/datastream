@@ -66,7 +66,7 @@ public class TaskController {
 
 
     @LogOperate(operateType = 2, moduleName = "创建迁移任务操作", description = "'sourceObjectName:'+#createMoveTaskRequest.sourceObjectName")
-    @PreAuthorize("@permissionService.hasPermission('task:create')")
+    @PreAuthorize("@permissionService.hasTaskTypePermission(#createMoveTaskRequest.taskType)")
     @PostMapping(path = "/createMoveTask", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CreateMoveTaskResponse> createMoveTask(@RequestBody CreateMoveTaskRequest createMoveTaskRequest) {
         CreateMoveTaskResponse createMoveTaskResponse = new CreateMoveTaskResponse();

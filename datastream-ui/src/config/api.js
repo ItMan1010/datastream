@@ -109,6 +109,27 @@ export default {
   MODIFY_TYPE_MAP: '/api/columnTypeConfig/modifyTypeMap',
   DEL_TYPE_MAP: '/api/columnTypeConfig/delTypeMap',
 
+  // ============ 权限管理（RBAC） ============
+  QUERY_USER_ROWS: '/api/systemUser/queryUserRows',
+  QUERY_USER_INFO: '/api/systemUser/queryUserInfo',
+  ADD_USER: '/api/systemUser/addUser',
+  MODIFY_USER: '/api/systemUser/modifyUser',
+  UPDATE_USER_STATE: '/api/systemUser/updateUserState',
+  RESET_USER_PASSWORD: '/api/systemUser/resetPassword',
+  DEL_USER: '/api/systemUser/delUser',
+  QUERY_ROLE_ROWS: '/api/role/queryRoleRows',
+  QUERY_ALL_ROLE: '/api/role/queryAllRole',
+  QUERY_ROLE_INFO: '/api/role/queryRoleInfo',
+  ADD_ROLE: '/api/role/addRole',
+  MODIFY_ROLE: '/api/role/modifyRole',
+  DEL_ROLE: '/api/role/delRole',
+  ASSIGN_ROLE_PERMISSIONS: '/api/role/assignRolePermissions',
+  QUERY_MENU_TREE: '/api/permission/queryMenuTree',
+  QUERY_DATA_PERMISSION_LIST: '/api/permission/queryDataPermissionList',
+  ADD_PERMISSION: '/api/permission/addPermission',
+  MODIFY_PERMISSION: '/api/permission/modifyPermission',
+  DEL_PERMISSION: '/api/permission/delPermission',
+
   // ============ 其他配置 ============
   ENCRYPT_KEY: '1234567812345678'
 }

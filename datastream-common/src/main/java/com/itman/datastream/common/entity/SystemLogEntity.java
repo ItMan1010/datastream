@@ -30,5 +30,7 @@ public class SystemLogEntity {
     private String userAgent;
     private String requestInfo;
     private String responseInfo;
+    private Long elapse;
+    private String result;
     private String createDate;
 }

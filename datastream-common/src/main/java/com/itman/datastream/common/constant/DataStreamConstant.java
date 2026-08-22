@@ -102,6 +102,11 @@ public class DataStreamConstant {
     public static final String SEQ_MQ_CONFIG_ID = "SEQ_MQ_CONFIG_ID";
     public static final String SEQ_COLUMN_TYPE_DEFINE_ID = "SEQ_COLUMN_TYPE_DEFINE_ID";
     public static final String SEQ_COLUMN_TYPE_MAP_ID = "SEQ_COLUMN_TYPE_MAP_ID";
+    public static final String SEQ_SYSTEM_USER_ID = "SEQ_SYSTEM_USER_ID";
+    public static final String SEQ_ROLE_ID = "SEQ_ROLE_ID";
+    public static final String SEQ_USER_ROLE_ID = "SEQ_USER_ROLE_ID";
+    public static final String SEQ_PERMISSION_ID = "SEQ_PERMISSION_ID";
+    public static final String SEQ_ROLE_PERMISSION_ID = "SEQ_ROLE_PERMISSION_ID";
 
     public static final String SQL_FORMAT_HINT_DATANODE = "/* !HINT({\"dn\":[\"%s\"]})*/ ";
 

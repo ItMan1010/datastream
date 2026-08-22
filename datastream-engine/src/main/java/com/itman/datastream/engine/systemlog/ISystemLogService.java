@@ -28,9 +28,12 @@ public interface ISystemLogService {
 
     Integer appendJobLogback(JobLogbackEntity jobLogback) throws DataStreamException;
 
-    List<SystemLogEntity> getSystemLog(Integer type, Integer page, Integer count) throws DataStreamException;
+    List<SystemLogEntity> getSystemLog(Integer type, Integer page, Integer count, String username, String moduleName,
+                                     String startDate, String endDate, String keyword) throws DataStreamException;
 
-    Integer getSystemLogCount(Integer type) throws DataStreamException;
+    Integer getSystemLogCount(Integer type, String username, String moduleName, String startDate, String endDate, String keyword) throws DataStreamException;
+
+    Integer deleteSystemLog(Long systemLogId) throws DataStreamException;
 
     Integer appendSystemSession(String tokenKey, String username, Integer state, Long expiration);
 

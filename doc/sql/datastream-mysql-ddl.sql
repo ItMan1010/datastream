@@ -249,6 +249,8 @@ create table if not exists `data_stream_system_log` (
     `user_agent` varchar(128) default null comment '操作浏览器',
     `request_info` varchar(1024) default null comment '输入信息',
     `response_info` varchar(1024) default null comment '输出信息',
+    `elapse` bigint(18) default null comment '耗时(毫秒)',
+    `result` varchar(10) default null comment '执行结果(成功/失败)',
     `create_date` datetime not null comment '生成时间',
     primary key (`system_log_id`)
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_bin comment='系统操作日志';
@@ -264,7 +266,7 @@ create table if not exists `data_stream_job_logback` (
 ) engine=innodb default charset=utf8mb4 collate=utf8mb4_bin comment='任务运行报错日志';
 
 create table if not exists `data_stream_session` (
-    `token_key` varchar(256) not null comment 'token',
+    `token_key` varchar(2048) character set ascii collate ascii_bin not null comment 'token',
     `username` varchar(30) not null comment '用户名',
     `create_date` datetime not null comment '生成时间',
     `expire_date` datetime not null comment '失效时间',
@@ -486,6 +488,71 @@ INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) 
 INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) VALUES ('SEQ_FILE_SPECIAL_ID', 1, 1);
 INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) VALUES ('SEQ_DEBEZIUM_HISTORY_ID', 1, 1);
 INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) VALUES ('SEQ_MQ_CONFIG_ID', 1, 1);
+INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) VALUES ('SEQ_SYSTEM_USER_ID', 50000, 1);
+INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) VALUES ('SEQ_ROLE_ID', 50000, 1);
+INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) VALUES ('SEQ_USER_ROLE_ID', 50000, 1);
+INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) VALUES ('SEQ_PERMISSION_ID', 50000, 1);
+INSERT INTO `data_stream_sequence` (`seq_name`, `current_val`, `increment_val`) VALUES ('SEQ_ROLE_PERMISSION_ID', 50000, 1);
+
+-- ==================== 权限管理（RBAC）====================
+
+create table if not exists `data_stream_system_user` (
+    `system_user_id` bigint not null comment '主键标识，序列名称：SEQ_SYSTEM_USER_ID',
+    `system_user_code` varchar(64) not null comment '登录账号（唯一）',
+    `system_user_name` varchar(128) default null comment '显示名',
+    `password` varchar(128) not null comment '登录密码（BCrypt密文）',
+    `org_id` bigint default null comment '机构标识',
+    `org_name` varchar(128) default null comment '机构名称',
+    `username` varchar(128) default null comment '用户名（兼容旧字段）',
+    `state` int not null comment '状态：0禁用、1启用',
+    `create_date` datetime not null comment '创建时间',
+    `update_date` datetime default null comment '更新时间',
+    primary key (`system_user_id`),
+    unique key `uk_data_stream_system_user_code` (`system_user_code`)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_bin comment='系统用户表';
+
+create table if not exists `data_stream_role` (
+    `role_id` bigint not null comment '主键标识，序列名称：SEQ_ROLE_ID',
+    `role_code` varchar(64) not null comment '角色编码（唯一）',
+    `role_name` varchar(128) not null comment '角色名称（唯一）',
+    `description` varchar(256) default null comment '角色描述',
+    `built_in` int not null default 0 comment '是否内置：0否、1是',
+    `create_date` datetime not null comment '创建时间',
+    `update_date` datetime default null comment '更新时间',
+    primary key (`role_id`),
+    unique key `uk_data_stream_role_code` (`role_code`)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_bin comment='角色表';
+
+create table if not exists `data_stream_user_role` (
+    `user_role_id` bigint not null comment '主键标识，序列名称：SEQ_USER_ROLE_ID',
+    `system_user_id` bigint not null comment '用户标识',
+    `role_id` bigint not null comment '角色标识',
+    primary key (`user_role_id`),
+    key `idx_data_stream_user_role_user` (`system_user_id`),
+    key `idx_data_stream_user_role_role` (`role_id`)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_bin comment='用户角色关联表';
+
+create table if not exists `data_stream_permission` (
+    `permission_id` bigint not null comment '主键标识，序列名称：SEQ_PERMISSION_ID',
+    `permission_code` varchar(128) not null comment '权限编码（唯一，如 task:create）',
+    `permission_name` varchar(128) not null comment '权限名称',
+    `permission_type` int not null comment '权限类型：1菜单、2数据操作',
+    `parent_id` bigint default null comment '父权限标识（菜单树）',
+    `sort_no` int default 0 comment '排序号',
+    `route` varchar(128) default null comment '菜单路由标识',
+    `built_in` int not null default 0 comment '是否内置：0否、1是',
+    primary key (`permission_id`),
+    unique key `uk_data_stream_permission_code` (`permission_code`)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_bin comment='权限资源表';
+
+create table if not exists `data_stream_role_permission` (
+    `role_permission_id` bigint not null comment '主键标识，序列名称：SEQ_ROLE_PERMISSION_ID',
+    `role_id` bigint not null comment '角色标识',
+    `permission_id` bigint not null comment '权限标识',
+    primary key (`role_permission_id`),
+    key `idx_data_stream_role_permission_role` (`role_id`),
+    key `idx_data_stream_role_permission_permission` (`permission_id`)
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_bin comment='角色权限关联表';
 
 -- mysql数据库字段类型
 CREATE TABLE data_stream_mysql_table_demo (

@@ -32,7 +32,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
@@ -85,7 +86,13 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         } else {
             String username = dsJwtToken.getUsername(token);
             if (!StringUtils.isEmpty(username)) {
-                return new UsernamePasswordAuthenticationToken(username, null, Collections.singleton(new SimpleGrantedAuthority(dsJwtToken.getUserRole(token))));
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                for (String authority : dsJwtToken.getUserAuthorities(token)) {
+                    if (!StringUtils.isEmpty(authority)) {
+                        authorities.add(new SimpleGrantedAuthority(authority));
+                    }
+                }
+                return new UsernamePasswordAuthenticationToken(username, null, authorities);
             }
         }
         return null;

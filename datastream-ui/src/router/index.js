@@ -15,9 +15,31 @@
  * limitations under the License.
  */
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 import constants from '@/comm/constants'
 import { useMainStore } from '../store'
+
+// 受菜单权限控制的路由名称（与 useMenuConfig 的 menuNameArr 对应）
+const PROTECTED_ROUTE_NAMES = [
+  'taskManage',
+  'tableLinkTask',
+  'tableManage',
+  'DataSearch',
+  'dataBaseConfig',
+  'tableLinkConfig',
+  'fileFormatConfig',
+  'mqConfig',
+  'columnTypeConfig',
+  'loginLogs',
+  'operationLogs',
+  'h2Manage',
+  'aboutTheSystem',
+  'resourceMonitor',
+  'userManage',
+  'roleManage',
+  'permissionManage'
+]
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -134,6 +156,24 @@ const router = createRouter({
           path: '/datastream/resource-monitor',
           component: () => import('@/views/resource-monitor/index.vue')
         },
+        // 用户管理
+        {
+          name: 'userManage',
+          path: '/datastream/system-manage/userManage',
+          component: () => import('@/views/system-manage/UserManage.vue')
+        },
+        // 角色管理
+        {
+          name: 'roleManage',
+          path: '/datastream/system-manage/roleManage',
+          component: () => import('@/views/system-manage/RoleManage.vue')
+        },
+        // 权限管理
+        {
+          name: 'permissionManage',
+          path: '/datastream/system-manage/permissionManage',
+          component: () => import('@/views/system-manage/PermissionManage.vue')
+        },
       ]
     }
   ]
@@ -152,6 +192,17 @@ router.beforeEach((to, from, next) => {
       alert(`登陆失败：${err.resultMsg}`)
     })
   }
+
+  // 菜单权限校验：无权限路由拦截并提示
+  if (to.name && PROTECTED_ROUTE_NAMES.includes(to.name)) {
+    const store = useMainStore()
+    if (!store.getIsAdmin && !store.getLoginMenus.includes(to.name)) {
+      ElMessage.warning('无权限访问该页面')
+      next({ name: 'overview' })
+      return
+    }
+  }
+
   next()
 })
 

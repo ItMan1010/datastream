@@ -19,6 +19,7 @@ package com.itman.datastream.security.domain;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class SystemUser implements Serializable {
@@ -30,4 +31,16 @@ public class SystemUser implements Serializable {
     private Long orgId;
     private String orgName;
     private String username;
+    /**
+     * 角色编码列表（登录响应返回，供前端菜单/权限过滤使用）
+     */
+    private List<String> roles;
+    /**
+     * 权限编码列表（登录响应返回，供前端操作鉴权使用）
+     */
+    private List<String> permissions;
+    /**
+     * 允许访问的菜单路由列表（登录响应返回，供前端菜单过滤使用）
+     */
+    private List<String> menus;
 }

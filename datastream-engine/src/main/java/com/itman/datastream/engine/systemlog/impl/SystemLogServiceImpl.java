@@ -59,15 +59,43 @@ public class SystemLogServiceImpl implements ISystemLogService {
     }
 
     @Override
-    public List<SystemLogEntity> getSystemLog(Integer type, Integer page, Integer count) throws DataStreamException {
+    public List<SystemLogEntity> getSystemLog(Integer type, Integer page, Integer count, String username, String moduleName,
+                                               String startDate, String endDate, String keyword) throws DataStreamException {
+        String startDateSql = toSqlDate(startDate);
+        String endDateSql = toSqlDate(endDate);
+        String likeKeyword = toLikeKeyword(keyword);
         return (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ?
-                systemLogDao.querySystemLog(getMetaDbObject().makeSqlLimit(genPageRow(page, count), count), type) :
-                systemLogDao.querySystemLogLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), type);
+                systemLogDao.querySystemLog(getMetaDbObject().makeSqlLimit(genPageRow(page, count), count), type, username, moduleName, startDateSql, endDateSql, likeKeyword) :
+                systemLogDao.querySystemLogLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), type, username, moduleName, startDateSql, endDateSql, likeKeyword);
     }
 
     @Override
-    public Integer getSystemLogCount(Integer type) throws DataStreamException {
-        return systemLogDao.querySystemLogCount(type);
+    public Integer getSystemLogCount(Integer type, String username, String moduleName, String startDate, String endDate, String keyword) throws DataStreamException {
+        return systemLogDao.querySystemLogCount(type, username, moduleName, toSqlDate(startDate), toSqlDate(endDate), toLikeKeyword(keyword));
+    }
+
+    @Override
+    public Integer deleteSystemLog(Long systemLogId) throws DataStreamException {
+        if (systemLogId == null) {
+            throw new DataStreamException("RBAC_LOG_001", "日志ID不能为空");
+        }
+        return systemLogDao.deleteSystemLog(systemLogId);
+    }
+
+    private String toSqlDate(String date) throws DataStreamException {
+        if (date == null || date.trim().isEmpty()) {
+            return null;
+        }
+        String trimmed = date.trim();
+        // 仅允许 yyyyMMddHHmmss 纯数字格式，避免 SQL 注入
+        return trimmed.matches("\\d{14}") ? getMetaDbObject().stringToDate(trimmed) : null;
+    }
+
+    private String toLikeKeyword(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return null;
+        }
+        return "%" + keyword.trim() + "%";
     }
 
     @Override

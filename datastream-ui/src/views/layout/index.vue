@@ -47,86 +47,98 @@
         </el-menu-item>
 
         <!-- 任务管理 -->
-        <el-sub-menu index="1">
+        <el-sub-menu v-if="showTaskMenu" index="1">
           <template #title>
             <el-icon><FolderOpened/></el-icon>
             <span>{{ menuDescArr[1] }}</span>
           </template>
-          <el-menu-item index="2">
+          <el-menu-item v-if="hasMenu('taskManage')" index="2">
             <el-icon><FolderRemove/></el-icon>
             <template #title>{{ menuDescArr[2] }}</template>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item v-if="hasMenu('tableLinkTask')" index="3">
             <el-icon><FolderAdd/></el-icon>
             <template #title>{{ menuDescArr[3] }}</template>
           </el-menu-item>
-          <el-menu-item index="15">
+          <el-menu-item v-if="hasMenu('tableManage')" index="15">
             <el-icon><Operation/></el-icon>
             <template #title>{{ menuDescArr[15] }}</template>
           </el-menu-item>
         </el-sub-menu>
 
         <!-- 数据检索 -->
-        <el-menu-item index="11">
+        <el-menu-item v-if="hasMenu('DataSearch')" index="11">
           <el-icon><Search/></el-icon>
           <template #title>{{ menuDescArr[11] }}</template>
         </el-menu-item>
 
         <!-- 配置管理 -->
-        <el-sub-menu index="14">
+        <el-sub-menu v-if="showConfigMenu" index="14">
           <template #title>
             <el-icon><Setting/></el-icon>
             <span>{{ menuDescArr[14] }}</span>
           </template>
-          <el-menu-item index="4">
+          <el-menu-item v-if="hasMenu('dataBaseConfig')" index="4">
             <el-icon><DataBoard/></el-icon>
             <template #title>{{ menuDescArr[4] }}</template>
           </el-menu-item>
-          <el-menu-item index="12">
+          <el-menu-item v-if="hasMenu('tableLinkConfig')" index="12">
             <el-icon><Tools/></el-icon>
             <template #title>{{ menuDescArr[12] }}</template>
           </el-menu-item>
-          <el-menu-item index="17">
+          <el-menu-item v-if="hasMenu('fileFormatConfig')" index="17">
             <el-icon><Notebook/></el-icon>
             <template #title>{{ menuDescArr[17] }}</template>
           </el-menu-item>
-          <el-menu-item index="18">
+          <el-menu-item v-if="hasMenu('mqConfig')" index="18">
             <el-icon><Message/></el-icon>
             <template #title>{{ menuDescArr[18] }}</template>
           </el-menu-item>
-          <el-menu-item index="20">
+          <el-menu-item v-if="hasMenu('columnTypeConfig')" index="20">
             <el-icon><Grid/></el-icon>
             <template #title>{{ menuDescArr[20] }}</template>
           </el-menu-item>
         </el-sub-menu>
 
         <!-- 资源监控 -->
-        <el-menu-item index="19">
+        <el-menu-item v-if="hasMenu('resourceMonitor')" index="19">
           <el-icon><DataAnalysis/></el-icon>
           <template #title>{{ menuDescArr[19] }}</template>
         </el-menu-item>
 
         <!-- 系统管理 -->
-        <el-sub-menu index="16">
+        <el-sub-menu v-if="showSystemMenu" index="16">
           <template #title>
             <el-icon><Tools/></el-icon>
             <span>{{ menuDescArr[16] }}</span>
           </template>
-          <el-menu-item index="9">
+          <el-menu-item v-if="hasMenu('loginLogs')" index="9">
             <el-icon><Tickets/></el-icon>
             <template #title>{{ menuDescArr[9] }}</template>
           </el-menu-item>
-          <el-menu-item index="10">
+          <el-menu-item v-if="hasMenu('operationLogs')" index="10">
             <el-icon><Document/></el-icon>
             <template #title>{{ menuDescArr[10] }}</template>
           </el-menu-item>
-          <el-menu-item index="7">
+          <el-menu-item v-if="hasMenu('aboutTheSystem')" index="7">
             <el-icon><ChatLineSquare/></el-icon>
             <template #title>{{ menuDescArr[7] }}</template>
           </el-menu-item>
-          <el-menu-item index="13">
+          <el-menu-item v-if="hasMenu('h2Manage')" index="13">
             <el-icon><Coin/></el-icon>
             <template #title>{{ menuDescArr[13] }}</template>
+          </el-menu-item>
+          <el-menu-item v-if="hasMenu('userManage')" index="21">
+            <el-icon><User/></el-icon>
+            <template #title>{{ menuDescArr[21] }}</template>
+          </el-menu-item>
+          <el-menu-item v-if="hasMenu('roleManage')" index="22">
+            <el-icon><Avatar/></el-icon>
+            <template #title>{{ menuDescArr[22] }}</template>
+          </el-menu-item>
+          <el-menu-item v-if="hasMenu('permissionManage')" index="23">
+            <el-icon><Lock/></el-icon>
+            <template #title>{{ menuDescArr[23] }}</template>
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -218,11 +230,12 @@
 </template>
 
 <script>
-import { ref, onMounted, onActivated, onBeforeUnmount, getCurrentInstance } from 'vue'
+import { ref, computed, onMounted, onActivated, onBeforeUnmount, getCurrentInstance } from 'vue'
 import { useMenuConfig } from '@/composables/useMenuConfig'
 import { useTabManage } from '@/composables/useTabManage'
 import { useAuth } from '@/composables/useAuth'
 import { useEventBus } from '@/composables/useEventBus'
+import { usePermission } from '@/composables/usePermission'
 import {
   Brush,
   Menu,
@@ -244,7 +257,9 @@ import {
   Tools,
   Operation,
   Message,
-  DataAnalysis
+  DataAnalysis,
+  Avatar,
+  Lock
 } from '@element-plus/icons-vue'
 
 export default {
@@ -270,7 +285,9 @@ export default {
     Tools,
     Operation,
     Message,
-    DataAnalysis
+    DataAnalysis,
+    Avatar,
+    Lock
   },
   setup() {
     const instance = getCurrentInstance()
@@ -290,6 +307,14 @@ export default {
 
     // 使用认证
     const auth = useAuth()
+
+    // 使用权限校验
+    const { hasMenu } = usePermission()
+
+    // 父级菜单可见性（仅当存在任一可见子菜单时展示）
+    const showTaskMenu = computed(() => hasMenu('taskManage') || hasMenu('tableLinkTask') || hasMenu('tableManage'))
+    const showConfigMenu = computed(() => hasMenu('dataBaseConfig') || hasMenu('tableLinkConfig') || hasMenu('fileFormatConfig') || hasMenu('mqConfig') || hasMenu('columnTypeConfig'))
+    const showSystemMenu = computed(() => hasMenu('loginLogs') || hasMenu('operationLogs') || hasMenu('aboutTheSystem') || hasMenu('h2Manage') || hasMenu('userManage') || hasMenu('roleManage') || hasMenu('permissionManage'))
 
     // 侧边栏折叠状态
     const isCollapse = ref(false)
@@ -363,6 +388,12 @@ export default {
       systemUserDesc: auth.systemUserDesc,
       loading: auth.loading,
       handleLogout,
+
+      // 权限过滤
+      hasMenu,
+      showTaskMenu,
+      showConfigMenu,
+      showSystemMenu,
 
       // 侧边栏
       isCollapse,

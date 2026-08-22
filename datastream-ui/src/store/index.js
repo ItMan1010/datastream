@@ -20,6 +20,12 @@ export const useMainStore = defineStore('main', {
   state: () => ({
     // 登陆信息
     loginSystemUser: {},
+    // 角色编码集合
+    loginRoles: [],
+    // 权限编码集合
+    loginPermissions: [],
+    // 允许访问的菜单路由列表
+    loginMenus: [],
     // 通用查询参数
     commQueryParams: null,
     // 暗黑模式状态
@@ -32,13 +38,47 @@ export const useMainStore = defineStore('main', {
         return state.loginSystemUser
       }
       return localStorage.getItem('SYSTEM_USER_INFO') ? JSON.parse(localStorage.getItem('SYSTEM_USER_INFO')) : {}
+    },
+    getLoginRoles: (state) => {
+      if (state.loginRoles && state.loginRoles.length) {
+        return state.loginRoles
+      }
+      const stored = localStorage.getItem('SYSTEM_USER_ROLES')
+      return stored ? JSON.parse(stored) : []
+    },
+    getLoginPermissions: (state) => {
+      if (state.loginPermissions && state.loginPermissions.length) {
+        return state.loginPermissions
+      }
+      const stored = localStorage.getItem('SYSTEM_USER_PERMISSIONS')
+      return stored ? JSON.parse(stored) : []
+    },
+    getLoginMenus: (state) => {
+      if (state.loginMenus && state.loginMenus.length) {
+        return state.loginMenus
+      }
+      const stored = localStorage.getItem('SYSTEM_USER_MENUS')
+      return stored ? JSON.parse(stored) : []
+    },
+    getIsAdmin: (state) => {
+      const roles = state.loginRoles && state.loginRoles.length
+        ? state.loginRoles
+        : (localStorage.getItem('SYSTEM_USER_ROLES') ? JSON.parse(localStorage.getItem('SYSTEM_USER_ROLES')) : [])
+      return roles.includes('SYSTEM_ADMIN')
     }
   },
 
   actions: {
     setLoginSystemUser(systemUser) {
-      this.loginSystemUser = systemUser
-      localStorage.setItem('SYSTEM_USER_INFO', JSON.stringify(systemUser))
+      const user = systemUser || {}
+      this.loginSystemUser = user
+      this.loginRoles = user.roles || []
+      this.loginPermissions = user.permissions || []
+      this.loginMenus = user.menus || []
+      localStorage.setItem('SYSTEM_USER_INFO', JSON.stringify(user))
+      localStorage.setItem('SYSTEM_USER_ROLES', JSON.stringify(this.loginRoles))
+      localStorage.setItem('SYSTEM_USER_PERMISSIONS', JSON.stringify(this.loginPermissions))
+      localStorage.setItem('SYSTEM_USER_MENUS', JSON.stringify(this.loginMenus))
     },
 
     setCommQueryParams(params) {

@@ -21,6 +21,7 @@ import com.itman.datastream.security.domain.SystemUser;
 import com.itman.datastream.security.jwt.DsJwtToken;
 import com.itman.datastream.security.jwt.DsJwtUser;
 import com.itman.datastream.security.handler.UserDetailsServiceImpl;
+import com.itman.datastream.security.utils.DsDesCipherUtils;
 import com.itman.datastream.security.utils.DsResponseUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -79,9 +80,12 @@ public class JWTAuthLoginFilter extends UsernamePasswordAuthenticationFilter {
             } else {
                 loginUser = new ObjectMapper().readValue(request.getInputStream(), SystemUser.class);
                 log.debug("用户[{}]登陆中...", loginUser.getSystemUserCode());
+                // 前端密码使用 DES 加密，登录前解密为明文，供 DaoAuthenticationProvider 做 BCrypt 校验
+                String rawPassword = DsDesCipherUtils.decrypt(loginUser.getPassword(), SecurityConstant.PASSWORD_SALT);
+                loginUser.setPassword(rawPassword);
                 userDetailsService.setLoginUser(loginUser);
                 return authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(loginUser.getSystemUserCode(), loginUser.getPassword(), new ArrayList<>()));
+                        new UsernamePasswordAuthenticationToken(loginUser.getSystemUserCode(), rawPassword, new ArrayList<>()));
             }
             //密码错误时抛出异常
         } catch (BadCredentialsException b) {
@@ -114,17 +118,17 @@ public class JWTAuthLoginFilter extends UsernamePasswordAuthenticationFilter {
                                             Authentication authResult) throws IOException {
         DsJwtUser dsJwtUser = (DsJwtUser) authResult.getPrincipal();
         log.info("用户[{}]登陆成功！", dsJwtUser.getSystemUserInfo().getSystemUserCode());
-        String role = "";
+        ArrayList<String> authorityList = new ArrayList<>();
         Collection<? extends GrantedAuthority> authorities = dsJwtUser.getAuthorities();
         for (GrantedAuthority authority : authorities) {
-            role = authority.getAuthority();
+            authorityList.add(authority.getAuthority());
         }
-        String token = dsJwtTokenUtils.createToken(dsJwtUser.getSystemUserInfo().getSystemUserCode(), role);
+        String token = dsJwtTokenUtils.createToken(dsJwtUser.getSystemUserInfo().getSystemUserCode(), String.join(",", authorityList));
         // 返回创建成功的token
         response.setHeader("token", SecurityConstant.TOKEN_PREFIX + token);
         // 将该用户的id进行返回了
         response.setIntHeader("id", dsJwtUser.getId().intValue());
-        // 清空登录信息
+        // 清空敏感信息，角色/权限/菜单列表随用户信息一并返回
         dsJwtUser.getSystemUserInfo().setUsername(null);
         dsJwtUser.getSystemUserInfo().setPassword(null);
         DsResponseUtils.write("0", "登陆成功！", dsJwtUser.getSystemUserInfo(), response);

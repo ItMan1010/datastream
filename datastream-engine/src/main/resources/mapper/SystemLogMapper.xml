@@ -4,7 +4,25 @@
 <mapper namespace="com.itman.datastream.engine.mapper.SystemLogMapper">
     <sql id="systemLogColumnList">
         system_log_id
-        ,type,username,ip_address,module_name,content,url_path,user_agent,request_info,response_info,create_date
+        ,type,username,ip_address,module_name,content,url_path,user_agent,request_info,response_info,elapse,result,create_date
+    </sql>
+
+    <sql id="systemLogFilterCondition">
+        <if test="username != null and username != ''">
+            and username=#{username}
+        </if>
+        <if test="moduleName != null and moduleName != ''">
+            and module_name=#{moduleName}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and create_date &gt;= ${startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and create_date &lt;= ${endDate}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (content like #{keyword} or username like #{keyword} or module_name like #{keyword})
+        </if>
     </sql>
 
     <insert id="insertSystemLog" parameterType="com.itman.datastream.common.entity.SystemLogEntity">
@@ -21,6 +39,8 @@
         #{systemLog.userAgent},
         #{systemLog.requestInfo},
         #{systemLog.responseInfo},
+        #{systemLog.elapse},
+        #{systemLog.result},
         ${sysdate})
     </insert>
 
@@ -33,6 +53,7 @@
         from data_stream_system_log
         <where>
             type=#{type}
+            <include refid="systemLogFilterCondition"/>
         </where>
         order by create_date desc
         ${sqlLimit}
@@ -48,6 +69,7 @@
         from data_stream_system_log
         <where>
             type=#{type}
+            <include refid="systemLogFilterCondition"/>
         </where>
         )
         where rn between #{pageBeginRow} and #{pageEndRow}
@@ -62,8 +84,14 @@
         from data_stream_system_log
         <where>
             type=#{type}
+            <include refid="systemLogFilterCondition"/>
         </where>
     </select>
+
+    <delete id="deleteSystemLog">
+        delete from data_stream_system_log
+        where system_log_id = #{systemLogId}
+    </delete>
 
     <insert id="insertSystemSession">
         insert into data_stream_session (token_key, username, create_date, expire_date, state)

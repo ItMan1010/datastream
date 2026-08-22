@@ -26,7 +26,7 @@ import { ref, computed } from 'vue'
  */
 export function useMenuConfig() {
   // 菜单名称数组（路由名称）
-  // 索引: 0    1          2                3                4                   5           6           7                 8                9            10               11               12                 13          14         15             16        17              18              19                20
+  // 索引: 0    1          2                3                4                   5           6           7                 8                9            10               11               12                 13          14         15             16        17              18              19                20               21              22                 23
   const menuNameArr = ref([
     '',           // 0: 空
     '',           // 1: 任务管理（父菜单）
@@ -48,7 +48,10 @@ export function useMenuConfig() {
     'fileFormatConfig', // 17: 文件配置
     'mqConfig', // 18: MQ配置
     'resourceMonitor', // 19: 资源监控
-    'columnTypeConfig' // 20: 字段类型配置
+    'columnTypeConfig', // 20: 字段类型配置
+    'userManage',   // 21: 用户管理
+    'roleManage',   // 22: 角色管理
+    'permissionManage' // 23: 权限管理
   ])
 
   // 菜单描述数组
@@ -73,7 +76,10 @@ export function useMenuConfig() {
     '文件配置',   // 17
     'MQ配置',   // 18
     '资源监控',    // 19
-    '字段类型配置' // 20
+    '字段类型配置', // 20
+    '用户管理',   // 21
+    '角色管理',   // 22
+    '权限管理'    // 23
   ])
 
   // 菜单图标数组
@@ -98,7 +104,10 @@ export function useMenuConfig() {
     'Notebook',     // 17
     'Message',      // 18: MQ配置图标
     'DataAnalysis',  // 19: 资源监控图标
-    'Grid'          // 20: 字段类型配置图标
+    'Grid',         // 20: 字段类型配置图标
+    'User',         // 21: 用户管理图标
+    'Avatar',       // 22: 角色管理图标
+    'Lock'          // 23: 权限管理图标
   ])
 
   // 面包屑配置
@@ -123,6 +132,9 @@ export function useMenuConfig() {
     '10': ['16', '10'],
     '7': ['16', '7'],
     '13': ['16', '13'],
+    '21': ['16', '21'],
+    '22': ['16', '22'],
+    '23': ['16', '23'],
     // 资源监控
     '19': ['19']
   })

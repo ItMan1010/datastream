@@ -46,18 +46,20 @@ public class SystemLogDao {
         }
     }
 
-    public List<SystemLogEntity> querySystemLog(String sqlLimit, Integer type) throws DataStreamException {
+    public List<SystemLogEntity> querySystemLog(String sqlLimit, Integer type, String username, String moduleName,
+                                                String startDate, String endDate, String keyword) throws DataStreamException {
         try {
-            return systemLogMapper.querySystemLog(dataStreamConfig.getMetaTeledbType(), sqlLimit, type);
+            return systemLogMapper.querySystemLog(dataStreamConfig.getMetaTeledbType(), sqlLimit, type, username, moduleName, startDate, endDate, keyword);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_SYSTEM_LOG_ERROR);
         }
     }
 
-    public List<SystemLogEntity> querySystemLogLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer type) throws DataStreamException {
+    public List<SystemLogEntity> querySystemLogLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer type,
+                                                          String username, String moduleName, String startDate, String endDate, String keyword) throws DataStreamException {
         try {
-            return systemLogMapper.querySystemLogLikeOracle(pageBeginRow, pageEndRow, type);
+            return systemLogMapper.querySystemLogLikeOracle(pageBeginRow, pageEndRow, type, username, moduleName, startDate, endDate, keyword);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_SYSTEM_LOG_ERROR);
@@ -73,12 +75,22 @@ public class SystemLogDao {
         }
     }
 
-    public Integer querySystemLogCount(Integer type) throws DataStreamException {
+    public Integer querySystemLogCount(Integer type, String username, String moduleName,
+                                       String startDate, String endDate, String keyword) throws DataStreamException {
         try {
-            return systemLogMapper.querySystemLogCount(dataStreamConfig.getMetaTeledbType(), type);
+            return systemLogMapper.querySystemLogCount(dataStreamConfig.getMetaTeledbType(), type, username, moduleName, startDate, endDate, keyword);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_SYSTEM_LOG_COUNT_ERROR);
+        }
+    }
+
+    public Integer deleteSystemLog(Long systemLogId) throws DataStreamException {
+        try {
+            return systemLogMapper.deleteSystemLog(systemLogId);
+        } catch (Exception e) {
+            log.error("error", e);
+            throw new DataStreamException(DAO_DEL_SYSTEM_LOG_ERROR);
         }
     }
 

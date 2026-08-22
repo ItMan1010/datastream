@@ -16,6 +16,7 @@
  */
 package com.itman.datastream.security.aspect;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itman.datastream.security.annotation.LogOperate;
 import com.itman.datastream.security.domain.SystemLog;
 import com.itman.datastream.engine.event.SystemLogEvent;
@@ -46,6 +47,8 @@ import java.util.Objects;
 @Component
 public class LogAspect {
     private final static ExpressionParser expressionParser = new SpelExpressionParser();
+    private static final int MAX_FIELD_LENGTH = 1000;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -92,7 +95,7 @@ public class LogAspect {
         Method method = methodSignature.getMethod();
         if (method.isAnnotationPresent(LogOperate.class)) {
             EvaluationContext ctx = this.getEvaluationContext(joinPoint);
-            this.recordOperateLog(methodSignature, ctx, throwable, finishTime - beginTime);
+            this.recordOperateLog(methodSignature, ctx, joinPoint.getArgs(), returnObject, throwable, finishTime - beginTime);
         }
 
         if (null != throwable) {
@@ -103,7 +106,7 @@ public class LogAspect {
     }
 
     private void recordOperateLog(MethodSignature methodSignature, EvaluationContext ctx,
-                                  Throwable throwable, long elapse) {
+                                  Object[] args, Object returnObject, Throwable throwable, long elapse) {
         Method method = methodSignature.getMethod();
         LogOperate logAnnotation = method.getAnnotation(LogOperate.class);
         Integer operateType = logAnnotation.operateType();
@@ -122,7 +125,48 @@ public class LogAspect {
                 .content(getParsedDescription(logAnnotation.description(), ctx))
                 .urlPath(DsServletUtils.getPathUri())
                 .userAgent(DsServletUtils.getUserAgent())
+                .requestInfo(buildRequestInfo(args))
+                .responseInfo(buildResponseInfo(returnObject))
+                .elapse(elapse)
+                .result(throwable == null ? "成功" : "失败")
                 .build();
         applicationEventPublisher.publishEvent(new SystemLogEvent(systemLogEntity));
+    }
+
+    private String buildRequestInfo(Object[] args) {
+        if (args == null || args.length == 0) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < args.length; i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(toJsonString(args[i]));
+        }
+        sb.append("]");
+        return truncate(sb.toString());
+    }
+
+    private String buildResponseInfo(Object returnObject) {
+        return truncate(toJsonString(returnObject));
+    }
+
+    private String toJsonString(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            return obj.getClass().getSimpleName();
+        }
+    }
+
+    private String truncate(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.length() > MAX_FIELD_LENGTH ? value.substring(0, MAX_FIELD_LENGTH) : value;
     }
 }

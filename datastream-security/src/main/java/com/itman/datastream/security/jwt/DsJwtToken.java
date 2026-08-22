@@ -25,8 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.itman.datastream.security.constant.SecurityConstant.EXPIRATION;
 
@@ -36,9 +39,9 @@ public class DsJwtToken {
     @Resource
     ISystemLogService ISystemLogService;
 
-    public String createToken(String username, String role) {
+    public String createToken(String username, String authorities) {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(SecurityConstant.ROLE_CLAIMS, role);
+        map.put(SecurityConstant.ROLE_CLAIMS, authorities);
         String token = Jwts.builder().signWith(SignatureAlgorithm.HS512, SecurityConstant.SECRET)
                 .setClaims(map)
                 .setIssuer(SecurityConstant.ISS)
@@ -57,8 +60,16 @@ public class DsJwtToken {
         return getTokenBody(token).getSubject();
     }
 
-    public static String getUserRole(String token) {
-        return (String) getTokenBody(token).get(SecurityConstant.ROLE_CLAIMS);
+    public static List<String> getUserAuthorities(String token) {
+        Object authorities = getTokenBody(token).get(SecurityConstant.ROLE_CLAIMS);
+        if (authorities == null) {
+            return new ArrayList<>();
+        }
+        String authorityStr = String.valueOf(authorities);
+        if (authorityStr == null || authorityStr.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(Arrays.asList(authorityStr.split(",")));
     }
 
     public boolean isExpiration(String token) {

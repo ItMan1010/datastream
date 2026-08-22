@@ -20,10 +20,10 @@ import com.itman.datastream.security.domain.SystemUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class DsJwtUser implements UserDetails {
 
@@ -32,13 +32,21 @@ public class DsJwtUser implements UserDetails {
     private String password;
     private SystemUser systemUser;
     private Collection<? extends GrantedAuthority> authorities;
+    private List<String> roles;
+    private List<String> permissions;
 
     public DsJwtUser(SystemUser systemUser) {
+        this(systemUser, Collections.singletonList(new SimpleGrantedAuthority("ROLE_TASK_ALL")));
+    }
+
+    public DsJwtUser(SystemUser systemUser, Collection<? extends GrantedAuthority> authorities) {
         this.id = systemUser.getSystemUserId();
-        this.username = systemUser.getUsername();
-        this.password = new BCryptPasswordEncoder().encode(systemUser.getPassword());
+        this.username = systemUser.getUsername() != null ? systemUser.getUsername() : systemUser.getSystemUserCode();
+        this.password = systemUser.getPassword();
         this.systemUser = systemUser;
-        this.authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_TASK_ALL"));
+        this.authorities = authorities;
+        this.roles = systemUser.getRoles();
+        this.permissions = systemUser.getPermissions();
     }
 
     @Override
@@ -82,5 +90,21 @@ public class DsJwtUser implements UserDetails {
 
     public SystemUser getSystemUserInfo() {
         return systemUser;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
+    public List<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<String> permissions) {
+        this.permissions = permissions;
     }
 }

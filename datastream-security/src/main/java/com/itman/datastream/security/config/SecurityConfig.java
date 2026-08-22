@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,7 +37,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -51,6 +51,7 @@ import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${auth.sso.loginPath:}")
@@ -68,6 +69,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private DsJwtToken dsJwtToken;
     @Resource
     private LogoutSuccessHandlerImpl logoutSuccessHandlerImpl;
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     private static class AjaxAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         @Override
@@ -86,14 +89,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder);
     }
 
     @Override
@@ -114,6 +112,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 // 允许 H2 控制台使用 iframe
                 .headers().frameOptions().sameOrigin()
+                .and()
+                .exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    DsResponseUtils.write("-1", "无权限执行该操作", response);
+                })
                 .and()
                 .addFilter(new JWTAuthLoginFilter(authenticationManager(), userDetailsServiceImpl, dsJwtToken, loginPath))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager(), dsJwtToken))

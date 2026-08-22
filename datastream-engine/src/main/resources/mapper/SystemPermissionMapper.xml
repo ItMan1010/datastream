@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itman.datastream.engine.mapper.SystemPermissionMapper">
+
+    <!-- ==================== 系统用户 ==================== -->
+
+    <sql id="systemUserColumns">
+        system_user_id, system_user_code, system_user_name, password, org_id, org_name, username, state, create_date, update_date
+    </sql>
+
+    <sql id="systemUserQueryCondition">
+        <where>
+            <if test="queryFlag == 2 and queryValue != null and queryValue != ''">
+                and system_user_code like concat('%', #{queryValue}, '%')
+            </if>
+            <if test="queryFlag == 3 and queryValue != null and queryValue != ''">
+                and system_user_name like concat('%', #{queryValue}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectSystemUserList" resultType="com.itman.datastream.common.entity.SystemUserEntity">
+        select <include refid="systemUserColumns"/>
+        from data_stream_system_user
+        <include refid="systemUserQueryCondition"/>
+        order by system_user_id
+        <if test="sqlLimit != null and sqlLimit != ''">
+            ${sqlLimit}
+        </if>
+    </select>
+
+    <select id="selectSystemUserListCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_system_user
+        <include refid="systemUserQueryCondition"/>
+    </select>
+
+    <select id="selectSystemUserById" resultType="com.itman.datastream.common.entity.SystemUserEntity">
+        select <include refid="systemUserColumns"/>
+        from data_stream_system_user
+        where system_user_id = #{systemUserId}
+    </select>
+
+    <select id="selectSystemUserByCode" resultType="com.itman.datastream.common.entity.SystemUserEntity">
+        select <include refid="systemUserColumns"/>
+        from data_stream_system_user
+        where system_user_code = #{systemUserCode}
+    </select>
+
+    <select id="selectSystemUserCodeCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_system_user
+        where system_user_code = #{systemUserCode}
+        <if test="excludeId != null">
+            and system_user_id &lt;&gt; #{excludeId}
+        </if>
+    </select>
+
+    <insert id="insertSystemUser">
+        insert into data_stream_system_user (
+            system_user_id, system_user_code, system_user_name, password,
+            org_id, org_name, username, state, create_date
+        ) values (
+            #{user.systemUserId}, #{user.systemUserCode}, #{user.systemUserName}, #{user.password},
+            #{user.orgId}, #{user.orgName}, #{user.username}, #{user.state}, now()
+        )
+    </insert>
+
+    <update id="updateSystemUser">
+        update data_stream_system_user
+        set system_user_code = #{user.systemUserCode},
+            system_user_name = #{user.systemUserName},
+            org_id = #{user.orgId},
+            org_name = #{user.orgName},
+            username = #{user.username},
+            state = #{user.state},
+            update_date = now()
+        where system_user_id = #{user.systemUserId}
+    </update>
+
+    <update id="updateSystemUserPassword">
+        update data_stream_system_user
+        set password = #{password},
+            update_date = now()
+        where system_user_id = #{systemUserId}
+    </update>
+
+    <update id="updateSystemUserState">
+        update data_stream_system_user
+        set state = #{state},
+            update_date = now()
+        where system_user_id = #{systemUserId}
+    </update>
+
+    <delete id="deleteSystemUser">
+        delete from data_stream_system_user
+        where system_user_id = #{systemUserId}
+    </delete>
+
+    <!-- ==================== 角色 ==================== -->
+
+    <sql id="roleColumns">
+        role_id, role_code, role_name, description, built_in, create_date, update_date
+    </sql>
+
+    <sql id="roleQueryCondition">
+        <where>
+            <if test="queryFlag == 2 and queryValue != null and queryValue != ''">
+                and role_code like concat('%', #{queryValue}, '%')
+            </if>
+            <if test="queryFlag == 3 and queryValue != null and queryValue != ''">
+                and role_name like concat('%', #{queryValue}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectRoleList" resultType="com.itman.datastream.common.entity.RoleEntity">
+        select <include refid="roleColumns"/>
+        from data_stream_role
+        <include refid="roleQueryCondition"/>
+        order by role_id
+        <if test="sqlLimit != null and sqlLimit != ''">
+            ${sqlLimit}
+        </if>
+    </select>
+
+    <select id="selectRoleListCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_role
+        <include refid="roleQueryCondition"/>
+    </select>
+
+    <select id="selectRoleById" resultType="com.itman.datastream.common.entity.RoleEntity">
+        select <include refid="roleColumns"/>
+        from data_stream_role
+        where role_id = #{roleId}
+    </select>
+
+    <select id="selectRoleByCode" resultType="com.itman.datastream.common.entity.RoleEntity">
+        select <include refid="roleColumns"/>
+        from data_stream_role
+        where role_code = #{roleCode}
+    </select>
+
+    <select id="selectRoleCodeCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_role
+        where role_code = #{roleCode}
+        <if test="excludeId != null">
+            and role_id &lt;&gt; #{excludeId}
+        </if>
+    </select>
+
+    <select id="selectRoleNameCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_role
+        where role_name = #{roleName}
+        <if test="excludeId != null">
+            and role_id &lt;&gt; #{excludeId}
+        </if>
+    </select>
+
+    <insert id="insertRole">
+        insert into data_stream_role (
+            role_id, role_code, role_name, description, built_in, create_date
+        ) values (
+            #{role.roleId}, #{role.roleCode}, #{role.roleName}, #{role.description}, #{role.builtIn}, now()
+        )
+    </insert>
+
+    <update id="updateRole">
+        update data_stream_role
+        set role_code = #{role.roleCode},
+            role_name = #{role.roleName},
+            description = #{role.description},
+            update_date = now()
+        where role_id = #{role.roleId}
+    </update>
+
+    <delete id="deleteRole">
+        delete from data_stream_role
+        where role_id = #{roleId}
+    </delete>
+
+    <select id="countRoleUserReferenced" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_user_role
+        where role_id = #{roleId}
+    </select>
+
+    <!-- ==================== 用户-角色 ==================== -->
+
+    <insert id="insertUserRole">
+        insert into data_stream_user_role (user_role_id, system_user_id, role_id)
+        values (#{userRole.userRoleId}, #{userRole.systemUserId}, #{userRole.roleId})
+    </insert>
+
+    <delete id="deleteUserRoleByUserId">
+        delete from data_stream_user_role
+        where system_user_id = #{systemUserId}
+    </delete>
+
+    <delete id="deleteUserRoleByRoleId">
+        delete from data_stream_user_role
+        where role_id = #{roleId}
+    </delete>
+
+    <select id="selectRolesByUserId" resultType="com.itman.datastream.common.entity.RoleEntity">
+        select r.role_id, r.role_code, r.role_name, r.description, r.built_in, r.create_date, r.update_date
+        from data_stream_role r,
+             data_stream_user_role ur
+        where r.role_id = ur.role_id
+          and ur.system_user_id = #{systemUserId}
+        order by r.role_id
+    </select>
+
+    <select id="selectRoleCodesByUserId" resultType="java.lang.String">
+        select r.role_code
+        from data_stream_role r,
+             data_stream_user_role ur
+        where r.role_id = ur.role_id
+          and ur.system_user_id = #{systemUserId}
+    </select>
+
+    <!-- ==================== 权限资源 ==================== -->
+
+    <sql id="permissionColumns">
+        permission_id, permission_code, permission_name, permission_type, parent_id, sort_no, route, built_in
+    </sql>
+
+    <select id="selectPermissionList" resultType="com.itman.datastream.common.entity.PermissionEntity">
+        select <include refid="permissionColumns"/>
+        from data_stream_permission
+        <where>
+            <if test="permissionType != null">
+                and permission_type = #{permissionType}
+            </if>
+        </where>
+        order by permission_type, sort_no, permission_id
+        <if test="sqlLimit != null and sqlLimit != ''">
+            ${sqlLimit}
+        </if>
+    </select>
+
+    <select id="selectPermissionListCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_permission
+        <where>
+            <if test="permissionType != null">
+                and permission_type = #{permissionType}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAllPermission" resultType="com.itman.datastream.common.entity.PermissionEntity">
+        select <include refid="permissionColumns"/>
+        from data_stream_permission
+        order by permission_type, sort_no, permission_id
+    </select>
+
+    <select id="selectPermissionById" resultType="com.itman.datastream.common.entity.PermissionEntity">
+        select <include refid="permissionColumns"/>
+        from data_stream_permission
+        where permission_id = #{permissionId}
+    </select>
+
+    <select id="selectPermissionCodeCount" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_permission
+        where permission_code = #{permissionCode}
+        <if test="excludeId != null">
+            and permission_id &lt;&gt; #{excludeId}
+        </if>
+    </select>
+
+    <insert id="insertPermission">
+        insert into data_stream_permission (
+            permission_id, permission_code, permission_name, permission_type,
+            parent_id, sort_no, route, built_in
+        ) values (
+            #{permission.permissionId}, #{permission.permissionCode}, #{permission.permissionName}, #{permission.permissionType},
+            #{permission.parentId}, #{permission.sortNo}, #{permission.route}, #{permission.builtIn}
+        )
+    </insert>
+
+    <update id="updatePermission">
+        update data_stream_permission
+        set permission_code = #{permission.permissionCode},
+            permission_name = #{permission.permissionName},
+            permission_type = #{permission.permissionType},
+            parent_id = #{permission.parentId},
+            sort_no = #{permission.sortNo},
+            route = #{permission.route},
+            built_in = #{permission.builtIn}
+        where permission_id = #{permission.permissionId}
+    </update>
+
+    <delete id="deletePermission">
+        delete from data_stream_permission
+        where permission_id = #{permissionId}
+    </delete>
+
+    <select id="countPermissionRoleReferenced" resultType="java.lang.Integer">
+        select count(1)
+        from data_stream_role_permission
+        where permission_id = #{permissionId}
+    </select>
+
+    <!-- ==================== 角色-权限 ==================== -->
+
+    <insert id="insertRolePermission">
+        insert into data_stream_role_permission (role_permission_id, role_id, permission_id)
+        values (#{rolePermission.rolePermissionId}, #{rolePermission.roleId}, #{rolePermission.permissionId})
+    </insert>
+
+    <delete id="deleteRolePermissionByRoleId">
+        delete from data_stream_role_permission
+        where role_id = #{roleId}
+    </delete>
+
+    <select id="selectPermissionsByRoleId" resultType="com.itman.datastream.common.entity.PermissionEntity">
+        select p.permission_id, p.permission_code, p.permission_name, p.permission_type, p.parent_id, p.sort_no, p.route, p.built_in
+        from data_stream_permission p,
+             data_stream_role_permission rp
+        where p.permission_id = rp.permission_id
+          and rp.role_id = #{roleId}
+        order by p.permission_type, p.sort_no, p.permission_id
+    </select>
+
+    <select id="selectPermissionCodesByUserId" resultType="java.lang.String">
+        select distinct p.permission_code
+        from data_stream_permission p,
+             data_stream_role_permission rp,
+             data_stream_user_role ur
+        where p.permission_id = rp.permission_id
+          and rp.role_id = ur.role_id
+          and ur.system_user_id = #{systemUserId}
+    </select>
+
+    <select id="selectMenuRoutesByUserId" resultType="java.lang.String">
+        select distinct p.route
+        from data_stream_permission p,
+             data_stream_role_permission rp,
+             data_stream_user_role ur
+        where p.permission_id = rp.permission_id
+          and rp.role_id = ur.role_id
+          and ur.system_user_id = #{systemUserId}
+          and p.permission_type = 1
+          and p.route is not null
+          and p.route &lt;&gt; ''
+    </select>
+
+</mapper>

@@ -23,4 +23,9 @@ public class QuerySystemLogRequest {
     private Integer type;
     private Integer page;
     private Integer count;
+    private String username;
+    private String moduleName;
+    private String startDate;
+    private String endDate;
+    private String keyword;
 }

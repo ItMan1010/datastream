@@ -19,11 +19,12 @@ package com.itman.datastream.security.handler;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.itman.datastream.common.entity.SystemUserEntity;
+import com.itman.datastream.engine.dao.SystemPermissionDao;
 import com.itman.datastream.security.annotation.LogOperate;
 import com.itman.datastream.security.constant.SecurityConstant;
 import com.itman.datastream.security.domain.SystemUser;
 import com.itman.datastream.security.jwt.DsJwtUser;
-import com.itman.datastream.security.utils.DsDesCipherUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -32,9 +33,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,21 +57,25 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Value("${auth.local.systemUserAuth.test.password:admin}")
     private String testPassword;
 
+    @Resource
+    private PasswordEncoder passwordEncoder;
+    @Resource
+    private SystemPermissionDao systemPermissionDao;
+
     @LogOperate(operateType = 1, moduleName = "用户登录", username = "#username", description = "'帐号登录：'+#username")
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.debug("isSsoModeEnabled: {}, isLocalTestModeEnabled: {}", isSsoModeEnabled(), isLocalTestModeEnabled());
-        if (!isSsoModeEnabled() && isLocalTestModeEnabled()) {
+        if (isSsoModeEnabled()) {
+            if (StringUtils.isEmpty(this.ssoToken)) {
+                throw new UsernameNotFoundException("登录失败,token不合法!");
+            }
+            return this.loadUserBySsoToken(username);
+        }
+        if (isLocalTestModeEnabled()) {
             return this.loadUserLocalTestMode(username);
-        } else if (!isSsoModeEnabled() && !isLocalTestModeEnabled()) {
-            //todo
         }
-
-        if (StringUtils.isEmpty(this.ssoToken)) {
-            throw new UsernameNotFoundException("登录失败,token不合法!");
-        }
-
-        return this.loadUserBySsoToken(username);
+        return this.loadUserByDatabase(username);
     }
 
 
@@ -81,16 +88,90 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private UserDetails loadUserLocalTestMode(String username) throws UsernameNotFoundException {
-        String password = DsDesCipherUtils.decrypt(loginUser.getPassword(), SecurityConstant.PASSWORD_SALT);
-        if (!testUser.equals(loginUser.getSystemUserCode()) || !testPassword.equals(password)) {
+        String password = loginUser == null ? null : loginUser.getPassword();
+        if (!testUser.equals(username) || !testPassword.equals(password)) {
             throw new UsernameNotFoundException("用户名或密码错误");
         }
         SystemUser systemUser = new SystemUser();
         systemUser.setSystemUserId(1L);
         systemUser.setSystemUserName(username);
         systemUser.setSystemUserCode(username);
-        systemUser.setPassword(this.loginUser.getPassword());
-        return new DsJwtUser(systemUser);
+        systemUser.setUsername(username);
+        // 过滤器已解密为明文，这里需与 DaoAuthenticationProvider 的 BCrypt 校验保持一致
+        systemUser.setPassword(passwordEncoder.encode(password));
+        // 本地测试模式映射内置系统管理员角色
+        List<String> roles = new ArrayList<>();
+        roles.add(SecurityConstant.SYSTEM_ADMIN_ROLE_CODE);
+        systemUser.setRoles(roles);
+        return new DsJwtUser(systemUser, buildAuthorities(roles, null));
+    }
+
+    private UserDetails loadUserByDatabase(String username) throws UsernameNotFoundException {
+        if (loginUser == null) {
+            throw new UsernameNotFoundException("用户名或密码错误");
+        }
+        SystemUserEntity userEntity;
+        try {
+            userEntity = systemPermissionDao.selectSystemUserByCode(username);
+        } catch (Exception e) {
+            log.error("loadUserByDatabase.selectSystemUserByCode.error: ", e);
+            throw new UsernameNotFoundException("用户名或密码错误");
+        }
+        if (userEntity == null) {
+            throw new UsernameNotFoundException("用户名或密码错误");
+        }
+        if (userEntity.getState() != null && userEntity.getState() != 1) {
+            throw new UsernameNotFoundException("账号已被禁用");
+        }
+        String rawPassword = loginUser.getPassword();
+        if (StringUtils.isEmpty(rawPassword) || !passwordEncoder.matches(rawPassword, userEntity.getPassword())) {
+            throw new UsernameNotFoundException("用户名或密码错误");
+        }
+
+        SystemUser systemUser = new SystemUser();
+        systemUser.setSystemUserId(userEntity.getSystemUserId());
+        systemUser.setSystemUserCode(userEntity.getSystemUserCode());
+        systemUser.setSystemUserName(userEntity.getSystemUserName());
+        systemUser.setOrgId(userEntity.getOrgId());
+        systemUser.setOrgName(userEntity.getOrgName());
+        systemUser.setUsername(userEntity.getUsername() != null ? userEntity.getUsername() : userEntity.getSystemUserCode());
+        systemUser.setPassword(userEntity.getPassword());
+
+        List<String> roles = null;
+        List<String> permissions = null;
+        List<String> menus = null;
+        try {
+            Long systemUserId = userEntity.getSystemUserId();
+            roles = systemPermissionDao.selectRoleCodesByUserId(systemUserId);
+            permissions = systemPermissionDao.selectPermissionCodesByUserId(systemUserId);
+            menus = systemPermissionDao.selectMenuRoutesByUserId(systemUserId);
+        } catch (Exception e) {
+            log.error("loadUserByDatabase.loadPermissions.error: ", e);
+        }
+        systemUser.setRoles(roles);
+        systemUser.setPermissions(permissions);
+        systemUser.setMenus(menus);
+
+        return new DsJwtUser(systemUser, buildAuthorities(roles, permissions));
+    }
+
+    private List<GrantedAuthority> buildAuthorities(List<String> roles, List<String> permissions) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if (roles != null) {
+            for (String role : roles) {
+                if (!StringUtils.isEmpty(role)) {
+                    authorities.add(new SimpleGrantedAuthority(SecurityConstant.ROLE_PREFIX + role));
+                }
+            }
+        }
+        if (permissions != null) {
+            for (String permission : permissions) {
+                if (!StringUtils.isEmpty(permission)) {
+                    authorities.add(new SimpleGrantedAuthority(SecurityConstant.PERM_PREFIX + permission));
+                }
+            }
+        }
+        return authorities;
     }
 
     private UserDetails loadUserBySsoToken(String ssoToken) throws UsernameNotFoundException {

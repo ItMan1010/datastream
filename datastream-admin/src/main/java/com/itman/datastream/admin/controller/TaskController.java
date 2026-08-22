@@ -28,6 +28,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +52,7 @@ public class TaskController {
 
 
     @LogOperate(operateType = 2, moduleName = "创建迁移任务操作", description = "'sourceObjectName:'+#createMoveTaskRequest.sourceObjectName")
+    @PreAuthorize("@permissionService.hasPermission('task:create')")
     @PostMapping(path = "/createMoveTask", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CreateMoveTaskResponse> createMoveTask(@RequestBody CreateMoveTaskRequest createMoveTaskRequest) {
         CreateMoveTaskResponse createMoveTaskResponse = new CreateMoveTaskResponse();
@@ -195,7 +197,8 @@ public class TaskController {
         return new ResponseEntity<>(queryDataMoveInfoResponse, HttpStatus.OK);
     }
 
-    @LogOperate(operateType = 2, moduleName = "任务控制操作", description = "'linkTaskId:'+#operateDataMoveTaskRequest.linkTaskId+',operate:'+#operateDataMoveTaskRequest.operate")
+    @LogOperate(operateType = 2, moduleName = "任务控制操作", description = "'taskId:'+#operateDataMoveTaskRequest.taskId+',operate:'+#operateDataMoveTaskRequest.operate")
+    @PreAuthorize("@permissionService.hasAnyPermission('task:execute','task:stop')")
     @PostMapping(path = "/operateDataMoveTask", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<OperateDataMoveTaskResponse> operateDataMoveTask(@RequestBody OperateDataMoveTaskRequest operateDataMoveTaskRequest) {
         OperateDataMoveTaskResponse operateDataMoveTaskResponse = new OperateDataMoveTaskResponse();
@@ -215,6 +218,7 @@ public class TaskController {
     }
 
     @LogOperate(operateType = 2, moduleName = "新建表链接任务", description = "'tableLinkId:'+#createTableLinkTaskRequest.tableLinkId+',businessId:'+#createTableLinkTaskRequest.businessId")
+    @PreAuthorize("@permissionService.hasPermission('task:create')")
     @PostMapping(path = "/createTableLinkTask", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CreateTableLinkTaskResponse> createTableLinkTask(@RequestBody CreateTableLinkTaskRequest createTableLinkTaskRequest) {
         CreateTableLinkTaskResponse createTableLinkTaskResponse = new CreateTableLinkTaskResponse();
@@ -234,6 +238,7 @@ public class TaskController {
     }
 
     @LogOperate(operateType = 2, moduleName = "表链接任务操作", description = "'linkTaskId:'+#operateTableLinkTaskRequest.linkTaskId+',operate:'+#operateTableLinkTaskRequest.operate")
+    @PreAuthorize("@permissionService.hasAnyPermission('task:execute','task:stop')")
     @PostMapping(path = "/operateTableLinkTask", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<OperateTableLinkTaskResponse> operateTableLinkTask(@RequestBody OperateTableLinkTaskRequest operateTableLinkTaskRequest) {
         OperateTableLinkTaskResponse operateTableLinkTaskResponse = new OperateTableLinkTaskResponse();

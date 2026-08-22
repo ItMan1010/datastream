@@ -31,4 +31,7 @@ public class SecurityConstant {
     public static final String ROLE_CLAIMS = "rol";
     public static final long EXPIRATION = 1800L;
     public static final String PASSWORD_SALT = "task-manage-3826";
+    public static final String SYSTEM_ADMIN_ROLE_CODE = "SYSTEM_ADMIN";
+    public static final String ROLE_PREFIX = "ROLE_";
+    public static final String PERM_PREFIX = "PERM_";
 }

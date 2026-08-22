@@ -30,11 +30,19 @@ import java.util.List;
 public interface SystemLogMapper {
     Integer insertSystemLog(@Param("sysdate") String sysdate, @Param("systemLog") SystemLogEntity systemLog) throws DataAccessException;
 
-    List<SystemLogEntity> querySystemLog(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("type") Integer type) throws DataAccessException;
+    List<SystemLogEntity> querySystemLog(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("type") Integer type,
+                                         @Param("username") String username, @Param("moduleName") String moduleName,
+                                         @Param("startDate") String startDate, @Param("endDate") String endDate, @Param("keyword") String keyword) throws DataAccessException;
 
-    List<SystemLogEntity> querySystemLogLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("type") Integer type) throws DataAccessException;
+    List<SystemLogEntity> querySystemLogLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("type") Integer type,
+                                                   @Param("username") String username, @Param("moduleName") String moduleName,
+                                                   @Param("startDate") String startDate, @Param("endDate") String endDate, @Param("keyword") String keyword) throws DataAccessException;
 
-    Integer querySystemLogCount(@Param("dbType") Integer dbType, @Param("type") Integer type);
+    Integer querySystemLogCount(@Param("dbType") Integer dbType, @Param("type") Integer type,
+                                @Param("username") String username, @Param("moduleName") String moduleName,
+                                @Param("startDate") String startDate, @Param("endDate") String endDate, @Param("keyword") String keyword);
+
+    Integer deleteSystemLog(@Param("systemLogId") Long systemLogId) throws DataAccessException;
 
     Integer insertSystemSession(@Param("createDate") String createDate, @Param("expireDate") String expireDate, @Param("tokenKey") String tokenKey, @Param("username") String username, @Param("state") Integer state) throws DataAccessException;
 

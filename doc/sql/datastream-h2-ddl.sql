@@ -39,6 +39,11 @@ CREATE SEQUENCE IF NOT EXISTS SEQ_DEBEZIUM_HISTORY_ID START WITH 1 INCREMENT BY 
 CREATE SEQUENCE IF NOT EXISTS SEQ_MQ_CONFIG_ID START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS SEQ_COLUMN_TYPE_DEFINE_ID START WITH 50000 INCREMENT BY 1;
 CREATE SEQUENCE IF NOT EXISTS SEQ_COLUMN_TYPE_MAP_ID START WITH 50000 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS SEQ_SYSTEM_USER_ID START WITH 50000 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS SEQ_ROLE_ID START WITH 50000 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS SEQ_USER_ROLE_ID START WITH 50000 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS SEQ_PERMISSION_ID START WITH 50000 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS SEQ_ROLE_PERMISSION_ID START WITH 50000 INCREMENT BY 1;
 
 drop table data_stream_data_base;
 drop table data_stream_move_task;
@@ -69,6 +74,11 @@ drop table data_stream_debezium_offsets;
 drop table data_stream_debezium_history;
 drop table data_stream_mq_config;
 drop table data_stream_session;
+drop table data_stream_system_user;
+drop table data_stream_role;
+drop table data_stream_user_role;
+drop table data_stream_permission;
+drop table data_stream_role_permission;
 
 -- 设置H2为MySQL兼容模式
 SET MODE MYSQL;
@@ -287,6 +297,8 @@ CREATE TABLE IF NOT EXISTS data_stream_system_log (
     user_agent VARCHAR(128) DEFAULT NULL COMMENT '操作浏览器',
     request_info VARCHAR(1024) DEFAULT NULL COMMENT '输入信息',
     response_info VARCHAR(1024) DEFAULT NULL COMMENT '输出信息',
+    elapse BIGINT DEFAULT NULL COMMENT '耗时(毫秒)',
+    result VARCHAR(10) DEFAULT NULL COMMENT '执行结果(成功/失败)',
     create_date DATETIME NOT NULL COMMENT '生成时间',
     PRIMARY KEY (system_log_id)
  );
@@ -303,7 +315,7 @@ CREATE TABLE IF NOT EXISTS data_stream_job_logback (
 CREATE INDEX IF NOT EXISTS idx_data_stream_job_logback_01 ON data_stream_job_logback(job_id, job_type);
 
 CREATE TABLE IF NOT EXISTS data_stream_session (
-    token_key VARCHAR(256) NOT NULL COMMENT 'token',
+    token_key VARCHAR(2048) NOT NULL COMMENT 'token',
     username VARCHAR(30) NOT NULL COMMENT '用户名',
     create_date DATETIME NOT NULL COMMENT '生成时间',
     expire_date DATETIME NOT NULL COMMENT '失效时间',
@@ -483,3 +495,68 @@ CREATE TABLE IF NOT EXISTS data_stream_mq_config (
 );
 
 CREATE INDEX IF NOT EXISTS idx_mq_config_name ON data_stream_mq_config(mq_config_name);
+
+-- ==================== 权限管理（RBAC）====================
+
+CREATE TABLE IF NOT EXISTS data_stream_system_user (
+    system_user_id BIGINT NOT NULL COMMENT '主键标识，序列名称：SEQ_SYSTEM_USER_ID',
+    system_user_code VARCHAR(64) NOT NULL COMMENT '登录账号（唯一）',
+    system_user_name VARCHAR(128) DEFAULT NULL COMMENT '显示名',
+    password VARCHAR(128) NOT NULL COMMENT '登录密码（BCrypt密文）',
+    org_id BIGINT DEFAULT NULL COMMENT '机构标识',
+    org_name VARCHAR(128) DEFAULT NULL COMMENT '机构名称',
+    username VARCHAR(128) DEFAULT NULL COMMENT '用户名（兼容旧字段）',
+    state INT NOT NULL COMMENT '状态：0禁用、1启用',
+    create_date DATETIME NOT NULL COMMENT '创建时间',
+    update_date DATETIME DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (system_user_id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_data_stream_system_user_code ON data_stream_system_user(system_user_code);
+
+CREATE TABLE IF NOT EXISTS data_stream_role (
+    role_id BIGINT NOT NULL COMMENT '主键标识，序列名称：SEQ_ROLE_ID',
+    role_code VARCHAR(64) NOT NULL COMMENT '角色编码（唯一）',
+    role_name VARCHAR(128) NOT NULL COMMENT '角色名称（唯一）',
+    description VARCHAR(256) DEFAULT NULL COMMENT '角色描述',
+    built_in INT NOT NULL DEFAULT 0 COMMENT '是否内置：0否、1是',
+    create_date DATETIME NOT NULL COMMENT '创建时间',
+    update_date DATETIME DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (role_id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_data_stream_role_code ON data_stream_role(role_code);
+
+CREATE TABLE IF NOT EXISTS data_stream_user_role (
+    user_role_id BIGINT NOT NULL COMMENT '主键标识，序列名称：SEQ_USER_ROLE_ID',
+    system_user_id BIGINT NOT NULL COMMENT '用户标识',
+    role_id BIGINT NOT NULL COMMENT '角色标识',
+    PRIMARY KEY (user_role_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_data_stream_user_role_user ON data_stream_user_role(system_user_id);
+CREATE INDEX IF NOT EXISTS idx_data_stream_user_role_role ON data_stream_user_role(role_id);
+
+CREATE TABLE IF NOT EXISTS data_stream_permission (
+    permission_id BIGINT NOT NULL COMMENT '主键标识，序列名称：SEQ_PERMISSION_ID',
+    permission_code VARCHAR(128) NOT NULL COMMENT '权限编码（唯一，如 task:create）',
+    permission_name VARCHAR(128) NOT NULL COMMENT '权限名称',
+    permission_type INT NOT NULL COMMENT '权限类型：1菜单、2数据操作',
+    parent_id BIGINT DEFAULT NULL COMMENT '父权限标识（菜单树）',
+    sort_no INT DEFAULT 0 COMMENT '排序号',
+    route VARCHAR(128) DEFAULT NULL COMMENT '菜单路由标识',
+    built_in INT NOT NULL DEFAULT 0 COMMENT '是否内置：0否、1是',
+    PRIMARY KEY (permission_id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_data_stream_permission_code ON data_stream_permission(permission_code);
+
+CREATE TABLE IF NOT EXISTS data_stream_role_permission (
+    role_permission_id BIGINT NOT NULL COMMENT '主键标识，序列名称：SEQ_ROLE_PERMISSION_ID',
+    role_id BIGINT NOT NULL COMMENT '角色标识',
+    permission_id BIGINT NOT NULL COMMENT '权限标识',
+    PRIMARY KEY (role_permission_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_data_stream_role_permission_role ON data_stream_role_permission(role_id);
+CREATE INDEX IF NOT EXISTS idx_data_stream_role_permission_permission ON data_stream_role_permission(permission_id);

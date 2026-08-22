@@ -115,6 +115,7 @@ public enum DataStreamErrorCode implements IErrorCode {
     DAO_UPDATE_TASK_EXECUTE_ERROR_INFO_ERROR("10094", "更新任务执行记录表失败"),
     DAO_UPDATE_TASK_ERROR_INFO_ERROR("10095", "更新任务表状态信息失败"),
     DAO_UPDATE_MOVE_TABLE_SQL_ERROR("10096", "更新表结构迁移保存sql字段失败"),
+    DAO_DEL_SYSTEM_LOG_ERROR("10097", "删除系统日志失败"),
 
 
     OPER_UPDATE_TASK_INFO_FAIL_ERROR("20000", "更新任务信息失败"),

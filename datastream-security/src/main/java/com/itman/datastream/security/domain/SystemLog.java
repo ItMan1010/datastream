@@ -16,4 +16,6 @@ public class SystemLog {
     private String userAgent;
     private String requestInfo;
     private String responseInfo;
+    private Long elapse;
+    private String result;
 }

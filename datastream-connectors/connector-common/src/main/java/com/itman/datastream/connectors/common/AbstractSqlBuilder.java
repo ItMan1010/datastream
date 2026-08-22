@@ -359,11 +359,18 @@ public abstract class AbstractSqlBuilder implements IDatabaseAdapter {
         if (bytes == null || bytes.length == 0) {
             return "''";
         }
-        // 转换为十六进制字符串，大部分数据库都支持
-        // MySQL: 0x... 或 UNHEX()
-        // PostgreSQL: decode('...', 'hex')
-        // Oracle: HEXTORAW('...')
-        return "0x" + bytesToHex(bytes);
+        String hex = bytesToHex(bytes);
+        DataBaseEnum dbType = getDataBaseType();
+        // PostgreSQL 的 bytea 类型不支持 MySQL 的 0x... 十六进制字面量，需使用 decode('...', 'hex')
+        if (dbType == DataBaseEnum.POSTGRESQL) {
+            return "decode('" + hex + "', 'hex')";
+        }
+        // Oracle/达梦 使用 HEXTORAW
+        if (dbType == DataBaseEnum.ORACLE || dbType == DataBaseEnum.DAMENG) {
+            return "HEXTORAW('" + hex + "')";
+        }
+        // MySQL 等数据库使用 0x... 十六进制字面量
+        return "0x" + hex;
     }
 
     /**

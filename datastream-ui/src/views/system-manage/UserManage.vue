@@ -50,7 +50,7 @@
         <el-table-column prop="systemUserId" label="ID" width="80" :show-overflow-tooltip="true" />
         <el-table-column prop="systemUserCode" label="账号" width="140" />
         <el-table-column prop="systemUserName" label="名称" width="140" />
-        <el-table-column prop="orgName" label="机构" min-width="140" :show-overflow-tooltip="true" />
+        <el-table-column prop="orgName" label="机构" width="140" :show-overflow-tooltip="true" />
         <el-table-column label="状态" width="90">
           <template #default="scope">
             <el-tag :type="stateTagType(scope.row.state)" effect="plain">
@@ -58,7 +58,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createDate" label="创建时间" width="170" />
+        <el-table-column prop="createDate" label="创建时间" min-width="170" />
         <el-table-column label="操作" width="320" fixed="right">
           <template #default="scope">
             <div class="datasource-opt">

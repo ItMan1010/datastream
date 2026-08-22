@@ -50,7 +50,7 @@
         <el-table-column prop="roleId" label="ID" width="80" :show-overflow-tooltip="true" />
         <el-table-column prop="roleCode" label="角色编码" width="160" />
         <el-table-column prop="roleName" label="角色名称" width="160" />
-        <el-table-column prop="description" label="描述" min-width="180" :show-overflow-tooltip="true" />
+        <el-table-column prop="description" label="描述" width="180" :show-overflow-tooltip="true" />
         <el-table-column label="类型" width="90">
           <template #default="scope">
             <el-tag :type="isBuiltInRole(scope.row) ? 'warning' : 'info'" effect="plain">
@@ -58,7 +58,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createDate" label="创建时间" width="170" />
+        <el-table-column prop="createDate" label="创建时间" min-width="170" />
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="scope">
             <div class="datasource-opt">

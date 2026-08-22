@@ -31,18 +31,18 @@
             stripe
             highlight-current-row
             style="width: 100%;">
-            <el-table-column prop="permissionName" label="菜单名称" min-width="180" />
+            <el-table-column prop="permissionName" label="菜单名称" width="180" />
             <el-table-column prop="permissionCode" label="权限编码" width="180" />
             <el-table-column prop="route" label="路由名称" width="160" />
             <el-table-column prop="sortNo" label="排序" width="80" />
-            <el-table-column label="类型" width="90">
+            <el-table-column label="类型" min-width="90">
               <template #default="scope">
                 <el-tag :type="isBuiltInPermission(scope.row) ? 'warning' : 'info'" effect="plain">
                   {{ builtInLabel(scope.row.builtIn) }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="240" fixed="right">
+            <el-table-column label="操作" width="280" fixed="right">
               <template #default="scope">
                 <div class="datasource-opt">
                   <el-button type="primary" size="small" @click="openAddPermission(1, scope.row.permissionId)" plain>
@@ -82,10 +82,10 @@
         </div>
         <div class="mt-10">
           <el-table :data="dataPermissionList" fit stripe highlight-current-row style="width: 100%;">
-            <el-table-column prop="permissionName" label="权限名称" min-width="180" />
+            <el-table-column prop="permissionName" label="权限名称" width="180" />
             <el-table-column prop="permissionCode" label="权限编码" width="200" />
             <el-table-column prop="sortNo" label="排序" width="80" />
-            <el-table-column label="类型" width="90">
+            <el-table-column label="类型" min-width="90">
               <template #default="scope">
                 <el-tag :type="isBuiltInPermission(scope.row) ? 'warning' : 'info'" effect="plain">
                   {{ builtInLabel(scope.row.builtIn) }}
@@ -236,8 +236,8 @@ export default {
 
 .datasource-opt {
   display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+  justify-content: flex-start;
   gap: 4px;
+  flex-wrap: nowrap;
 }
 </style>

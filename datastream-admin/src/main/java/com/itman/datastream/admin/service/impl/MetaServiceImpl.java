@@ -55,29 +55,29 @@ public class MetaServiceImpl implements IMetaService {
 
 
     @Override
-    public List<DataMoveTaskEntity> queryDataMoveTaskByState(Integer state, Integer page, Integer count) throws DataStreamException {
-        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByState(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), state) : dataStreamDao.queryDataMoveTaskByStateLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), state);
+    public List<DataMoveTaskEntity> queryDataMoveTaskByState(Integer state, Integer page, Integer count, String systemUserCode) throws DataStreamException {
+        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByState(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), state, systemUserCode) : dataStreamDao.queryDataMoveTaskByStateLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), state, systemUserCode);
         loadDataSourceByMoveTasks(dataMoveTaskList);
         return dataMoveTaskList;
     }
 
     @Override
-    public List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(Long batchTaskId, Integer page, Integer count) throws DataStreamException {
-        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByBatchTaskId(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), batchTaskId) : dataStreamDao.queryDataMoveTaskByBatchTaskIdLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), batchTaskId);
+    public List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(Long batchTaskId, Integer page, Integer count, String systemUserCode) throws DataStreamException {
+        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByBatchTaskId(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), batchTaskId, systemUserCode) : dataStreamDao.queryDataMoveTaskByBatchTaskIdLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), batchTaskId, systemUserCode);
         loadDataSourceByMoveTasks(dataMoveTaskList);
         return dataMoveTaskList;
     }
 
     @Override
-    public List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(Long copyTaskId, Integer page, Integer count) throws DataStreamException {
-        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByCopyTaskId(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), copyTaskId) : dataStreamDao.queryDataMoveTaskByCopyTaskIdLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), copyTaskId);
+    public List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(Long copyTaskId, Integer page, Integer count, String systemUserCode) throws DataStreamException {
+        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByCopyTaskId(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), copyTaskId, systemUserCode) : dataStreamDao.queryDataMoveTaskByCopyTaskIdLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), copyTaskId, systemUserCode);
         loadDataSourceByMoveTasks(dataMoveTaskList);
         return dataMoveTaskList;
     }
 
     @Override
-    public List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(Integer taskType, Integer page, Integer count) throws DataStreamException {
-        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByTaskType(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), taskType) : dataStreamDao.queryDataMoveTaskByTaskTypeLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), taskType);
+    public List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(Integer taskType, Integer page, Integer count, String systemUserCode) throws DataStreamException {
+        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByTaskType(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), taskType, systemUserCode) : dataStreamDao.queryDataMoveTaskByTaskTypeLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), taskType, systemUserCode);
         loadDataSourceByMoveTasks(dataMoveTaskList);
         return dataMoveTaskList;
     }
@@ -191,16 +191,16 @@ public class MetaServiceImpl implements IMetaService {
     }
 
     @Override
-    public List<DataMoveTaskEntity> queryDataMoveTaskByDate(String beginDate, String endDate, Integer page, Integer count) throws DataStreamException {
-        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByDate(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), geMetaDbObject().stringToDate(beginDate), geMetaDbObject().stringToDate(endDate)) : dataStreamDao.queryDataMoveTaskByDateLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), geMetaDbObject().stringToDate(beginDate), geMetaDbObject().stringToDate(endDate));
+    public List<DataMoveTaskEntity> queryDataMoveTaskByDate(String beginDate, String endDate, Integer page, Integer count, String systemUserCode) throws DataStreamException {
+        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByDate(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), geMetaDbObject().stringToDate(beginDate), geMetaDbObject().stringToDate(endDate), systemUserCode) : dataStreamDao.queryDataMoveTaskByDateLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), geMetaDbObject().stringToDate(beginDate), geMetaDbObject().stringToDate(endDate), systemUserCode);
 
         loadDataSourceByMoveTasks(dataMoveTaskList);
         return dataMoveTaskList;
     }
 
     @Override
-    public List<DataMoveTaskEntity> queryDataMoveTaskByTableName(String tableName, Integer page, Integer count) throws DataStreamException {
-        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByTableName(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), tableName) : dataStreamDao.queryDataMoveTaskByTableNameLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), tableName);
+    public List<DataMoveTaskEntity> queryDataMoveTaskByTableName(String tableName, Integer page, Integer count, String systemUserCode) throws DataStreamException {
+        List<DataMoveTaskEntity> dataMoveTaskList = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ? dataStreamDao.queryDataMoveTaskByTableName(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), tableName, systemUserCode) : dataStreamDao.queryDataMoveTaskByTableNameLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), tableName, systemUserCode);
         loadDataSourceByMoveTasks(dataMoveTaskList);
         return dataMoveTaskList;
     }
@@ -355,28 +355,28 @@ public class MetaServiceImpl implements IMetaService {
     }
 
     @Override
-    public Integer getMoveTaskCount(String beginDate, String endDate, Integer state) throws DataStreamException {
-        return dataStreamDao.getMoveTaskCount(StringUtils.isEmpty(beginDate) ? null : geMetaDbObject().stringToDate(beginDate), StringUtils.isEmpty(endDate) ? null : geMetaDbObject().stringToDate(endDate), state);
+    public Integer getMoveTaskCount(String beginDate, String endDate, Integer state, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.getMoveTaskCount(StringUtils.isEmpty(beginDate) ? null : geMetaDbObject().stringToDate(beginDate), StringUtils.isEmpty(endDate) ? null : geMetaDbObject().stringToDate(endDate), state, systemUserCode);
     }
 
     @Override
-    public Integer getMoveTaskCountByBatchTaskId(Long batchTaskId) throws DataStreamException {
-        return dataStreamDao.getMoveTaskCountByBatchTaskId(batchTaskId);
+    public Integer getMoveTaskCountByBatchTaskId(Long batchTaskId, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.getMoveTaskCountByBatchTaskId(batchTaskId, systemUserCode);
     }
 
     @Override
-    public Integer getMoveTaskCountByCopyTaskId(Long copyTaskId) throws DataStreamException {
-        return dataStreamDao.getMoveTaskCountByCopyTaskId(copyTaskId);
+    public Integer getMoveTaskCountByCopyTaskId(Long copyTaskId, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.getMoveTaskCountByCopyTaskId(copyTaskId, systemUserCode);
     }
 
     @Override
-    public Integer getMoveTaskCountByTaskType(Integer taskType) throws DataStreamException {
-        return dataStreamDao.getMoveTaskCountByTaskType(taskType);
+    public Integer getMoveTaskCountByTaskType(Integer taskType, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.getMoveTaskCountByTaskType(taskType, systemUserCode);
     }
 
     @Override
-    public Integer getMoveTaskCountByTableName(String tableName) throws DataStreamException {
-        return dataStreamDao.getMoveTaskCountByTableName(tableName);
+    public Integer getMoveTaskCountByTableName(String tableName, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.getMoveTaskCountByTableName(tableName, systemUserCode);
     }
 
     @Override

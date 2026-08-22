@@ -124,7 +124,7 @@ public class StartExecutor {
     }
 
     public void dispatchMoveTask() throws DataStreamException {
-        List<DataMoveTaskEntity> dataMoveTaskList = metaService.queryDataMoveTaskByState(DATA_STREAM_TASK_STATE_INIT, 1, 10);
+        List<DataMoveTaskEntity> dataMoveTaskList = metaService.queryDataMoveTaskByState(DATA_STREAM_TASK_STATE_INIT, 1, 10, null);
         if (!CollectionUtils.isEmpty(dataMoveTaskList) && dataMoveTaskList.get(0).getTaskId() != null) {
             if (dataMoveTaskList.get(0).getState().equals(DATA_STREAM_TASK_STATE_INIT)) {
                 Integer sendMode = (dataMoveTaskList.get(0).getSendMode() == null) ? dataMoveTaskList.get(0).getSourcePropertiesSendMode() : dataMoveTaskList.get(0).getSendMode();

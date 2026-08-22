@@ -18,7 +18,9 @@ package com.itman.datastream.security.service;
 
 import com.itman.datastream.engine.dao.SystemPermissionDao;
 import com.itman.datastream.security.constant.SecurityConstant;
+import com.itman.datastream.security.domain.SystemUser;
 import com.itman.datastream.security.exception.PermissionDeniedException;
+import com.itman.datastream.security.jwt.DsJwtUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -68,6 +70,41 @@ public class PermissionService {
             }
         }
         throw new PermissionDeniedException(buildAnyDeniedMessage(permissionCodes));
+    }
+
+    /**
+     * 判断当前登录用户是否为系统管理员（或兼容的 SSO 全量角色）。
+     * 用于行级数据范围控制：管理员返回 {@code true}，可见全部任务数据。
+     */
+    public boolean isAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getAuthorities() == null) {
+            return false;
+        }
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            String auth = authority.getAuthority();
+            if (SYSTEM_ADMIN_AUTHORITY.equals(auth) || LEGACY_TASK_ALL_AUTHORITY.equals(auth)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获取当前登录用户的用户编码。
+     * 兼容 JWT 认证（principal 为 String，即 systemUserCode）与登录态（principal 为 {@link DsJwtUser}）两种情形。
+     */
+    public String getCurrentUserCode() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof DsJwtUser) {
+            SystemUser systemUser = ((DsJwtUser) principal).getSystemUserInfo();
+            return systemUser != null ? systemUser.getSystemUserCode() : null;
+        }
+        return authentication.getName();
     }
 
     private boolean checkPermission(String permissionCode) {

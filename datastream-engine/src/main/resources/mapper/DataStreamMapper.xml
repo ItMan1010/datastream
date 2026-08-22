@@ -8,6 +8,9 @@
         </if>
         SELECT count(1) from data_stream_move_task
         where 1=1
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         <if test="state!=null and state!=''">
             and state=#{state}
         </if>
@@ -23,6 +26,9 @@
         SELECT count(1)
         from data_stream_move_task
         where batch_task_id = #{batchTaskId}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
     </select>
 
     <select id="getMoveTaskCountByCopyTaskId" resultType="java.lang.Integer">
@@ -31,8 +37,10 @@
         </if>
         SELECT count(1)
         from data_stream_move_task
-        where task_id = #{copyTaskId}
-        or copy_task_id = #{copyTaskId}
+        where (task_id = #{copyTaskId} or copy_task_id = #{copyTaskId})
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
     </select>
 
     <select id="getMoveTaskCountByTaskType" resultType="java.lang.Integer">
@@ -42,6 +50,9 @@
         SELECT count(1)
         from data_stream_move_task
         where task_type = #{taskType}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
     </select>
 
     <select id="getMoveTaskCountByTableName" resultType="java.lang.Integer">
@@ -51,6 +62,9 @@
         SELECT count(1)
         from data_stream_move_task
         where source_table_name = #{tableName}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
     </select>
 
     <select id="statMoveTaskCount" resultType="java.lang.Integer">
@@ -97,6 +111,9 @@
         <include refid="dataMoveTaskColumnList"/>
         from data_stream_move_task
         where state = #{state}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         order by priority,create_date, source_object_name
         ${sqlLimit}
     </select>
@@ -110,6 +127,9 @@
         ,row_number() over (order by priority,create_date, source_object_name) as rn
         from data_stream_move_task
         where state = #{state}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         )
         where rn between #{pageBeginRow} and #{pageEndRow}
     </select>
@@ -123,6 +143,9 @@
         <include refid="dataMoveTaskColumnList"/>
         from data_stream_move_task
         where batch_task_id = #{batchTaskId}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         order by create_date desc
         ${sqlLimit}
     </select>
@@ -136,6 +159,9 @@
         ,row_number() over (order by create_date desc) as rn
         from data_stream_move_task
         where batch_task_id = #{batchTaskId}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         )
         where rn between #{pageBeginRow} and #{pageEndRow}
     </select>
@@ -148,7 +174,10 @@
         select
         <include refid="dataMoveTaskColumnList"/>
         from data_stream_move_task
-        where task_id=#{copyTaskId} or copy_task_id=#{copyTaskId}
+        where (task_id=#{copyTaskId} or copy_task_id=#{copyTaskId})
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         order by create_date desc
         ${sqlLimit}
     </select>
@@ -161,7 +190,10 @@
         <include refid="dataMoveTaskColumnList"/>
         ,row_number() over (order by create_date desc) as rn
         from data_stream_move_task
-        where task_id=#{copyTaskId} or copy_task_id=#{copyTaskId}
+        where (task_id=#{copyTaskId} or copy_task_id=#{copyTaskId})
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         )
         where rn between #{pageBeginRow} and #{pageEndRow}
     </select>
@@ -174,7 +206,11 @@
         select
         <include refid="dataMoveTaskColumnList"/>
         from data_stream_move_task
-        where task_type=#{taskType} order by create_date desc
+        where task_type=#{taskType}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
+        order by create_date desc
         ${sqlLimit}
     </select>
 
@@ -187,6 +223,9 @@
         ,row_number() over (order by create_date desc) as rn
         from data_stream_move_task
         where task_type=#{taskType}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         )
         where rn between #{pageBeginRow} and #{pageEndRow}
     </select>
@@ -200,6 +239,9 @@
         from data_stream_move_task
         <where>
             create_date between ${beginDate} and ${endDate}
+            <if test="systemUserCode != null and systemUserCode != ''">
+                and system_user_code = #{systemUserCode}
+            </if>
         </where>
         order by create_date desc
         ${sqlLimit}
@@ -215,6 +257,9 @@
         from data_stream_move_task
         <where>
             create_date between ${beginDate} and ${endDate}
+            <if test="systemUserCode != null and systemUserCode != ''">
+                and system_user_code = #{systemUserCode}
+            </if>
         </where>
         )
         where rn between #{pageBeginRow} and #{pageEndRow}
@@ -239,6 +284,9 @@
         <include refid="dataMoveTaskColumnList"/>
         from data_stream_move_task
         where source_object_name = #{tableName}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         order by create_date desc
         ${sqlLimit}
     </select>
@@ -252,6 +300,9 @@
         ,row_number() over (order by create_date desc) as rn
         from data_stream_move_task
         where source_object_name = #{tableName}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         )
         where rn between #{pageBeginRow} and #{pageEndRow}
     </select>

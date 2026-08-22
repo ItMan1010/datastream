@@ -22,17 +22,17 @@ import com.itman.datastream.common.errcode.DataStreamException;
 import java.util.List;
 
 public interface IMetaService {
-    List<DataMoveTaskEntity> queryDataMoveTaskByState(Integer state, Integer page, Integer count) throws DataStreamException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByState(Integer state, Integer page, Integer count, String systemUserCode) throws DataStreamException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(Long batchTaskId, Integer page, Integer count) throws DataStreamException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(Long batchTaskId, Integer page, Integer count, String systemUserCode) throws DataStreamException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(Long copyTaskId, Integer page, Integer count) throws DataStreamException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(Long copyTaskId, Integer page, Integer count, String systemUserCode) throws DataStreamException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(Integer taskType, Integer page, Integer count) throws DataStreamException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(Integer taskType, Integer page, Integer count, String systemUserCode) throws DataStreamException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByDate(String beginDate, String endDate, Integer page, Integer count) throws DataStreamException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByDate(String beginDate, String endDate, Integer page, Integer count, String systemUserCode) throws DataStreamException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByTableName(String tableName, Integer page, Integer count) throws DataStreamException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByTableName(String tableName, Integer page, Integer count, String systemUserCode) throws DataStreamException;
 
     Integer updateDataMoveTaskState(Long taskId, Long taskExecuteId, Integer oldState, Integer state, Integer sendMode) throws DataStreamException;
 
@@ -77,15 +77,15 @@ public interface IMetaService {
     void updateDataMoveInfoById(DataMoveInfoEntity dataMoveInfo);
     void updateDataMoveInfoRunningById(DataMoveInfoEntity dataMoveInfo);
 
-    Integer getMoveTaskCount(String beginDate, String endDate, Integer state) throws DataStreamException;
+    Integer getMoveTaskCount(String beginDate, String endDate, Integer state, String systemUserCode) throws DataStreamException;
 
-    Integer getMoveTaskCountByBatchTaskId(Long batchTaskId) throws DataStreamException;
+    Integer getMoveTaskCountByBatchTaskId(Long batchTaskId, String systemUserCode) throws DataStreamException;
 
-    Integer getMoveTaskCountByCopyTaskId(Long copyTaskId) throws DataStreamException;
+    Integer getMoveTaskCountByCopyTaskId(Long copyTaskId, String systemUserCode) throws DataStreamException;
 
-    Integer getMoveTaskCountByTaskType(Integer taskType) throws DataStreamException;
+    Integer getMoveTaskCountByTaskType(Integer taskType, String systemUserCode) throws DataStreamException;
 
-    Integer getMoveTaskCountByTableName(String tableName) throws DataStreamException;
+    Integer getMoveTaskCountByTableName(String tableName, String systemUserCode) throws DataStreamException;
 
     List<TableLinkTaskEntity> queryTableLinkTaskByState(Integer state, Integer page, Integer count) throws DataStreamException;
     Integer queryTableLinkTaskByStateCount(Integer state) throws DataStreamException;

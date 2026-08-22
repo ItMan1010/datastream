@@ -36,6 +36,7 @@ import com.itman.datastream.common.api.DataSourceFactory;
 import com.itman.datastream.admin.service.IMetaService;
 import com.itman.datastream.admin.service.IMoveSourceService;
 import com.itman.datastream.admin.service.IMoveTargetService;
+import com.itman.datastream.security.service.PermissionService;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,8 +71,9 @@ public class DataMoveHandler extends AbstractHandler {
     private final ISystemLogEvent systemLogEvent;
     private final DataStreamHolder dataStreamHolder;
     private final TaskParamExtend taskParamExtend;
+    private final PermissionService permissionService;
 
-    public DataMoveHandler(DataSourceFactory dataSourceFactory, IMetaService metaService, IMoveSourceService moveSourceService, IMoveTargetService moveTargetService, DataStreamConfig dataStreamConfig, DataBaseSource dataBaseSource, ISystemLogEvent systemLogEvent, DataStreamHolder dataStreamHolder, TaskParamExtend taskParamExtend) {
+    public DataMoveHandler(DataSourceFactory dataSourceFactory, IMetaService metaService, IMoveSourceService moveSourceService, IMoveTargetService moveTargetService, DataStreamConfig dataStreamConfig, DataBaseSource dataBaseSource, ISystemLogEvent systemLogEvent, DataStreamHolder dataStreamHolder, TaskParamExtend taskParamExtend, PermissionService permissionService) {
         super(dataSourceFactory, dataStreamConfig, metaService, dataStreamHolder, moveTargetService);
         this.metaService = metaService;
         this.moveSourceService = moveSourceService;
@@ -79,6 +81,7 @@ public class DataMoveHandler extends AbstractHandler {
         this.systemLogEvent = systemLogEvent;
         this.dataStreamHolder = dataStreamHolder;
         this.taskParamExtend = taskParamExtend;
+        this.permissionService = permissionService;
     }
 
     private static final ConcurrentHashMap<Long, Object> taskLocks = new ConcurrentHashMap<>();
@@ -1385,27 +1388,29 @@ public class DataMoveHandler extends AbstractHandler {
 
     public Integer queryDataMoveTaskCount(QueryDataMoveTaskRequest queryDateMoveTaskRequest) throws DataStreamException {
         int total = 0;
+        String systemUserCode = permissionService.isAdmin() ? null : permissionService.getCurrentUserCode();
         switch (queryDateMoveTaskRequest.getQueryFlag()) {
             case QUERY_DATE_MOVE_TASK_FLAG_BY_TASK_ID:
+                validateTaskOwner(queryDateMoveTaskRequest.getTaskId());
                 total = metaService.queryTaskByTaskId(queryDateMoveTaskRequest.getTaskId()).size();
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_TABLE_NAME:
-                total = metaService.getMoveTaskCountByTableName(queryDateMoveTaskRequest.getTableName());
+                total = metaService.getMoveTaskCountByTableName(queryDateMoveTaskRequest.getTableName(), systemUserCode);
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_STATE:
-                total = metaService.getMoveTaskCount(null, null, queryDateMoveTaskRequest.getState());
+                total = metaService.getMoveTaskCount(null, null, queryDateMoveTaskRequest.getState(), systemUserCode);
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_TIME:
-                total = metaService.getMoveTaskCount(queryDateMoveTaskRequest.getBeginDate(), queryDateMoveTaskRequest.getEndDate(), null);
+                total = metaService.getMoveTaskCount(queryDateMoveTaskRequest.getBeginDate(), queryDateMoveTaskRequest.getEndDate(), null, systemUserCode);
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_BATCH_TASK_ID:
-                total = metaService.getMoveTaskCountByBatchTaskId(queryDateMoveTaskRequest.getBatchTaskId());
+                total = metaService.getMoveTaskCountByBatchTaskId(queryDateMoveTaskRequest.getBatchTaskId(), systemUserCode);
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_COPY_TASK_ID:
-                total = metaService.getMoveTaskCountByCopyTaskId(queryDateMoveTaskRequest.getCopyTaskId());
+                total = metaService.getMoveTaskCountByCopyTaskId(queryDateMoveTaskRequest.getCopyTaskId(), systemUserCode);
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_TASK_TYPE:
-                total = metaService.getMoveTaskCountByTaskType(queryDateMoveTaskRequest.getTaskType());
+                total = metaService.getMoveTaskCountByTaskType(queryDateMoveTaskRequest.getTaskType(), systemUserCode);
                 break;
             default:
                 throw new DataStreamException(DataStreamErrorCode.OPER_TASK_QUERY_FLAG_NULL_ERROR);
@@ -1415,33 +1420,50 @@ public class DataMoveHandler extends AbstractHandler {
 
     public List<DataMoveTaskEntity> queryDataMoveTaskList(QueryDataMoveTaskRequest queryDateMoveTaskRequest) throws DataStreamException {
         List<DataMoveTaskEntity> dataMoveTaskList = new ArrayList<>();
+        String systemUserCode = permissionService.isAdmin() ? null : permissionService.getCurrentUserCode();
 
         switch (queryDateMoveTaskRequest.getQueryFlag()) {
             case QUERY_DATE_MOVE_TASK_FLAG_BY_TASK_ID:
+                validateTaskOwner(queryDateMoveTaskRequest.getTaskId());
                 dataMoveTaskList.addAll(queryDateMoveTaskByTaskId(queryDateMoveTaskRequest));
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_TABLE_NAME:
-                dataMoveTaskList.addAll(queryDateMoveTaskByTableName(queryDateMoveTaskRequest));
+                dataMoveTaskList.addAll(queryDateMoveTaskByTableName(queryDateMoveTaskRequest, systemUserCode));
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_STATE:
-                dataMoveTaskList.addAll(queryDateMoveTaskByState(queryDateMoveTaskRequest));
+                dataMoveTaskList.addAll(queryDateMoveTaskByState(queryDateMoveTaskRequest, systemUserCode));
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_TIME:
-                dataMoveTaskList.addAll(queryDateMoveTaskByDate(queryDateMoveTaskRequest));
+                dataMoveTaskList.addAll(queryDateMoveTaskByDate(queryDateMoveTaskRequest, systemUserCode));
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_BATCH_TASK_ID:
-                dataMoveTaskList.addAll(queryDataMoveTaskByBatchTaskId(queryDateMoveTaskRequest));
+                dataMoveTaskList.addAll(queryDataMoveTaskByBatchTaskId(queryDateMoveTaskRequest, systemUserCode));
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_COPY_TASK_ID:
-                dataMoveTaskList.addAll(queryDataMoveTaskByCopyTaskId(queryDateMoveTaskRequest));
+                dataMoveTaskList.addAll(queryDataMoveTaskByCopyTaskId(queryDateMoveTaskRequest, systemUserCode));
                 break;
             case QUERY_DATE_MOVE_TASK_FLAG_BY_TASK_TYPE:
-                dataMoveTaskList.addAll(queryDataMoveTaskByTaskType(queryDateMoveTaskRequest));
+                dataMoveTaskList.addAll(queryDataMoveTaskByTaskType(queryDateMoveTaskRequest, systemUserCode));
                 break;
             default:
                 throw new DataStreamException(DataStreamErrorCode.OPER_TASK_QUERY_FLAG_NULL_ERROR);
         }
         return dataMoveTaskList;
+    }
+
+    private void validateTaskOwner(Long taskId) throws DataStreamException {
+        if (permissionService.isAdmin()) {
+            return;
+        }
+        String currentUserCode = permissionService.getCurrentUserCode();
+        List<DataMoveTaskEntity> taskList = metaService.queryTaskByTaskId(taskId);
+        if (CollectionUtils.isEmpty(taskList)) {
+            return;
+        }
+        String owner = taskList.get(0).getSystemUserCode();
+        if (StringUtils.isEmpty(currentUserCode) || !currentUserCode.equals(owner)) {
+            throw new DataStreamException(DataStreamErrorCode.OPER_TASK_NOT_OWNER_ERROR);
+        }
     }
 
 
@@ -1450,36 +1472,36 @@ public class DataMoveHandler extends AbstractHandler {
         return metaService.queryTaskByTaskId(queryDateMoveTaskRequest.getTaskId());
     }
 
-    private List<DataMoveTaskEntity> queryDateMoveTaskByTableName(QueryDataMoveTaskRequest queryDateMoveTaskRequest) throws DataStreamException {
+    private List<DataMoveTaskEntity> queryDateMoveTaskByTableName(QueryDataMoveTaskRequest queryDateMoveTaskRequest, String systemUserCode) throws DataStreamException {
         Optional.ofNullable(queryDateMoveTaskRequest.getTableName()).orElseThrow(() -> new DataStreamException(DataStreamErrorCode.PARAM_TASK_QUERY_TABLE_NAME_NULL_ERROR));
-        return metaService.queryDataMoveTaskByTableName(queryDateMoveTaskRequest.getTableName(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount());
+        return metaService.queryDataMoveTaskByTableName(queryDateMoveTaskRequest.getTableName(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount(), systemUserCode);
     }
 
-    private List<DataMoveTaskEntity> queryDateMoveTaskByState(QueryDataMoveTaskRequest queryDateMoveTaskRequest) throws DataStreamException {
+    private List<DataMoveTaskEntity> queryDateMoveTaskByState(QueryDataMoveTaskRequest queryDateMoveTaskRequest, String systemUserCode) throws DataStreamException {
         Optional.ofNullable(queryDateMoveTaskRequest.getState()).orElseThrow(() -> new DataStreamException(DataStreamErrorCode.PARAM_TASK_QUERY_STATE_NULL_ERROR));
-        return metaService.queryDataMoveTaskByState(queryDateMoveTaskRequest.getState(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount());
+        return metaService.queryDataMoveTaskByState(queryDateMoveTaskRequest.getState(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount(), systemUserCode);
     }
 
-    private List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(QueryDataMoveTaskRequest queryDateMoveTaskRequest) throws DataStreamException {
+    private List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(QueryDataMoveTaskRequest queryDateMoveTaskRequest, String systemUserCode) throws DataStreamException {
         Optional.ofNullable(queryDateMoveTaskRequest.getBatchTaskId()).orElseThrow(() -> new DataStreamException(OPER_BATCH_TASK_ID_NULL_ERROR));
-        return metaService.queryDataMoveTaskByBatchTaskId(queryDateMoveTaskRequest.getBatchTaskId(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount());
+        return metaService.queryDataMoveTaskByBatchTaskId(queryDateMoveTaskRequest.getBatchTaskId(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount(), systemUserCode);
     }
 
-    private List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(QueryDataMoveTaskRequest queryDateMoveTaskRequest) throws DataStreamException {
+    private List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(QueryDataMoveTaskRequest queryDateMoveTaskRequest, String systemUserCode) throws DataStreamException {
         Optional.ofNullable(queryDateMoveTaskRequest.getCopyTaskId()).orElseThrow(() -> new DataStreamException(OPER_COPY_TASK_ID_NULL_ERROR));
-        return metaService.queryDataMoveTaskByCopyTaskId(queryDateMoveTaskRequest.getCopyTaskId(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount());
+        return metaService.queryDataMoveTaskByCopyTaskId(queryDateMoveTaskRequest.getCopyTaskId(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount(), systemUserCode);
     }
 
-    private List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(QueryDataMoveTaskRequest queryDateMoveTaskRequest) throws DataStreamException {
+    private List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(QueryDataMoveTaskRequest queryDateMoveTaskRequest, String systemUserCode) throws DataStreamException {
         Optional.ofNullable(queryDateMoveTaskRequest.getTaskType()).orElseThrow(() -> new DataStreamException(OPER_TASK_TYPE_NULL_ERROR));
-        return metaService.queryDataMoveTaskByTaskType(queryDateMoveTaskRequest.getTaskType(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount());
+        return metaService.queryDataMoveTaskByTaskType(queryDateMoveTaskRequest.getTaskType(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount(), systemUserCode);
     }
 
 
-    public List<DataMoveTaskEntity> queryDateMoveTaskByDate(QueryDataMoveTaskRequest queryDateMoveTaskRequest) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDateMoveTaskByDate(QueryDataMoveTaskRequest queryDateMoveTaskRequest, String systemUserCode) throws DataStreamException {
         Optional.ofNullable(queryDateMoveTaskRequest.getBeginDate()).orElseThrow(() -> new DataStreamException(DataStreamErrorCode.PARAM_TASK_QUERY_BEGIN_DATE_NULL_ERROR));
         Optional.ofNullable(queryDateMoveTaskRequest.getEndDate()).orElseThrow(() -> new DataStreamException(DataStreamErrorCode.PARAM_TASK_QUERY_END_DATE_NULL_ERROR));
-        return metaService.queryDataMoveTaskByDate(queryDateMoveTaskRequest.getBeginDate(), queryDateMoveTaskRequest.getEndDate(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount());
+        return metaService.queryDataMoveTaskByDate(queryDateMoveTaskRequest.getBeginDate(), queryDateMoveTaskRequest.getEndDate(), queryDateMoveTaskRequest.getPage(), queryDateMoveTaskRequest.getCount(), systemUserCode);
     }
 
     public List<DataMoveInfoEntity> queryDataMoveInfoList(QueryDataMoveInfoRequest queryDateMoveInfoRequest) throws DataStreamException {

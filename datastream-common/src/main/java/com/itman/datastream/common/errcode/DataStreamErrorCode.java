@@ -247,6 +247,7 @@ public enum DataStreamErrorCode implements IErrorCode {
     OPER_SOURCE_DATA_QUERY_BY_PK_ERROR("20128", "根据主键查询源数据失败"),
     OPER_GET_SCHEMA_NULL_FAIL_ERROR("20129", "获取schema失败报错"),
     OPER_GET_TABLE_STRUCT_INFO_ERROR("20130", "根据表名称获取表结构信息失败"),
+    OPER_TASK_NOT_OWNER_ERROR("20131", "无权访问该任务数据"),
 
 
     PARAM_TASK_CREATE_REQUEST_NULL_ERROR("30000", "任务创建请求为空"),

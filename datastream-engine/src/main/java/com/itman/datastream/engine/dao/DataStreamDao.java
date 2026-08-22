@@ -50,153 +50,153 @@ public class DataStreamDao {
     public final ISystemLogEvent systemLogEvent;
 
 
-    public Integer getMoveTaskCount(String beginDate, String endDate, Integer state) throws DataStreamException {
+    public Integer getMoveTaskCount(String beginDate, String endDate, Integer state, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.getMoveTaskCount(dataStreamConfig.getMetaTeledbType(), beginDate, endDate, state);
+            return dataStreamMapper.getMoveTaskCount(dataStreamConfig.getMetaTeledbType(), beginDate, endDate, state, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TABLE_COUNT_ERROR);
         }
     }
 
-    public Integer getMoveTaskCountByBatchTaskId(Long batchTaskId) throws DataStreamException {
+    public Integer getMoveTaskCountByBatchTaskId(Long batchTaskId, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.getMoveTaskCountByBatchTaskId(dataStreamConfig.getMetaTeledbType(), batchTaskId);
+            return dataStreamMapper.getMoveTaskCountByBatchTaskId(dataStreamConfig.getMetaTeledbType(), batchTaskId, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TABLE_COUNT_ERROR);
         }
     }
 
-    public Integer getMoveTaskCountByCopyTaskId(Long copyTaskId) throws DataStreamException {
+    public Integer getMoveTaskCountByCopyTaskId(Long copyTaskId, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.getMoveTaskCountByCopyTaskId(dataStreamConfig.getMetaTeledbType(), copyTaskId);
+            return dataStreamMapper.getMoveTaskCountByCopyTaskId(dataStreamConfig.getMetaTeledbType(), copyTaskId, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TABLE_COUNT_ERROR);
         }
     }
 
-    public Integer getMoveTaskCountByTaskType(Integer taskType) throws DataStreamException {
+    public Integer getMoveTaskCountByTaskType(Integer taskType, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.getMoveTaskCountByTaskType(dataStreamConfig.getMetaTeledbType(), taskType);
+            return dataStreamMapper.getMoveTaskCountByTaskType(dataStreamConfig.getMetaTeledbType(), taskType, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TABLE_COUNT_ERROR);
         }
     }
 
-    public Integer getMoveTaskCountByTableName(String tableName) throws DataStreamException {
+    public Integer getMoveTaskCountByTableName(String tableName, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.getMoveTaskCountByTableName(dataStreamConfig.getMetaTeledbType(), tableName);
+            return dataStreamMapper.getMoveTaskCountByTableName(dataStreamConfig.getMetaTeledbType(), tableName, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TABLE_COUNT_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByState(String sqlLimit, Integer state) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByState(String sqlLimit, Integer state, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByState(dataStreamConfig.getMetaTeledbType(), sqlLimit, state);
+            return dataStreamMapper.queryDataMoveTaskByState(dataStreamConfig.getMetaTeledbType(), sqlLimit, state, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_STATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByStateLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer state) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByStateLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer state, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByStateLikeOracle(pageBeginRow, pageEndRow, state);
+            return dataStreamMapper.queryDataMoveTaskByStateLikeOracle(pageBeginRow, pageEndRow, state, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_STATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(String sqlLimit, Long batchTaskId) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(String sqlLimit, Long batchTaskId, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByBatchTaskId(dataStreamConfig.getMetaTeledbType(), sqlLimit, batchTaskId);
+            return dataStreamMapper.queryDataMoveTaskByBatchTaskId(dataStreamConfig.getMetaTeledbType(), sqlLimit, batchTaskId, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_STATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskIdLikeOracle(Integer pageBeginRow, Integer pageEndRow, Long batchTaskId) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskIdLikeOracle(Integer pageBeginRow, Integer pageEndRow, Long batchTaskId, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByBatchTaskIdLikeOracle(pageBeginRow, pageEndRow, batchTaskId);
+            return dataStreamMapper.queryDataMoveTaskByBatchTaskIdLikeOracle(pageBeginRow, pageEndRow, batchTaskId, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_STATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(String sqlLimit, Long copyTaskId) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(String sqlLimit, Long copyTaskId, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByCopyTaskId(dataStreamConfig.getMetaTeledbType(), sqlLimit, copyTaskId);
+            return dataStreamMapper.queryDataMoveTaskByCopyTaskId(dataStreamConfig.getMetaTeledbType(), sqlLimit, copyTaskId, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_STATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskIdLikeOracle(Integer pageBeginRow, Integer pageEndRow, Long copyTaskId) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskIdLikeOracle(Integer pageBeginRow, Integer pageEndRow, Long copyTaskId, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByCopyTaskIdLikeOracle(pageBeginRow, pageEndRow, copyTaskId);
+            return dataStreamMapper.queryDataMoveTaskByCopyTaskIdLikeOracle(pageBeginRow, pageEndRow, copyTaskId, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_STATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(String sqlLimit, Integer taskType) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(String sqlLimit, Integer taskType, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByTaskType(dataStreamConfig.getMetaTeledbType(), sqlLimit, taskType);
+            return dataStreamMapper.queryDataMoveTaskByTaskType(dataStreamConfig.getMetaTeledbType(), sqlLimit, taskType, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_STATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByTaskTypeLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer taskType) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByTaskTypeLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer taskType, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByTaskTypeLikeOracle(pageBeginRow, pageEndRow, taskType);
+            return dataStreamMapper.queryDataMoveTaskByTaskTypeLikeOracle(pageBeginRow, pageEndRow, taskType, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_STATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByDate(String sqlLimit, String beginDate, String endDate) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByDate(String sqlLimit, String beginDate, String endDate, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByDate(dataStreamConfig.getMetaTeledbType(), sqlLimit, beginDate, endDate);
+            return dataStreamMapper.queryDataMoveTaskByDate(dataStreamConfig.getMetaTeledbType(), sqlLimit, beginDate, endDate, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_DATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByDateLikeOracle(Integer pageBeginRow, Integer pageEndRow, String beginDate, String endDate) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByDateLikeOracle(Integer pageBeginRow, Integer pageEndRow, String beginDate, String endDate, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByDateLikeOracle(pageBeginRow, pageEndRow, beginDate, endDate);
+            return dataStreamMapper.queryDataMoveTaskByDateLikeOracle(pageBeginRow, pageEndRow, beginDate, endDate, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_DATE_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByTableName(String sqlLimit, String tableName) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByTableName(String sqlLimit, String tableName, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByTableName(dataStreamConfig.getMetaTeledbType(), sqlLimit, tableName);
+            return dataStreamMapper.queryDataMoveTaskByTableName(dataStreamConfig.getMetaTeledbType(), sqlLimit, tableName, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_TABLE_NAME_ERROR);
         }
     }
 
-    public List<DataMoveTaskEntity> queryDataMoveTaskByTableNameLikeOracle(Integer pageBeginRow, Integer pageEndRow, String tableName) throws DataStreamException {
+    public List<DataMoveTaskEntity> queryDataMoveTaskByTableNameLikeOracle(Integer pageBeginRow, Integer pageEndRow, String tableName, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataMoveTaskByTableNameLikeOracle(pageBeginRow, pageEndRow, tableName);
+            return dataStreamMapper.queryDataMoveTaskByTableNameLikeOracle(pageBeginRow, pageEndRow, tableName, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DataStreamErrorCode.DAO_QUERY_TASK_BY_TABLE_NAME_ERROR);

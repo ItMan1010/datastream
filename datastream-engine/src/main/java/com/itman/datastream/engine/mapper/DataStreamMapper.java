@@ -27,39 +27,39 @@ import java.util.Map;
 
 @Mapper
 public interface DataStreamMapper {
-    Integer getMoveTaskCount(@Param("dbType") Integer dbType, @Param("beginDate") String beginDate, @Param("endDate") String endDate, @Param("state") Integer state);
+    Integer getMoveTaskCount(@Param("dbType") Integer dbType, @Param("beginDate") String beginDate, @Param("endDate") String endDate, @Param("state") Integer state, @Param("systemUserCode") String systemUserCode);
 
-    Integer getMoveTaskCountByBatchTaskId(@Param("dbType") Integer dbType, @Param("batchTaskId") Long batchTaskId);
+    Integer getMoveTaskCountByBatchTaskId(@Param("dbType") Integer dbType, @Param("batchTaskId") Long batchTaskId, @Param("systemUserCode") String systemUserCode);
 
-    Integer getMoveTaskCountByCopyTaskId(@Param("dbType") Integer dbType, @Param("copyTaskId") Long copyTaskId);
+    Integer getMoveTaskCountByCopyTaskId(@Param("dbType") Integer dbType, @Param("copyTaskId") Long copyTaskId, @Param("systemUserCode") String systemUserCode);
 
-    Integer getMoveTaskCountByTaskType(@Param("dbType") Integer dbType, @Param("taskType") Integer taskType);
+    Integer getMoveTaskCountByTaskType(@Param("dbType") Integer dbType, @Param("taskType") Integer taskType, @Param("systemUserCode") String systemUserCode);
 
-    Integer getMoveTaskCountByTableName(@Param("dbType") Integer dbType, @Param("tableName") String tableName);
+    Integer getMoveTaskCountByTableName(@Param("dbType") Integer dbType, @Param("tableName") String tableName, @Param("systemUserCode") String systemUserCode);
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByState(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("state") Integer state) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByState(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("state") Integer state, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByStateLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("state") Integer state) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByStateLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("state") Integer state, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("batchTaskId") Long batchTaskId) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskId(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("batchTaskId") Long batchTaskId, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskIdLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("batchTaskId") Long batchTaskId) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByBatchTaskIdLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("batchTaskId") Long batchTaskId, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("copyTaskId") Long copyTaskId) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskId(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("copyTaskId") Long copyTaskId, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskIdLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("copyTaskId") Long copyTaskId) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByCopyTaskIdLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("copyTaskId") Long copyTaskId, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("taskType") Integer taskType) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByTaskType(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("taskType") Integer taskType, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByTaskTypeLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("taskType") Integer taskType) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByTaskTypeLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("taskType") Integer taskType, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByDate(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("beginDate") String beginDate, @Param("endDate") String endDate) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByDate(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("beginDate") String beginDate, @Param("endDate") String endDate, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByDateLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("beginDate") String beginDate, @Param("endDate") String endDate) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByDateLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("beginDate") String beginDate, @Param("endDate") String endDate, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByTableName(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("tableName") String tableName) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByTableName(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("tableName") String tableName, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<DataMoveTaskEntity> queryDataMoveTaskByTableNameLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("tableName") String tableName) throws DataAccessException;
+    List<DataMoveTaskEntity> queryDataMoveTaskByTableNameLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("tableName") String tableName, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
     Integer updateDataMoveTaskState(@Param("sysdate") String sysdate, @Param("taskId") Long taskId, @Param("oldState") Integer oldState, @Param("state") Integer state, @Param("sendMode") Integer sendMode) throws DataAccessException;
 

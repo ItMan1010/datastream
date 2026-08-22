@@ -175,7 +175,7 @@ public class DataBaseHandler {
     }
 
     private void addDataMoveTaskEntityAllList(List<DataMoveTaskEntity> dataMoveTaskEntityAllList, Integer state) throws DataStreamException {
-        List<DataMoveTaskEntity> dataMoveTaskEntityList = metaService.queryDataMoveTaskByState(state, 1, 100);
+        List<DataMoveTaskEntity> dataMoveTaskEntityList = metaService.queryDataMoveTaskByState(state, 1, 100, null);
         if (!CollectionUtils.isEmpty(dataMoveTaskEntityList)) {
             dataMoveTaskEntityAllList.addAll(dataMoveTaskEntityAllList);
         }

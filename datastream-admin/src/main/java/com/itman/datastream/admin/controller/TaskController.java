@@ -22,6 +22,7 @@ import com.itman.datastream.admin.handler.*;
 import com.itman.datastream.common.entity.*;
 import com.itman.datastream.common.errcode.DataStreamException;
 import com.itman.datastream.security.annotation.LogOperate;
+import com.itman.datastream.security.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,6 +51,18 @@ public class TaskController {
     private final DataCdcHandler dataCdcHandler;
     private final DataCheckHandler dataCheckHandler;
     private final DataMQHandler dataMQHandler;
+    private final PermissionService permissionService;
+
+    private void checkTaskOwner(List<DataMoveTaskEntity> taskList) throws DataStreamException {
+        if (permissionService.isAdmin()) {
+            return;
+        }
+        String currentUserCode = permissionService.getCurrentUserCode();
+        String owner = CollectionUtils.isEmpty(taskList) ? null : taskList.get(0).getSystemUserCode();
+        if (StringUtils.isEmpty(currentUserCode) || !currentUserCode.equals(owner)) {
+            throw new DataStreamException(OPER_TASK_NOT_OWNER_ERROR);
+        }
+    }
 
 
     @LogOperate(operateType = 2, moduleName = "创建迁移任务操作", description = "'sourceObjectName:'+#createMoveTaskRequest.sourceObjectName")
@@ -82,6 +96,7 @@ public class TaskController {
             if (CollectionUtils.isEmpty(taskList)) {
                 throw new DataStreamException(OPER_QUERY_TASK_BY_TASKID_ERROR);
             }
+            checkTaskOwner(taskList);
             if (taskList.get(0).getTaskType().equals(DATA_STREAM_TASK_TYPE_TABLE_MOVE)) {
                 List<MoveTableEntity> moveTableList = dataMoveHandler.queryMoveTable(queryTaskProgressRequest.getTaskId());
                 List<MoveTableEntity> moveTableListDone = moveTableList.stream().filter(x -> (x.getState().equals(DATA_STREAM_TASK_STATE_RUNNING) || x.getState().equals(DATA_STREAM_TASK_STATE_ERROR) || x.getState().equals(DATA_STREAM_TASK_STATE_FINISH))).collect(Collectors.toList());
@@ -141,6 +156,11 @@ public class TaskController {
     public ResponseEntity<QueryTableMoveResponse> queryTableMoveList(@RequestBody QueryTableMoveRequest queryTableMoveRequest) {
         QueryTableMoveResponse response = new QueryTableMoveResponse();
         try {
+            List<DataMoveTaskEntity> taskList = dataMoveHandler.queryTaskByTaskId(queryTableMoveRequest.getTaskId());
+            if (CollectionUtils.isEmpty(taskList)) {
+                throw new DataStreamException(OPER_QUERY_TASK_BY_TASKID_ERROR);
+            }
+            checkTaskOwner(taskList);
             response.setMoveTableList(dataMoveHandler.queryMoveTable(queryTableMoveRequest.getTaskId()));
         } catch (DataStreamException aie) {
             response.setErrorCode(aie.getErrCode());
@@ -163,6 +183,7 @@ public class TaskController {
             if (CollectionUtils.isEmpty(taskList)) {
                 throw new DataStreamException(OPER_QUERY_TASK_BY_TASKID_ERROR);
             }
+            checkTaskOwner(taskList);
 
             List<DataMoveInfoEntity> dataMoveInfoList = null;
             if (taskList.get(0).getState().equals(DATA_STREAM_TASK_STATE_RUNNING)) {

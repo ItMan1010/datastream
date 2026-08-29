@@ -36,6 +36,7 @@ import com.itman.datastream.common.api.DataSourceFactory;
 import com.itman.datastream.admin.service.IMetaService;
 import com.itman.datastream.admin.service.IMoveSourceService;
 import com.itman.datastream.admin.service.IMoveTargetService;
+import com.itman.datastream.admin.support.DataMoveSqlSupport;
 import com.itman.datastream.security.service.PermissionService;
 import lombok.Data;
 import lombok.Getter;
@@ -153,6 +154,7 @@ public class DataMoveHandler extends AbstractHandler {
             //下面取值一定要用returnValueObject，不能用currentValueObject，这个一直应用缓存变量，会变化
             CurrentValueObject returnValueObject = new CurrentValueObject();
             BeanUtils.copyProperties(currentValueObject, returnValueObject);
+
             if (returnValueObject.getCurrentValue().equals(taskInitValue)) {
                 returnValueObject.setCurrentValue("0");
                 returnValueObject.setPageLoopCount(1);
@@ -1065,31 +1067,11 @@ public class DataMoveHandler extends AbstractHandler {
     }
 
     public String makeDataSelectCountSql(String tableName, String tableCondition, String dataNode, Integer dataSet) {
-        String tableCountSql = "select count(1) from " + tableName;
-        if (dataNode != null) {
-            tableCountSql = (dataSet != null) ? (String.format(SQL_FORMAT_HINT_BALANCE_DATANODE, dataSet, dataNode) + tableCountSql) : (String.format(SQL_FORMAT_HINT_DATANODE, dataNode) + tableCountSql);
-        }
-
-        if (!StringUtils.isEmpty(tableCondition)) {
-            tableCountSql = tableCountSql + " where " + tableCondition;
-        }
-        return tableCountSql;
+        return DataMoveSqlSupport.makeDataSelectCountSql(tableName, tableCondition, dataNode, dataSet);
     }
 
     public List<Object> makeInsertRowObject(Long taskId, List<TableColumnEntity> tableColumns, Map dataRow) {
-        List<Object> dataColumnList = new ArrayList<>();
-        for (TableColumnEntity iterator : tableColumns) {
-            Object columnValue = dataRow.get(iterator.getColumnName());
-            if (Objects.isNull(columnValue)) {
-                columnValue = dataRow.get(iterator.getColumnName().toLowerCase());
-                if (Objects.isNull(columnValue) && TARGET_TABLE_ADD_COLUMNS_MOVE_TASK_ID.equalsIgnoreCase(iterator.getColumnName())) {
-                    columnValue = taskId;
-                }
-            }
-
-            dataColumnList.add(columnValue);
-        }
-        return dataColumnList;
+        return DataMoveSqlSupport.makeInsertRowObject(taskId, tableColumns, dataRow);
     }
 
     private void jobLogbackEventMoveInfo(Long infoId, String content) {

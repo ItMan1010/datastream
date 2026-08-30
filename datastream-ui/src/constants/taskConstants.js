@@ -87,7 +87,8 @@ export const DATASOURCE_TYPE_DESC = {
   7: 'H2',
   8: 'Text',
   9: 'Excel',
-  10: 'Kafka'
+  10: 'Kafka',
+  15: '达梦'
 }
 
 // 数据源加载策略描述

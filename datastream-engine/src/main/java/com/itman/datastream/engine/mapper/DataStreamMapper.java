@@ -129,11 +129,11 @@ public interface DataStreamMapper {
 
     Integer testDataBase(@Param("testSql") String testSql);
 
-    Integer getDataBaseCount(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") Long queryValue, @Param("state") Integer state);
+    Integer getDataBaseCount(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") Long queryValue, @Param("state") Integer state, @Param("systemUserCode") String systemUserCode);
 
-    List<DataBaseEntity> queryDataBase(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("queryFlag") Integer queryFlag, @Param("queryValue") Long queryValue, @Param("state") Integer state);
+    List<DataBaseEntity> queryDataBase(@Param("dbType") Integer dbType, @Param("sqlLimit") String sqlLimit, @Param("queryFlag") Integer queryFlag, @Param("queryValue") Long queryValue, @Param("state") Integer state, @Param("systemUserCode") String systemUserCode);
 
-    List<DataBaseEntity> queryDataBaseLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("queryFlag") Integer queryFlag, @Param("queryValue") Long queryValue, @Param("state") Integer state);
+    List<DataBaseEntity> queryDataBaseLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("queryFlag") Integer queryFlag, @Param("queryValue") Long queryValue, @Param("state") Integer state, @Param("systemUserCode") String systemUserCode);
 
     Integer insertDataBase(@Param("sysdate") String sysdate, @Param("dataBase") DataBaseEntity dataBase) throws DataAccessException;
 
@@ -141,21 +141,21 @@ public interface DataStreamMapper {
 
     Integer updateDataBaseState(@Param("sysdate") String sysdate, @Param("dataBaseId") Long dataBaseId, @Param("state") Integer state) throws DataAccessException;
 
-    Integer statMoveTaskCount(@Param("dbType") Integer dbType, @Param("state") String state);
+    Integer statMoveTaskCount(@Param("dbType") Integer dbType, @Param("state") String state, @Param("systemUserCode") String systemUserCode);
 
-    Integer statLinkTaskCount(@Param("dbType") Integer dbType, @Param("state") String state);
+    Integer statLinkTaskCount(@Param("dbType") Integer dbType, @Param("state") String state, @Param("systemUserCode") String systemUserCode);
 
-    List<StatDayCountEntity> statMoveTaskCountGroupByDay(@Param("dbType") Integer dbType, @Param("intervalDay") String intervalDay);
+    List<StatDayCountEntity> statMoveTaskCountGroupByDay(@Param("dbType") Integer dbType, @Param("intervalDay") String intervalDay, @Param("systemUserCode") String systemUserCode);
 
-    List<StatDayCountEntity> statMoveTaskCountGroupByDayLikeOracle(@Param("intervalDay") String intervalDay);
+    List<StatDayCountEntity> statMoveTaskCountGroupByDayLikeOracle(@Param("intervalDay") String intervalDay, @Param("systemUserCode") String systemUserCode);
 
-    List<StatDayCountEntity> statLinkTaskCountGroupByDay(@Param("dbType") Integer dbType, @Param("intervalDay") String intervalDay);
+    List<StatDayCountEntity> statLinkTaskCountGroupByDay(@Param("dbType") Integer dbType, @Param("intervalDay") String intervalDay, @Param("systemUserCode") String systemUserCode);
 
-    List<StatDayCountEntity> statLinkTaskCountGroupByDayLikeOracle(@Param("intervalDay") String intervalDay);
+    List<StatDayCountEntity> statLinkTaskCountGroupByDayLikeOracle(@Param("intervalDay") String intervalDay, @Param("systemUserCode") String systemUserCode);
 
-    List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType(@Param("dbType") Integer dbType);
+    List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType(@Param("dbType") Integer dbType, @Param("systemUserCode") String systemUserCode);
 
-    List<StatTaskStateCountEntity> statMoveTaskCountGroupByState(@Param("dbType") Integer dbType);
+    List<StatTaskStateCountEntity> statMoveTaskCountGroupByState(@Param("dbType") Integer dbType, @Param("systemUserCode") String systemUserCode);
 
     Integer getBatchTaskCountByDate(@Param("dbType") Integer dbType, @Param("beginDate") String beginDate, @Param("endDate") String endDate) throws DataAccessException;
 

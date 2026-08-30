@@ -104,6 +104,11 @@ public class FileFormatEntity extends BaseEntity {
      */
     private Integer onLineFlag;
 
+    /**
+     * 创建人工号（登录账号）
+     */
+    private String systemUserCode;
+
     //-------------界面扩展使用-------------------------------
     private String fileBakActionName;
     private String fileNameTypeName;

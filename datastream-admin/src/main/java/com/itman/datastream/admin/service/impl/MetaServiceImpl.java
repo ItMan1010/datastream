@@ -466,15 +466,15 @@ public class MetaServiceImpl implements IMetaService {
     }
 
     @Override
-    public List<DataBaseEntity> queryDataBase(Integer queryFlag, Long queryValue, Integer state, Integer page, Integer count) throws DataStreamException {
+    public List<DataBaseEntity> queryDataBase(Integer queryFlag, Long queryValue, Integer state, Integer page, Integer count, String systemUserCode) throws DataStreamException {
         return (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ?
-                dataStreamDao.queryDataBase(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), queryFlag, queryValue, state) :
-                dataStreamDao.queryDataBaseLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), queryFlag, queryValue, state);
+                dataStreamDao.queryDataBase(geMetaDbObject().makeSqlLimit(genPageRow(page, count), count), queryFlag, queryValue, state, systemUserCode) :
+                dataStreamDao.queryDataBaseLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), queryFlag, queryValue, state, systemUserCode);
     }
 
     @Override
-    public Integer getDataBaseCount(Integer queryFlag, Long queryValue, Integer state) throws DataStreamException {
-        return dataStreamDao.getDataBaseCount(queryFlag, queryValue, state);
+    public Integer getDataBaseCount(Integer queryFlag, Long queryValue, Integer state, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.getDataBaseCount(queryFlag, queryValue, state, systemUserCode);
     }
 
 
@@ -498,33 +498,33 @@ public class MetaServiceImpl implements IMetaService {
     }
 
     @Override
-    public Integer statMoveTaskCount(String state) throws DataStreamException {
-        return dataStreamDao.statMoveTaskCount(state);
+    public Integer statMoveTaskCount(String state, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.statMoveTaskCount(state, systemUserCode);
     }
 
     @Override
-    public Integer statLinkTaskCount(String state) throws DataStreamException {
-        return dataStreamDao.statLinkTaskCount(state);
+    public Integer statLinkTaskCount(String state, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.statLinkTaskCount(state, systemUserCode);
     }
 
     @Override
-    public List<StatDayCountEntity> statMoveTaskCountGroupByDay(Integer days) throws DataStreamException {
-        return dataStreamDao.statMoveTaskCountGroupByDay(geMetaDbObject().makeSqlIntervalDay(days));
+    public List<StatDayCountEntity> statMoveTaskCountGroupByDay(Integer days, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.statMoveTaskCountGroupByDay(geMetaDbObject().makeSqlIntervalDay(days), systemUserCode);
     }
 
     @Override
-    public List<StatDayCountEntity> statLinkTaskCountGroupByDay(Integer days) throws DataStreamException {
-        return dataStreamDao.statLinkTaskCountGroupByDay(geMetaDbObject().makeSqlIntervalDay(days));
+    public List<StatDayCountEntity> statLinkTaskCountGroupByDay(Integer days, String systemUserCode) throws DataStreamException {
+        return dataStreamDao.statLinkTaskCountGroupByDay(geMetaDbObject().makeSqlIntervalDay(days), systemUserCode);
     }
 
     @Override
-    public List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType() throws DataStreamException {
-        return dataStreamDao.statMoveTaskCountGroupByType();
+    public List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType(String systemUserCode) throws DataStreamException {
+        return dataStreamDao.statMoveTaskCountGroupByType(systemUserCode);
     }
 
     @Override
-    public List<StatTaskStateCountEntity> statMoveTaskCountGroupByState() throws DataStreamException {
-        return dataStreamDao.statMoveTaskCountGroupByState();
+    public List<StatTaskStateCountEntity> statMoveTaskCountGroupByState(String systemUserCode) throws DataStreamException {
+        return dataStreamDao.statMoveTaskCountGroupByState(systemUserCode);
     }
 
     @Override

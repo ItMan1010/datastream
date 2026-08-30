@@ -75,12 +75,12 @@ public class FileDao {
         return fileMapper.selectFileFilter(fileFormatId);
     }
 
-    public Integer selectFileFormatCount(Integer queryFlag, String queryValue) {
-        return fileMapper.selectFileFormatCount(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue);
+    public Integer selectFileFormatCount(Integer queryFlag, String queryValue, String systemUserCode) {
+        return fileMapper.selectFileFormatCount(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, systemUserCode);
     }
 
-    public List<FileFormatEntity> selectFileFormatByPage(Integer queryFlag, String queryValue, String sqlLimit) {
-        return fileMapper.selectFileFormatByPage(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, sqlLimit);
+    public List<FileFormatEntity> selectFileFormatByPage(Integer queryFlag, String queryValue, String sqlLimit, String systemUserCode) {
+        return fileMapper.selectFileFormatByPage(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, sqlLimit, systemUserCode);
     }
 
 

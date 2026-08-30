@@ -62,6 +62,7 @@
             <el-tag v-if="scope.row.state === 1" type="info" effect="dark">下线</el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="systemUserCode" label="创建用户" width="100" />
         <el-table-column prop="createDate" label="创建时间" width="140" />
         <el-table-column prop="stateDate" label="状态时间" width="140" />
         <el-table-column fixed="right" label="操作" width="380">

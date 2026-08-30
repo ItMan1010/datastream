@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS data_stream_data_base (
     url VARCHAR(512) NOT NULL COMMENT '数据库链接',
     user_name VARCHAR(128) NOT NULL COMMENT '数据库用户名',
     pass_word VARCHAR(128) NOT NULL COMMENT '数据库密码',
+    system_user_code VARCHAR(256) DEFAULT NULL COMMENT '员工编码（创建人工号）',
     table_key_not_supported INT DEFAULT NULL COMMENT '数据不支持表主键：1:不支持，其他默认支持',
     create_date DATETIME NOT NULL COMMENT '记录生成时间',
     state INT NOT NULL COMMENT '状态：0(删除)、1(下线)、2(上线)',
@@ -268,6 +269,7 @@ CREATE TABLE IF NOT EXISTS data_stream_table_link (
     create_date DATETIME NOT NULL COMMENT '记录生成时间',
     state INT NOT NULL COMMENT '状态：0(删除)、1(下线)、2(上线)',
     state_date DATETIME NOT NULL COMMENT '状态时间',
+    system_user_code VARCHAR(256) DEFAULT NULL COMMENT '员工编码（创建人工号）',
     PRIMARY KEY (table_link_id)
 );
 
@@ -362,6 +364,7 @@ CREATE TABLE IF NOT EXISTS data_stream_column_type_define (
     max_value bigint(20) DEFAULT NULL COMMENT '最大值',
     is_national_flag int(2) DEFAULT 0 COMMENT '是否支持字符集(如 nvarchar)',
     require_length_param int(2) DEFAULT 0 COMMENT '是否必须指定长度参数',
+    system_user_code VARCHAR(256) DEFAULT NULL COMMENT '员工编码（创建人工号）',
     PRIMARY KEY (column_type_define_id)
 );
 
@@ -374,6 +377,7 @@ CREATE TABLE IF NOT EXISTS data_stream_column_type_map (
     length_conversion_rule varchar(200) default NULL comment '长度转换规则表达式',
     conversion_warning varchar(500) default NULL comment '转换警告信息',
     is_reversible int default 1 comment '是否可逆转换（双向无损）',
+    system_user_code VARCHAR(256) DEFAULT NULL COMMENT '员工编码（创建人工号）',
     PRIMARY KEY (column_type_map_id)
 );
 
@@ -405,6 +409,7 @@ CREATE TABLE IF NOT EXISTS data_stream_file_format (
     on_line_flag INT NOT NULL COMMENT '发布标志：0下线、1在线',
     state INT NOT NULL,
     state_date DATETIME NOT NULL,
+    system_user_code VARCHAR(256) DEFAULT NULL COMMENT '员工编码（创建人工号）',
     PRIMARY KEY (file_format_id)
 );
 
@@ -491,6 +496,7 @@ CREATE TABLE IF NOT EXISTS data_stream_mq_config (
     state INT NOT NULL,
     state_date DATETIME NOT NULL,
     create_date DATETIME NOT NULL,
+    system_user_code VARCHAR(256) DEFAULT NULL COMMENT '员工编码（创建人工号）',
     PRIMARY KEY (mq_config_id)
 );
 

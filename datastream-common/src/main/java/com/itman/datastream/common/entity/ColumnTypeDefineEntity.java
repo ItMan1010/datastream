@@ -130,6 +130,11 @@ public class ColumnTypeDefineEntity {
     private Integer requireLengthParam;
 
     /**
+     * 创建人工号（登录账号）
+     */
+    private String systemUserCode;
+
+    /**
      * 判断是否为整数类型
      */
     public boolean isNumericInteger() {

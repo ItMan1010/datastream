@@ -27,6 +27,7 @@ import com.itman.datastream.common.api.DataSourceFactory;
 import com.itman.datastream.admin.service.IMetaService;
 import com.itman.datastream.common.errcode.DataStreamException;
 import com.itman.datastream.admin.service.IDataSearchService;
+import com.itman.datastream.security.service.PermissionService;
 import com.itman.datastream.common.api.IDatabaseAdapter;
 import com.itman.datastream.common.utils.AESUtils;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +61,7 @@ public class DataBaseHandler {
     private final DataSourceFactory dataSourceFactory;
     private final IDataSearchService dataSearchService;
     private final ConnectionPoolManager poolManager;
+    private final PermissionService permissionService;
 
 
     public void testDataDase(DataBaseEntity dataDase) throws DataStreamException {
@@ -70,16 +72,17 @@ public class DataBaseHandler {
     }
 
     public List<DataBaseEntity> queryDataBase(Integer queryFlag, Long queryValue, Integer state, Integer page, Integer count) throws DataStreamException {
-        return metaService.queryDataBase(queryFlag, queryValue, state, page, count);
+        return metaService.queryDataBase(queryFlag, queryValue, state, page, count, currentUserScope());
     }
 
     public Integer getDataBaseCount(Integer queryFlag, Long queryValue, Integer state) throws DataStreamException {
-        return metaService.getDataBaseCount(queryFlag, queryValue, state);
+        return metaService.getDataBaseCount(queryFlag, queryValue, state, currentUserScope());
     }
 
     public Long insertDataBase(DataBaseEntity dataBase) throws DataStreamException {
         dataBase.setDataBaseId(metaService.querySequence(SEQ_DATA_BASE_ID));
         dataBase.setState(COMMON_STATE_OFFLINE);
+        dataBase.setSystemUserCode(permissionService.getCurrentUserCode());
         if (metaService.insertDataBase(dataBase).equals(0)) {
             throw new DataStreamException(OPER_INSERT_DATA_BASE_FAIL_ERROR);
         }
@@ -87,11 +90,32 @@ public class DataBaseHandler {
         return dataBase.getDataBaseId();
     }
 
+    /**
+     * 计算当前用户的数据范围过滤值：管理员返回 null（不过滤），普通用户返回当前工号。
+     */
+    private String currentUserScope() {
+        return permissionService.isAdmin() ? null : permissionService.getCurrentUserCode();
+    }
+
+    /**
+     * 校验配置归属：非管理员访问他人配置时抛出无权限错误。
+     */
+    private void checkDataBaseOwner(DataBaseEntity dataBase) throws DataStreamException {
+        if (permissionService.isAdmin()) {
+            return;
+        }
+        String currentUserCode = permissionService.getCurrentUserCode();
+        if (StringUtils.isEmpty(currentUserCode) || !currentUserCode.equals(dataBase.getSystemUserCode())) {
+            throw new DataStreamException(OPER_CONFIG_NOT_OWNER_ERROR);
+        }
+    }
+
     public Long updateDataBase(DataBaseEntity dataBase) throws DataStreamException {
-        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBase.getDataBaseId(), null, 1, 10);
+        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBase.getDataBaseId(), null, 1, 10, null);
         if (CollectionUtils.isEmpty(dataBaseList)) {
             throw new DataStreamException(OPER_QUERY_DATA_BASE_FAIL_ERROR);
         }
+        checkDataBaseOwner(dataBaseList.get(0));
 
         if (!dataBaseList.get(0).getState().equals(COMMON_STATE_OFFLINE)) {
             throw new DataStreamException(OPER_DATA_BASE_STATE_NOT_OFF_ERROR);
@@ -106,10 +130,11 @@ public class DataBaseHandler {
     }
 
     public Long delDataBase(Long dataBaseId) throws DataStreamException {
-        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10);
+        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10, null);
         if (CollectionUtils.isEmpty(dataBaseList)) {
             throw new DataStreamException(OPER_QUERY_DATA_BASE_FAIL_ERROR);
         }
+        checkDataBaseOwner(dataBaseList.get(0));
 
         if (!dataBaseList.get(0).getState().equals(COMMON_STATE_OFFLINE)) {
             throw new DataStreamException(OPER_DATA_BASE_STATE_NOT_OFF_ERROR);
@@ -124,10 +149,11 @@ public class DataBaseHandler {
     }
 
     private void checkDataBaseList(Long dataBaseId, Integer state) throws DataStreamException {
-        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10);
+        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10, null);
         if (CollectionUtils.isEmpty(dataBaseList)) {
             throw new DataStreamException(OPER_QUERY_DATA_BASE_FAIL_ERROR);
         }
+        checkDataBaseOwner(dataBaseList.get(0));
 
         if (state.equals(COMMON_STATE_ONLINE) && !dataBaseList.get(0).getState().equals(COMMON_STATE_OFFLINE)) {
             throw new DataStreamException(OPER_DATA_BASE_STATE_NOT_OFF_ERROR);
@@ -182,8 +208,9 @@ public class DataBaseHandler {
     }
 
     public void statSystemInfo(Integer days, StatSystemInfoEntity statSystemInfoEntity) throws DataStreamException {
+        String systemUserCode = currentUserScope();
         Integer dataBaseCount = 0;
-        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ALL, null, null, 1, 1000);
+        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ALL, null, null, 1, 1000, systemUserCode);
         if (!CollectionUtils.isEmpty(dataBaseList)) {
             dataBaseCount = dataBaseList.size();
         }
@@ -191,28 +218,29 @@ public class DataBaseHandler {
         //查询数据连接总
         statSystemInfoEntity.setDataSourceCount(dataBaseCount);
         //数据迁移任务总数
-        statSystemInfoEntity.setMoveTaskSumCount(metaService.statMoveTaskCount(null));
+        statSystemInfoEntity.setMoveTaskSumCount(metaService.statMoveTaskCount(null, systemUserCode));
         //数据迁移运行总数
-        statSystemInfoEntity.setMoveTaskRunCount(metaService.statMoveTaskCount(DATA_STREAM_TASK_STATE_INIT + "," + DATA_STREAM_TASK_STATE_RUNNING));
+        statSystemInfoEntity.setMoveTaskRunCount(metaService.statMoveTaskCount(DATA_STREAM_TASK_STATE_INIT + "," + DATA_STREAM_TASK_STATE_RUNNING, systemUserCode));
         //数据回迁任务总数
-        statSystemInfoEntity.setLinkTaskSumCount(metaService.statLinkTaskCount(null));
+        statSystemInfoEntity.setLinkTaskSumCount(metaService.statLinkTaskCount(null, systemUserCode));
         //数据回迁运行总数
-        statSystemInfoEntity.setLinkTaskRunCount(metaService.statLinkTaskCount(DATA_STREAM_TASK_STATE_INIT + "," + DATA_STREAM_TASK_STATE_RUNNING));
+        statSystemInfoEntity.setLinkTaskRunCount(metaService.statLinkTaskCount(DATA_STREAM_TASK_STATE_INIT + "," + DATA_STREAM_TASK_STATE_RUNNING, systemUserCode));
         //查询迁移执行总数
-        statSystemInfoEntity.setMoveTaskDayCountList(metaService.statMoveTaskCountGroupByDay(days));
-        statSystemInfoEntity.setLinkTaskDayCountList(metaService.statLinkTaskCountGroupByDay(days));
+        statSystemInfoEntity.setMoveTaskDayCountList(metaService.statMoveTaskCountGroupByDay(days, systemUserCode));
+        statSystemInfoEntity.setLinkTaskDayCountList(metaService.statLinkTaskCountGroupByDay(days, systemUserCode));
         //按任务类型统计迁移任务数
-        statSystemInfoEntity.setTaskTypeCountList(metaService.statMoveTaskCountGroupByType());
+        statSystemInfoEntity.setTaskTypeCountList(metaService.statMoveTaskCountGroupByType(systemUserCode));
         //按任务状态统计迁移任务数
-        statSystemInfoEntity.setTaskStateCountList(metaService.statMoveTaskCountGroupByState());
+        statSystemInfoEntity.setTaskStateCountList(metaService.statMoveTaskCountGroupByState(systemUserCode));
     }
 
     public void dataSearch(DataSearchRequest dataSearchRequest, DataSearchResponse dataSearchResponse) throws DataStreamException {
         //获取数据源
-        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataSearchRequest.getDataSourceId(), null, 1, 10);
+        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataSearchRequest.getDataSourceId(), null, 1, 10, null);
         if (CollectionUtils.isEmpty(dataBaseList)) {
             throw new DataStreamException(OPER_QUERY_DATA_BASE_FAIL_ERROR);
         }
+        checkDataBaseOwner(dataBaseList.get(0));
 
         IDatabaseAdapter dataBase = dataSourceFactory.matchDataBase(dataBaseList.get(0).getDataBaseType());
 

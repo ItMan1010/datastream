@@ -109,6 +109,11 @@ public class ColumnTypeMapEntity {
     private Integer isReversible;
 
     /**
+     * 创建人工号（登录账号）
+     */
+    private String systemUserCode;
+
+    /**
      * 判断是否为精确匹配
      */
     public boolean isExactMatch() {

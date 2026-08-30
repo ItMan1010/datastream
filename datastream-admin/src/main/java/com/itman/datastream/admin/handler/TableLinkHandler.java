@@ -116,7 +116,7 @@ public class TableLinkHandler {
     }
 
     public DataBaseEntity judgeDataBaseById(Long dataBaseId) throws DataStreamException {
-        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10);
+        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10, null);
         if (CollectionUtils.isEmpty(dataBaseList)) {
             throw new DataStreamException(OPER_DATA_SOURCE_NOT_EXISTS_ERROR);
         }

@@ -41,9 +41,9 @@ public interface FileMapper {
 
     List<FileFilterEntity> selectFileFilter(@Param("fileFormatId") Long fileFormatId) throws DataAccessException;
 
-    Integer selectFileFormatCount(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue);
+    Integer selectFileFormatCount(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("systemUserCode") String systemUserCode);
 
-    List<FileFormatEntity> selectFileFormatByPage(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("sqlLimit") String sqlLimit) throws DataAccessException;
+    List<FileFormatEntity> selectFileFormatByPage(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("sqlLimit") String sqlLimit, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
     Integer deleteFileFormatById(@Param("fileFormatId") Long fileFormatId) throws DataAccessException;
 

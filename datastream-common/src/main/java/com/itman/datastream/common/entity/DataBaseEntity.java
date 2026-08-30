@@ -30,6 +30,10 @@ public class DataBaseEntity{
     private String passWord;
     private Integer passWordLength;
     private String createDate;
+    /**
+     * 创建人工号（登录账号）
+     */
+    private String systemUserCode;
     private Integer tableKeyNotSupported;
     private Integer state;
     private String stateDate;

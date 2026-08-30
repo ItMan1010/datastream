@@ -68,5 +68,10 @@ public class MQConfigEntity {
     private Integer onLineFlag;
 
     private String topicPrefix;
+
+    /**
+     * 创建人工号（登录账号）
+     */
+    private String systemUserCode;
 }
 

@@ -76,6 +76,9 @@
         <if test="state!=null">
             and state in (${state})
         </if>
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
     </select>
 
     <select id="statLinkTaskCount" resultType="java.lang.Integer">
@@ -86,6 +89,9 @@
         where 1=1
         <if test="state!=null">
             and state in (${state})
+        </if>
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
         </if>
     </select>
 
@@ -791,7 +797,7 @@
     <sql id="dataBaseColumnList">
         data_base_id
         ,data_base_type,data_base_name,url,user_name,pass_word,state,create_date,state_date,
-        table_key_not_supported
+        table_key_not_supported,system_user_code
     </sql>
 
     <select id="getDataBaseById"
@@ -821,6 +827,9 @@
         </if>
         <if test="state == 1 or state == 2">
             and state=#{state}
+        </if>
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
         </if>
     </sql>
 
@@ -873,7 +882,8 @@
         #{dataBase.state},
         ${sysdate},
         ${sysdate},
-        #{dataBase.tableKeyNotSupported})
+        #{dataBase.tableKeyNotSupported},
+        #{dataBase.systemUserCode})
     </insert>
 
     <update id="updateDataBase" parameterType="com.itman.datastream.common.entity.DataBaseEntity">
@@ -906,6 +916,9 @@
         from
         data_stream_move_task
         where create_date >= (now() - ${intervalDay})
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         group by taskDate
         order by taskDate
     </select>
@@ -916,6 +929,9 @@
                count(1)           as taskCount
         from data_stream_move_task
         where create_date >= ${intervalDay}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         group by trunc(create_date)
         order by trunc(create_date)
     </select>
@@ -932,6 +948,9 @@
         from
         data_stream_link_task
         where create_date >= (now() - ${intervalDay})
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         group by taskDate
         order by taskDate
     </select>
@@ -942,6 +961,9 @@
                count(1)           as taskCount
         from data_stream_link_task
         where create_date >= ${intervalDay}
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
+        </if>
         group by trunc(create_date)
         order by trunc(create_date)
     </select>
@@ -954,6 +976,9 @@
         select task_type as taskType,
                count(1)  as taskCount
         from data_stream_move_task
+        <if test="systemUserCode != null and systemUserCode != ''">
+            where system_user_code = #{systemUserCode}
+        </if>
         group by task_type
         order by task_type
     </select>
@@ -966,6 +991,9 @@
         select state,
                count(1) as taskCount
         from data_stream_move_task
+        <if test="systemUserCode != null and systemUserCode != ''">
+            where system_user_code = #{systemUserCode}
+        </if>
         group by state
         order by state
     </select>

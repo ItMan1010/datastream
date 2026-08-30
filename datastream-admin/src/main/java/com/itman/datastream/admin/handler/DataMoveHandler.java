@@ -1300,7 +1300,7 @@ public class DataMoveHandler extends AbstractHandler {
     }
 
     public void addDataBase(Long dataBaseId, Long taskId) throws DataStreamException {
-        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10);
+        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10, null);
         if (CollectionUtils.isEmpty(dataBaseList)) {
             throw new DataStreamException(OPER_QUERY_DATA_SOURCE_INFO_ERROR);
         }

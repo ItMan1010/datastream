@@ -62,6 +62,7 @@
             <el-table-column prop="maxScale" label="最大小数位" width="100" />
             <el-table-column prop="characterMaxLength" label="最大长度" width="90" />
             <el-table-column prop="remark" label="备注" min-width="140" :show-overflow-tooltip="true" />
+            <el-table-column prop="systemUserCode" label="创建用户" width="100" />
             <el-table-column label="操作" width="180" fixed="right">
               <template #default="scope">
                 <div class="datasource-opt">
@@ -154,6 +155,7 @@
                 {{ scope.row.isReversible === 1 ? '是' : '否' }}
               </template>
             </el-table-column>
+            <el-table-column prop="systemUserCode" label="创建用户" width="100" />
             <el-table-column label="操作" width="180" fixed="right">
               <template #default="scope">
                 <div class="datasource-opt">

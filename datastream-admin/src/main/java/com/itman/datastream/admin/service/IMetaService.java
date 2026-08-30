@@ -105,9 +105,9 @@ public interface IMetaService {
 
     Integer insertTableLinkTask(TableLinkTaskEntity tableLinkTask) throws DataStreamException;
 
-    List<DataBaseEntity> queryDataBase(Integer queryFlag, Long queryValue, Integer state, Integer page, Integer count) throws DataStreamException;
+    List<DataBaseEntity> queryDataBase(Integer queryFlag, Long queryValue, Integer state, Integer page, Integer count, String systemUserCode) throws DataStreamException;
 
-    Integer getDataBaseCount(Integer queryFlag, Long queryValue, Integer state) throws DataStreamException;
+    Integer getDataBaseCount(Integer queryFlag, Long queryValue, Integer state, String systemUserCode) throws DataStreamException;
 
     Integer insertDataBase(DataBaseEntity dataBase) throws DataStreamException;
 
@@ -115,17 +115,17 @@ public interface IMetaService {
 
     Integer updateDataBaseState(Long dataBaseId, Integer state) throws DataStreamException;
 
-    Integer statMoveTaskCount(String state) throws DataStreamException;
+    Integer statMoveTaskCount(String state, String systemUserCode) throws DataStreamException;
 
-    Integer statLinkTaskCount(String state) throws DataStreamException;
+    Integer statLinkTaskCount(String state, String systemUserCode) throws DataStreamException;
 
-    List<StatDayCountEntity> statMoveTaskCountGroupByDay(Integer days) throws DataStreamException;
+    List<StatDayCountEntity> statMoveTaskCountGroupByDay(Integer days, String systemUserCode) throws DataStreamException;
 
-    List<StatDayCountEntity> statLinkTaskCountGroupByDay(Integer days) throws DataStreamException;
+    List<StatDayCountEntity> statLinkTaskCountGroupByDay(Integer days, String systemUserCode) throws DataStreamException;
 
-    List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType() throws DataStreamException;
+    List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType(String systemUserCode) throws DataStreamException;
 
-    List<StatTaskStateCountEntity> statMoveTaskCountGroupByState() throws DataStreamException;
+    List<StatTaskStateCountEntity> statMoveTaskCountGroupByState(String systemUserCode) throws DataStreamException;
 
     void initDataStreamMetaDb() throws DataStreamException;
 

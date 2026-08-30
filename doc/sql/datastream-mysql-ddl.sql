@@ -305,6 +305,7 @@ CREATE TABLE `data_stream_column_type_define` (
     `max_value` bigint(20) DEFAULT NULL COMMENT '最大值',
     `is_national_flag` int(2) DEFAULT '0' COMMENT '是否支持字符集(如 nvarchar)',
     `require_length_param` int(2) DEFAULT '0' COMMENT '是否必须指定长度参数',
+    `system_user_code` varchar(256) default null comment '员工编码（创建人工号）',
     primary key  (`column_type_define_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='数据库字段类型名称定义';
 
@@ -317,6 +318,7 @@ create table if not exists `data_stream_column_type_map` (
     `length_conversion_rule` varchar(200) default NULL comment '长度转换规则表达式',
     `conversion_warning` varchar(500) default NULL comment '转换警告信息',
     `is_reversible` int default 1 comment '是否可逆转换（双向无损）',
+    `system_user_code` varchar(256) default null comment '员工编码（创建人工号）',
     primary key (`column_type_map_id`)
     ) engine=innodb default charset=utf8mb4 collate=utf8mb4_bin comment='数据库字段类型名称应映射';
 
@@ -435,6 +437,7 @@ CREATE TABLE IF NOT EXISTS `data_stream_mq_config` (
     `state` int(2) not null,
     `state_date` datetime not null,
     `create_date` datetime not null,
+    `system_user_code` varchar(256) default null comment '员工编码（创建人工号）',
     PRIMARY KEY (`mq_config_id`),
     KEY `idx_mq_config_name` (`mq_config_name`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='MQ消息配置表';

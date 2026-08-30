@@ -39,27 +39,27 @@ public class TableLinkDao {
     private final DataStreamConfig dataStreamConfig;
 
 
-    public Integer queryTableLinkCount(Integer queryFlag, String queryValue) throws DataStreamException {
+    public Integer queryTableLinkCount(Integer queryFlag, String queryValue, String systemUserCode) throws DataStreamException {
         try {
-            return tableLinkMapper.queryTableLinkCount(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, (queryFlag.equals(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID) || queryFlag.equals(TABLE_LINK_QUERY_FLAG_STATE)) ? Long.valueOf(queryValue) : null);
+            return tableLinkMapper.queryTableLinkCount(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, (queryFlag.equals(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID) || queryFlag.equals(TABLE_LINK_QUERY_FLAG_STATE)) ? Long.valueOf(queryValue) : null, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_TABLE_LINK_COUNT_ERROR);
         }
     }
 
-    public List<TableLinkEntity> queryTableLink(Integer queryFlag, String queryValue, String sqlLimit) throws DataStreamException {
+    public List<TableLinkEntity> queryTableLink(Integer queryFlag, String queryValue, String sqlLimit, String systemUserCode) throws DataStreamException {
         try {
-            return tableLinkMapper.queryTableLink(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, (queryFlag.equals(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID) || queryFlag.equals(TABLE_LINK_QUERY_FLAG_STATE)) ? Long.valueOf(queryValue) : null, sqlLimit);
+            return tableLinkMapper.queryTableLink(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, (queryFlag.equals(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID) || queryFlag.equals(TABLE_LINK_QUERY_FLAG_STATE)) ? Long.valueOf(queryValue) : null, sqlLimit, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_TABLE_LINK_ERROR);
         }
     }
 
-    public List<TableLinkEntity> queryTableLinkLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer queryFlag, String queryValue) throws DataStreamException {
+    public List<TableLinkEntity> queryTableLinkLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer queryFlag, String queryValue, String systemUserCode) throws DataStreamException {
         try {
-            return tableLinkMapper.queryTableLinkLikeOracle(pageBeginRow, pageEndRow, queryFlag, queryValue, (queryFlag.equals(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID) || queryFlag.equals(TABLE_LINK_QUERY_FLAG_STATE)) ? Long.valueOf(queryValue) : null);
+            return tableLinkMapper.queryTableLinkLikeOracle(pageBeginRow, pageEndRow, queryFlag, queryValue, (queryFlag.equals(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID) || queryFlag.equals(TABLE_LINK_QUERY_FLAG_STATE)) ? Long.valueOf(queryValue) : null, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_TABLE_LINK_ERROR);

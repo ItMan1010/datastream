@@ -26,6 +26,7 @@ import com.itman.datastream.common.entity.ColumnTypeMapEntity;
 import com.itman.datastream.common.errcode.DataStreamException;
 import com.itman.datastream.engine.dao.ColumnTypeConfigDao;
 import com.itman.datastream.engine.dao.DataStreamDao;
+import com.itman.datastream.security.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,7 @@ public class ColumnTypeConfigServiceImpl implements IColumnTypeConfigService {
     private final DataStreamDao dataStreamDao;
     private final DataSourceFactory dataSourceFactory;
     private final DataStreamConfig dataStreamConfig;
+    private final PermissionService permissionService;
 
     private IDatabaseAdapter getDataBaseObject() throws DataStreamException {
         return dataSourceFactory.matchDataBase(dataStreamConfig.getMetaDbBaseType());
@@ -94,6 +96,7 @@ public class ColumnTypeConfigServiceImpl implements IColumnTypeConfigService {
         checkDefineUnique(define.getDatabaseType(), define.getColumnTypeName(), null);
         define.setColumnTypeClassify(deriveClassifyFromCategory(define.getTypeCategory()));
         define.setColumnTypeDefineId(dataStreamDao.querySequence(SEQ_COLUMN_TYPE_DEFINE_ID));
+        define.setSystemUserCode(permissionService.getCurrentUserCode());
         columnTypeConfigDao.insertTypeDefine(define);
         return define.getColumnTypeDefineId();
     }
@@ -146,6 +149,7 @@ public class ColumnTypeConfigServiceImpl implements IColumnTypeConfigService {
     public Long addTypeMap(ColumnTypeMapEntity map) throws DataStreamException {
         validateMap(map);
         map.setColumnTypeMapId(dataStreamDao.querySequence(SEQ_COLUMN_TYPE_MAP_ID));
+        map.setSystemUserCode(permissionService.getCurrentUserCode());
         columnTypeConfigDao.insertTypeMap(map);
         return map.getColumnTypeMapId();
     }

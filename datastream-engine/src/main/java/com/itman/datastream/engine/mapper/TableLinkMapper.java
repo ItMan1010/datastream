@@ -27,11 +27,11 @@ import java.util.List;
 
 @Mapper
 public interface TableLinkMapper {
-    Integer queryTableLinkCount(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("queryValue2") Long queryValue2);
+    Integer queryTableLinkCount(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("queryValue2") Long queryValue2, @Param("systemUserCode") String systemUserCode);
 
-    List<TableLinkEntity> queryTableLink(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("queryValue2") Long queryValue2, @Param("sqlLimit") String sqlLimit);
+    List<TableLinkEntity> queryTableLink(@Param("dbType") Integer dbType, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("queryValue2") Long queryValue2, @Param("sqlLimit") String sqlLimit, @Param("systemUserCode") String systemUserCode);
 
-    List<TableLinkEntity> queryTableLinkLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("queryValue2") Long queryValue2);
+    List<TableLinkEntity> queryTableLinkLikeOracle(@Param("pageBeginRow") Integer pageBeginRow, @Param("pageEndRow") Integer pageEndRow, @Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("queryValue2") Long queryValue2, @Param("systemUserCode") String systemUserCode);
 
     Integer insertTableLink(@Param("sysdate") String sysdate, @Param("tableLink") TableLinkEntity tableLink) throws DataAccessException;
 

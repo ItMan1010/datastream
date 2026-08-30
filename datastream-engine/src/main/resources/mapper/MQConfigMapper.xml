@@ -4,7 +4,7 @@
 <mapper namespace="com.itman.datastream.engine.mapper.MQConfigMapper">
     <sql id="mqConfigColumnList">
         mq_config_id
-        ,mq_config_name,mq_type,bootstrap_servers,message_format,delimiter,topic_prefix,remark,on_line_flag,state,state_date,create_date
+        ,mq_config_name,mq_type,bootstrap_servers,message_format,delimiter,topic_prefix,remark,on_line_flag,state,state_date,create_date,system_user_code
     </sql>
 
     <sql id="MQConfigWhereCon">
@@ -15,7 +15,10 @@
             and mq_config_id=#{queryValue} and state!=3
         </if>
         <if test="queryFlag==@com.itman.datastream.common.constant.DataStreamConstant@MQ_CONFIG_QUERY_FLAG_FILE_NAME">
-            and mq_name like #{queryValue} and state!=3
+            and mq_config_name like #{queryValue} and state!=3
+        </if>
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
         </if>
     </sql>
 
@@ -58,7 +61,8 @@
         #{mqConfig.onLineFlag},
         #{mqConfig.state},
         ${sysdate},
-        ${sysdate})
+        ${sysdate},
+        #{mqConfig.systemUserCode})
     </insert>
 
     <update id="updateMQConfig">

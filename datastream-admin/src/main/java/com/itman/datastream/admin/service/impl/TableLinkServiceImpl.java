@@ -25,6 +25,7 @@ import com.itman.datastream.common.errcode.DataStreamException;
 import com.itman.datastream.common.utils.CommUtils;
 import com.itman.datastream.engine.dao.TableLinkDao;
 import com.itman.datastream.engine.dao.DataStreamDao;
+import com.itman.datastream.security.service.PermissionService;
 import com.itman.datastream.common.api.DataSourceFactory;
 import com.itman.datastream.common.api.IDatabaseAdapter;
 import com.itman.datastream.common.entity.TableColumnEntity;
@@ -50,6 +51,7 @@ public class TableLinkServiceImpl implements ITableLinkService {
     private final TableLinkDao tableLinkDao;
     private final DataSourceFactory dataSourceFactory;
     private final DataStreamDao dataStreamDao;
+    private final PermissionService permissionService;
 
     private IDatabaseAdapter getDataBaseObject() throws DataStreamException {
         return dataSourceFactory.matchDataBase(dataStreamConfig.getMetaDbBaseType());
@@ -58,15 +60,15 @@ public class TableLinkServiceImpl implements ITableLinkService {
     @Override
     public Integer queryTableLinkCount(Integer queryFlag, String queryValue) throws DataStreamException {
         queryValue = (queryFlag.equals(TABLE_LINK_QUERY_FLAG_LINK_NAME) || queryFlag.equals(TABLE_LINK_QUERY_FLAG_TABLE_NAME)) ? "%" + queryValue + "%" : queryValue;
-        return tableLinkDao.queryTableLinkCount(queryFlag, queryValue);
+        return tableLinkDao.queryTableLinkCount(queryFlag, queryValue, currentUserScope());
     }
 
     @Override
     public List<TableLinkEntity> queryTableLink(Integer queryFlag, String queryValue, Integer page, Integer count) throws DataStreamException {
         queryValue = (queryFlag.equals(TABLE_LINK_QUERY_FLAG_LINK_NAME) || queryFlag.equals(TABLE_LINK_QUERY_FLAG_TABLE_NAME)) ? "%" + queryValue + "%" : queryValue;
         return (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) ?
-                tableLinkDao.queryTableLink(queryFlag, queryValue, getDataBaseObject().makeSqlLimit(genPageRow(page, count), count)) :
-                tableLinkDao.queryTableLinkLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), queryFlag, queryValue);
+                tableLinkDao.queryTableLink(queryFlag, queryValue, getDataBaseObject().makeSqlLimit(genPageRow(page, count), count), currentUserScope()) :
+                tableLinkDao.queryTableLinkLikeOracle(genPageRow(page, count), (genPageRow(page, count) + count), queryFlag, queryValue, currentUserScope());
     }
 
     @Transactional(rollbackFor = DataStreamException.class)
@@ -76,6 +78,7 @@ public class TableLinkServiceImpl implements ITableLinkService {
         tableLink.setTableLinkName(tableLinkName);
         tableLink.setTableLinkDes(tableLinkDes);
         tableLink.setState(COMMON_STATE_OFFLINE);
+        tableLink.setSystemUserCode(permissionService.getCurrentUserCode());
         if (tableLinkDao.insertTableLink(getDataBaseObject().makeSqlSystemDate(), tableLink).equals(0)) {
             throw new DataStreamException(OPER_INSERT_TABLE_LINK_ERROR);
         }
@@ -149,6 +152,7 @@ public class TableLinkServiceImpl implements ITableLinkService {
     }
 
     private void checkFlowDefine(Long flowDefineId) throws DataStreamException {
+        checkTableLinkOwner(flowDefineId);
         List<TableLinkEntity> canalTableLinkDefineEntityList = queryTableLink(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID, flowDefineId.toString(), 1, 10);
         if (CollectionUtils.isEmpty(canalTableLinkDefineEntityList)) {
             throw new DataStreamException(OPER_FLOW_DEFINE_NOT_EXISTS_ERROR);
@@ -161,6 +165,7 @@ public class TableLinkServiceImpl implements ITableLinkService {
 
 
     public Long onOffTableLink(Long tableLinkId, Integer state) throws DataStreamException {
+        checkTableLinkOwner(tableLinkId);
         List<TableLinkEntity> canalTableLinkDefineEntityList = queryTableLink(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID, tableLinkId.toString(), 1, 10);
         if (CollectionUtils.isEmpty(canalTableLinkDefineEntityList)) {
             throw new DataStreamException(OPER_FLOW_DEFINE_NOT_EXISTS_ERROR);
@@ -186,6 +191,7 @@ public class TableLinkServiceImpl implements ITableLinkService {
 
     @Override
     public LinkNodeEntity queryTableLink(Long flowDefineId) throws DataStreamException {
+        checkTableLinkOwner(flowDefineId);
         List<LinkNodeEntity> canalLinkNodeEntityList = tableLinkDao.queryTableLinkNode(flowDefineId);
         LinkNodeEntity canalFlowNodeRoot = null;
         if (!CollectionUtils.isEmpty(canalLinkNodeEntityList)) {
@@ -216,6 +222,33 @@ public class TableLinkServiceImpl implements ITableLinkService {
 
     @Override
     public List<LinkNodeEntity> queryTableLinkNodeList(Long flowDefineId) throws DataStreamException {
+        checkTableLinkOwner(flowDefineId);
         return tableLinkDao.queryTableLinkNode(flowDefineId);
+    }
+
+    /**
+     * 计算当前用户的数据范围过滤值：管理员返回 null（不过滤），普通用户返回当前工号。
+     */
+    private String currentUserScope() {
+        return permissionService.isAdmin() ? null : permissionService.getCurrentUserCode();
+    }
+
+    /**
+     * 校验表链接配置归属：非管理员访问他人配置时抛出无权限错误。
+     */
+    private void checkTableLinkOwner(Long tableLinkId) throws DataStreamException {
+        if (permissionService.isAdmin()) {
+            return;
+        }
+        List<TableLinkEntity> list = (!dataStreamConfig.getMetaDbBaseType().equals(DATA_SOURCE_TYPE_ORACLE))
+                ? tableLinkDao.queryTableLink(TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID, tableLinkId.toString(), getDataBaseObject().makeSqlLimit(genPageRow(1, 10), 10), null)
+                : tableLinkDao.queryTableLinkLikeOracle(genPageRow(1, 10), (genPageRow(1, 10) + 10), TABLE_LINK_QUERY_FLAG_TABLE_LINK_ID, tableLinkId.toString(), null);
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        String currentUserCode = permissionService.getCurrentUserCode();
+        if (currentUserCode == null || currentUserCode.isEmpty() || !currentUserCode.equals(list.get(0).getSystemUserCode())) {
+            throw new DataStreamException(OPER_CONFIG_NOT_OWNER_ERROR);
+        }
     }
 }

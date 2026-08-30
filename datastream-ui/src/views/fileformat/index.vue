@@ -77,6 +77,7 @@
                     <el-tag v-if="scope.row.fileType === 9" type="info" effect="dark">excel</el-tag>
                   </template>
                 </el-table-column>
+                <el-table-column prop="systemUserCode" label="创建用户" width="100" />
                 <el-table-column prop="createDate" label="创建时间" width="160" />
                 <el-table-column label="状态" width="80">
                   <template #default="scope">

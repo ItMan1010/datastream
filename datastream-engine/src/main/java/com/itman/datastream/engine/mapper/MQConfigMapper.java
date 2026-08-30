@@ -26,9 +26,9 @@ import java.util.List;
 
 @Mapper
 public interface MQConfigMapper {
-    Integer getMQConfigCountById(@Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue) throws DataAccessException;
+    Integer getMQConfigCountById(@Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
-    List<MQConfigEntity> selectMQConfigByPage(@Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("sqlLimit") String sqlLimit) throws DataAccessException;
+    List<MQConfigEntity> selectMQConfigByPage(@Param("queryFlag") Integer queryFlag, @Param("queryValue") String queryValue, @Param("sqlLimit") String sqlLimit, @Param("systemUserCode") String systemUserCode) throws DataAccessException;
 
     List<MQConfigEntity> queryMQConfigById(@Param("mqConfigId") Long mqConfigId) throws DataAccessException;
 

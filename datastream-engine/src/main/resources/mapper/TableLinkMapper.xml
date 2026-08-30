@@ -13,7 +13,7 @@
 
     <sql id="tableLinkColumns">
         table_link_id
-        ,table_link_name,table_link_des,create_date,state,state_date
+        ,table_link_name,table_link_des,create_date,state,state_date,system_user_code
     </sql>
 
     <sql id="tableLinkWhereCon">
@@ -32,6 +32,9 @@
         </if>
         <if test="queryFlag==@com.itman.datastream.common.constant.DataStreamConstant@TABLE_LINK_QUERY_FLAG_STATE">
             and state=#{queryValue2}
+        </if>
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
         </if>
     </sql>
 
@@ -70,7 +73,8 @@
         #{tableLink.tableLinkDes},
         ${sysdate},
         #{tableLink.state},
-        ${sysdate})
+        ${sysdate},
+        #{tableLink.systemUserCode})
     </insert>
 
     <sql id="linkNodeColumnList">

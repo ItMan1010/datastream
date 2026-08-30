@@ -32,7 +32,8 @@
                t.min_value,
                t.max_value,
                t.is_national_flag,
-               t.require_length_param
+               t.require_length_param,
+               t.system_user_code
         from data_stream_column_type_define t
         <include refid="defineQueryCondition"/>
         order by t.column_type_define_id
@@ -61,7 +62,8 @@
                min_value,
                max_value,
                is_national_flag,
-               require_length_param
+               require_length_param,
+               system_user_code
         from data_stream_column_type_define
         where column_type_define_id = #{columnTypeDefineId}
     </select>
@@ -91,7 +93,8 @@
             min_value,
             max_value,
             is_national_flag,
-            require_length_param
+            require_length_param,
+            system_user_code
         ) values (
             #{define.columnTypeDefineId},
             #{define.databaseType},
@@ -106,7 +109,8 @@
             #{define.minValue},
             #{define.maxValue},
             #{define.isNationalFlag},
-            #{define.requireLengthParam}
+            #{define.requireLengthParam},
+            #{define.systemUserCode}
         )
     </insert>
 
@@ -153,7 +157,8 @@
                a.precision_conversion_rule,
                a.length_conversion_rule,
                a.conversion_warning,
-               a.is_reversible
+               a.is_reversible,
+               a.system_user_code
         from data_stream_column_type_map a,
              data_stream_column_type_define b,
              data_stream_column_type_define c
@@ -198,7 +203,8 @@
                a.precision_conversion_rule,
                a.length_conversion_rule,
                a.conversion_warning,
-               a.is_reversible
+               a.is_reversible,
+               a.system_user_code
         from data_stream_column_type_map a,
              data_stream_column_type_define b,
              data_stream_column_type_define c
@@ -216,7 +222,8 @@
             precision_conversion_rule,
             length_conversion_rule,
             conversion_warning,
-            is_reversible
+            is_reversible,
+            system_user_code
         ) values (
             #{map.columnTypeMapId},
             #{map.columnTypeDefineIdA},
@@ -225,7 +232,8 @@
             #{map.precisionConversionRule},
             #{map.lengthConversionRule},
             #{map.conversionWarning},
-            #{map.isReversible}
+            #{map.isReversible},
+            #{map.systemUserCode}
         )
     </insert>
 

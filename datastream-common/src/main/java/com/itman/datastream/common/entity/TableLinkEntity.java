@@ -26,4 +26,9 @@ public class TableLinkEntity {
     private String createDate;
     private Integer state;
     private String stateDate;
+
+    /**
+     * 创建人工号（登录账号）
+     */
+    private String systemUserCode;
 }

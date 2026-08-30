@@ -33,12 +33,12 @@ public class MQConfigDao {
     public final MQConfigMapper MQConfigMapper;
 
 
-    public Integer getMQConfigCountById(Integer queryFlag, String queryValue) throws DataStreamException {
-        return MQConfigMapper.getMQConfigCountById(queryFlag, queryValue);
+    public Integer getMQConfigCountById(Integer queryFlag, String queryValue, String systemUserCode) throws DataStreamException {
+        return MQConfigMapper.getMQConfigCountById(queryFlag, queryValue, systemUserCode);
     }
 
-    public List<MQConfigEntity> selectMQConfigByPage(Integer queryFlag, String queryValue, String sqlLimit) throws DataStreamException {
-        return MQConfigMapper.selectMQConfigByPage(queryFlag, queryValue, sqlLimit);
+    public List<MQConfigEntity> selectMQConfigByPage(Integer queryFlag, String queryValue, String sqlLimit, String systemUserCode) throws DataStreamException {
+        return MQConfigMapper.selectMQConfigByPage(queryFlag, queryValue, sqlLimit, systemUserCode);
     }
 
     public List<MQConfigEntity> queryMQConfigById(Long mqConfigId) throws DataStreamException {

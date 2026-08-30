@@ -542,27 +542,27 @@ public class DataStreamDao {
         }
     }
 
-    public Integer getDataBaseCount(Integer queryFlag, Long queryValue, Integer state) throws DataStreamException {
+    public Integer getDataBaseCount(Integer queryFlag, Long queryValue, Integer state, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.getDataBaseCount(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, state);
+            return dataStreamMapper.getDataBaseCount(dataStreamConfig.getMetaTeledbType(), queryFlag, queryValue, state, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_DATA_SOURCE_ERROR);
         }
     }
 
-    public List<DataBaseEntity> queryDataBase(String sqlLimit, Integer queryFlag, Long queryValue, Integer state) throws DataStreamException {
+    public List<DataBaseEntity> queryDataBase(String sqlLimit, Integer queryFlag, Long queryValue, Integer state, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataBase(dataStreamConfig.getMetaTeledbType(), sqlLimit, queryFlag, queryValue, state);
+            return dataStreamMapper.queryDataBase(dataStreamConfig.getMetaTeledbType(), sqlLimit, queryFlag, queryValue, state, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_DATA_SOURCE_ERROR);
         }
     }
 
-    public List<DataBaseEntity> queryDataBaseLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer queryFlag, Long queryValue, Integer state) throws DataStreamException {
+    public List<DataBaseEntity> queryDataBaseLikeOracle(Integer pageBeginRow, Integer pageEndRow, Integer queryFlag, Long queryValue, Integer state, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.queryDataBaseLikeOracle(pageBeginRow, pageEndRow, queryFlag, queryValue, state);
+            return dataStreamMapper.queryDataBaseLikeOracle(pageBeginRow, pageEndRow, queryFlag, queryValue, state, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_QUERY_DATA_SOURCE_ERROR);
@@ -596,56 +596,56 @@ public class DataStreamDao {
         }
     }
 
-    public Integer statMoveTaskCount(String state) throws DataStreamException {
+    public Integer statMoveTaskCount(String state, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.statMoveTaskCount(dataStreamConfig.getMetaTeledbType(), state);
+            return dataStreamMapper.statMoveTaskCount(dataStreamConfig.getMetaTeledbType(), state, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_STAT_MOVE_TASK_COUNT_ERROR);
         }
     }
 
-    public Integer statLinkTaskCount(String state) throws DataStreamException {
+    public Integer statLinkTaskCount(String state, String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.statLinkTaskCount(dataStreamConfig.getMetaTeledbType(), state);
+            return dataStreamMapper.statLinkTaskCount(dataStreamConfig.getMetaTeledbType(), state, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_STAT_LINK_TASK_COUNT_ERROR);
         }
     }
 
-    public List<StatDayCountEntity> statMoveTaskCountGroupByDay(String intervalDay) throws DataStreamException {
+    public List<StatDayCountEntity> statMoveTaskCountGroupByDay(String intervalDay, String systemUserCode) throws DataStreamException {
         try {
-            return (!Arrays.asList(DATA_SOURCE_TYPE_ORACLE, DATA_SOURCE_TYPE_H2).contains(dataStreamConfig.getMetaDbBaseType())) ? dataStreamMapper.statMoveTaskCountGroupByDay(dataStreamConfig.getMetaTeledbType(), intervalDay) : dataStreamMapper.statMoveTaskCountGroupByDayLikeOracle(intervalDay);
+            return (!Arrays.asList(DATA_SOURCE_TYPE_ORACLE, DATA_SOURCE_TYPE_H2).contains(dataStreamConfig.getMetaDbBaseType())) ? dataStreamMapper.statMoveTaskCountGroupByDay(dataStreamConfig.getMetaTeledbType(), intervalDay, systemUserCode) : dataStreamMapper.statMoveTaskCountGroupByDayLikeOracle(intervalDay, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_STAT_MOVE_TASK_COUNT_GROUP_BY_DAY_ERROR);
         }
     }
 
-    public List<StatDayCountEntity> statLinkTaskCountGroupByDay(String intervalDay) throws DataStreamException {
+    public List<StatDayCountEntity> statLinkTaskCountGroupByDay(String intervalDay, String systemUserCode) throws DataStreamException {
         try {
             return (!Arrays.asList(DATA_SOURCE_TYPE_ORACLE, DATA_SOURCE_TYPE_H2).contains(dataStreamConfig.getMetaDbBaseType())) ?
-                    dataStreamMapper.statLinkTaskCountGroupByDay(dataStreamConfig.getMetaTeledbType(), intervalDay) :
-                    dataStreamMapper.statLinkTaskCountGroupByDayLikeOracle(intervalDay);
+                    dataStreamMapper.statLinkTaskCountGroupByDay(dataStreamConfig.getMetaTeledbType(), intervalDay, systemUserCode) :
+                    dataStreamMapper.statLinkTaskCountGroupByDayLikeOracle(intervalDay, systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_STAT_BACK_TASK_COUNT_GROUP_BY_DAY_ERROR);
         }
     }
 
-    public List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType() throws DataStreamException {
+    public List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType(String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.statMoveTaskCountGroupByType(dataStreamConfig.getMetaTeledbType());
+            return dataStreamMapper.statMoveTaskCountGroupByType(dataStreamConfig.getMetaTeledbType(), systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_STAT_MOVE_TASK_COUNT_GROUP_BY_TYPE_ERROR);
         }
     }
 
-    public List<StatTaskStateCountEntity> statMoveTaskCountGroupByState() throws DataStreamException {
+    public List<StatTaskStateCountEntity> statMoveTaskCountGroupByState(String systemUserCode) throws DataStreamException {
         try {
-            return dataStreamMapper.statMoveTaskCountGroupByState(dataStreamConfig.getMetaTeledbType());
+            return dataStreamMapper.statMoveTaskCountGroupByState(dataStreamConfig.getMetaTeledbType(), systemUserCode);
         } catch (Exception e) {
             log.error("error", e);
             throw new DataStreamException(DAO_STAT_MOVE_TASK_COUNT_GROUP_BY_STATE_ERROR);

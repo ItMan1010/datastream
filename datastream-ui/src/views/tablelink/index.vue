@@ -78,6 +78,7 @@
               <el-table :data="tableData" fit stripe highlight-current-row style="width: 100%;">
                 <el-table-column prop="tableLinkId" label="链接ID" width="160" :show-overflow-tooltip="true" />
                 <el-table-column prop="tableLinkName" label="链接名称" width="160" />
+                <el-table-column prop="systemUserCode" label="创建用户" width="100" />
                 <el-table-column prop="createDate" label="创建时间" width="160" />
                 <el-table-column label="状态" width="80">
                   <template #default="scope">

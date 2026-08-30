@@ -28,6 +28,7 @@ import com.itman.datastream.common.utils.FTPUtils;
 import com.itman.datastream.common.utils.FileUtils;
 import com.itman.datastream.engine.dao.DataStreamDao;
 import com.itman.datastream.engine.dao.FileDao;
+import com.itman.datastream.security.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.itman.datastream.common.constant.DataStreamConstant.*;
+import static com.itman.datastream.common.errcode.DataStreamErrorCode.OPER_CONFIG_NOT_OWNER_ERROR;
 import static com.itman.datastream.common.errcode.DataStreamErrorCode.OPER_SELECT_FILE_FORMAT_BY_ID_ERROR;
 import static com.itman.datastream.common.utils.CommUtils.genPageRow;
 
@@ -53,6 +55,7 @@ public class FileServiceImpl implements IFileService {
     private final DataSourceFactory dataSourceFactory;
     private final DataStreamConfig dataStreamConfig;
     private final List<IFileApi> fileList;
+    private final PermissionService permissionService;
 
 
     private IDatabaseAdapter getDataBaseObject() throws DataStreamException {
@@ -63,6 +66,7 @@ public class FileServiceImpl implements IFileService {
         //获取文件定义
         FileFormatEntity fileFormat = fileDao.selectFileFormat(fileFormatId);
         Optional.ofNullable(fileFormat).orElseThrow(() -> new DataStreamException(OPER_SELECT_FILE_FORMAT_BY_ID_ERROR));
+        checkFileFormatOwner(fileFormat);
 
         //获取文件过滤规则
         fileFormat.setFileFilterList(fileDao.selectFileFilter(fileFormatId));
@@ -145,6 +149,7 @@ public class FileServiceImpl implements IFileService {
     public void createFileFormat(FileFormatEntity fileFormat) throws DataStreamException {
         fileFormat.setFileFormatId(dataStreamDao.querySequence(SEQ_FILE_FORMAT_ID));
         fileFormat.setOnLineFlag(COMMON_STATE_OFFLINE);
+        fileFormat.setSystemUserCode(permissionService.getCurrentUserCode());
         fileDao.insertFileFormat(fileFormat, geMetaDbObject().makeSqlSystemDate());
 
         fileFormat.getFileBody().setFileFormatId(fileFormat.getFileFormatId());
@@ -259,6 +264,7 @@ public class FileServiceImpl implements IFileService {
     @Override
     @Transactional(rollbackFor = DataStreamException.class)
     public void modifyFileInstance(FileFormatEntity fileFormat) throws DataStreamException {
+        checkFileFormatOwner(fileFormat.getFileFormatId());
         fileDao.updateFile(fileFormat);
 
         fileFormat.getFileBody().setFileFormatId(fileFormat.getFileFormatId());
@@ -331,6 +337,7 @@ public class FileServiceImpl implements IFileService {
     @Override
     @Transactional(rollbackFor = DataStreamException.class)
     public void deleteFileInstance(Long fileFormatId) throws DataStreamException {
+        checkFileFormatOwner(fileFormatId);
         fileDao.deleteFileFieldByFileFormatId(fileFormatId);
         fileDao.deleteFileFilterByFileFormatId(fileFormatId);
         fileDao.deleteFileBodyByFileFormatId(fileFormatId);
@@ -360,13 +367,13 @@ public class FileServiceImpl implements IFileService {
     @Override
     public Integer selectFileFormatCount(Integer queryFlag, String queryValue) throws DataStreamException {
         queryValue = queryFlag.equals(FILE_FORMAT_QUERY_FLAG_FILE_NAME) ? "%" + queryValue + "%" : queryValue;
-        return fileDao.selectFileFormatCount(queryFlag, queryValue);
+        return fileDao.selectFileFormatCount(queryFlag, queryValue, currentUserScope());
     }
 
     @Override
     public List<FileFormatEntity> selectFileFormatByPage(Integer queryFlag, String queryValue, Integer page, Integer count) throws DataStreamException {
         queryValue = queryFlag.equals(FILE_FORMAT_QUERY_FLAG_FILE_NAME) ? "%" + queryValue + "%" : queryValue;
-        return fileDao.selectFileFormatByPage(queryFlag, queryValue, getDataBaseObject().makeSqlLimit(genPageRow(page, count), count));
+        return fileDao.selectFileFormatByPage(queryFlag, queryValue, getDataBaseObject().makeSqlLimit(genPageRow(page, count), count), currentUserScope());
     }
 
 
@@ -437,6 +444,34 @@ public class FileServiceImpl implements IFileService {
 
     @Override
     public void updateFileFormatOnLineFlagById(Long fileFormatId, Integer onLineFlag) throws DataStreamException {
+        checkFileFormatOwner(fileFormatId);
         fileDao.updateFileFormatOnLineFlagById(fileFormatId, onLineFlag);
+    }
+
+    /**
+     * 计算当前用户的数据范围过滤值：管理员返回 null（不过滤），普通用户返回当前工号。
+     */
+    private String currentUserScope() {
+        return permissionService.isAdmin() ? null : permissionService.getCurrentUserCode();
+    }
+
+    /**
+     * 校验文件格式配置归属：非管理员访问他人配置时抛出无权限错误。
+     */
+    private void checkFileFormatOwner(FileFormatEntity fileFormat) throws DataStreamException {
+        if (permissionService.isAdmin() || fileFormat == null) {
+            return;
+        }
+        String currentUserCode = permissionService.getCurrentUserCode();
+        if (currentUserCode == null || currentUserCode.isEmpty() || !currentUserCode.equals(fileFormat.getSystemUserCode())) {
+            throw new DataStreamException(OPER_CONFIG_NOT_OWNER_ERROR);
+        }
+    }
+
+    private void checkFileFormatOwner(Long fileFormatId) throws DataStreamException {
+        if (permissionService.isAdmin()) {
+            return;
+        }
+        checkFileFormatOwner(fileDao.selectFileFormat(fileFormatId));
     }
 }

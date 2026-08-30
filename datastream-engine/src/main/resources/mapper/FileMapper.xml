@@ -74,7 +74,7 @@
         ,ftp_host
         ,ftp_port
         ,ftp_user
-        ,ftp_passwd,ftp_path,local_path,file_bak_action,file_bak_path,state,state_date,create_date,on_line_flag
+        ,ftp_passwd,ftp_path,local_path,file_bak_action,file_bak_path,state,state_date,create_date,on_line_flag,system_user_code
     </sql>
 
     <select id="selectFileFormat" resultType="com.itman.datastream.common.entity.FileFormatEntity">
@@ -101,6 +101,9 @@
         </if>
         <if test="queryFlag==@com.itman.datastream.common.constant.DataStreamConstant@FILE_FORMAT_QUERY_FLAG_FILE_NAME">
             and file_name_format like #{queryValue} and state!=3
+        </if>
+        <if test="systemUserCode != null and systemUserCode != ''">
+            and system_user_code = #{systemUserCode}
         </if>
     </sql>
 
@@ -181,7 +184,8 @@
         1,
         ${sysdate},
         ${sysdate},
-        #{fileFormat.onLineFlag})
+        #{fileFormat.onLineFlag},
+        #{fileFormat.systemUserCode})
     </insert>
 
     <update id="updateFile">

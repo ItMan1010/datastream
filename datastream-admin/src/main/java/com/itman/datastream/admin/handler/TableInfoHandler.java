@@ -58,7 +58,7 @@ public class TableInfoHandler {
     public List<TableInfoEntity> getTableList(Long dataBaseId) throws DataStreamException {
         log.info("开始获取表列表，数据源ID: {}", dataBaseId);
 
-        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10);
+        List<DataBaseEntity> dataBaseList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataBaseId, null, 1, 10, null);
         if (CollectionUtils.isEmpty(dataBaseList)) {
             log.error("数据源不存在，ID: {}", dataBaseId);
             throw new DataStreamException(OPER_DATA_SOURCE_NOT_EXISTS_ERROR);
@@ -267,7 +267,7 @@ public class TableInfoHandler {
 
 
     public List<TableColumnEntity> getTableColumnInfo(Long dataSourceId, String tableName) throws DataStreamException {
-        List<DataBaseEntity> dataSourceList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataSourceId, null, 1, 10);
+        List<DataBaseEntity> dataSourceList = metaService.queryDataBase(DATA_BASE_QUERY_FLAG_ID, dataSourceId, null, 1, 10, null);
         if (CollectionUtils.isEmpty(dataSourceList)) {
             throw new DataStreamException(OPER_DATA_SOURCE_NOT_EXISTS_ERROR);
         }

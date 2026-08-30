@@ -16,7 +16,7 @@
 # ====================================================================
 # DataStream 测试环境 Docker Compose 配置
 # 日期: 2026-01-08
-# 说明: 快速搭建测试数据库环境，支持 MySQL、PostgreSQL、Oracle
+# 说明: 快速搭建测试数据库环境，支持 MySQL、PostgreSQL、Oracle、达梦 DM8
 # ====================================================================
 
 version: '3.8'
@@ -82,6 +82,23 @@ services:
       retries: 10
       start_period: 60s
 
+  # 达梦 DM8 测试数据库（ARM64 社区镜像，基于官方试用版，端口 5236）
+  # 默认账号/密码: SYSDBA / SYSDBA
+  dm8-test:
+    image: qinchz/dm8-arm64:latest
+    container_name: datastream-dm8-test
+    ports:
+      - "5236:5236"
+    volumes:
+      - dm8_data:/home/dmdba/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "echo \"select 1;\" | LD_LIBRARY_PATH=/home/dmdba/dmdbms/bin /home/dmdba/dmdbms/bin/disql SYSDBA/SYSDBA@localhost:5236 >/dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
   # pgAdmin (PostgreSQL 管理工具 - 可选)
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -108,6 +125,7 @@ volumes:
   mysql_data:
   postgres_data:
   oracle_data:
+  dm8_data:
 
 networks:
   default:

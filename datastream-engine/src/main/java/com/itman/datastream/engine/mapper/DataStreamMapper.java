@@ -153,6 +153,10 @@ public interface DataStreamMapper {
 
     List<StatDayCountEntity> statLinkTaskCountGroupByDayLikeOracle(@Param("intervalDay") String intervalDay);
 
+    List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType(@Param("dbType") Integer dbType);
+
+    List<StatTaskStateCountEntity> statMoveTaskCountGroupByState(@Param("dbType") Integer dbType);
+
     Integer getBatchTaskCountByDate(@Param("dbType") Integer dbType, @Param("beginDate") String beginDate, @Param("endDate") String endDate) throws DataAccessException;
 
     Integer queryTableMap(@Param("tableName") String tableName);

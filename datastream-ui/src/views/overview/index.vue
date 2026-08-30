@@ -14,6 +14,49 @@
 <!--limitations under the License.-->
 <template>
   <div class="main-content overview-page">
+    <!-- 任务维度统计区域 -->
+    <el-row :gutter="16" class="dimension-cards">
+      <el-col :xs="24" :sm="24" :md="12">
+        <el-card class="dimension-card" shadow="never">
+          <div class="dimension-title">
+            <el-icon><Histogram /></el-icon>
+            <span>任务类型分布</span>
+          </div>
+          <div id="taskTypeChart" class="dimension-chart"></div>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="12">
+        <el-card class="dimension-card" shadow="never">
+          <div class="dimension-title">
+            <el-icon><PieChart /></el-icon>
+            <span>任务状态分布</span>
+          </div>
+          <div id="taskStateChart" class="dimension-chart"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-divider />
+
+    <!-- 图表控制栏 -->
+    <div class="chart-control">
+      <div class="chart-title">
+        <el-icon><TrendCharts /></el-icon>
+        <span>任务统计趋势</span>
+      </div>
+      <el-select v-model.number="cycle" @change="changeCycle" class="cycle-select">
+        <el-option label="1日内" :value="1" />
+        <el-option label="3日内" :value="3" />
+        <el-option label="7日内" :value="7" />
+        <el-option label="30日内" :value="30" />
+      </el-select>
+    </div>
+
+    <!-- 图表区域 -->
+    <el-card class="chart-card" shadow="never">
+      <div id="myChart" class="chart-container"></div>
+    </el-card>
+
     <!-- 统计卡片 -->
     <el-row :gutter="16" class="overview-cards">
       <el-col :span="24 / 5">
@@ -92,34 +135,13 @@
         </el-card>
       </el-col>
     </el-row>
-
-    <el-divider />
-
-    <!-- 图表控制栏 -->
-    <div class="chart-control">
-      <div class="chart-title">
-        <el-icon><TrendCharts /></el-icon>
-        <span>任务统计趋势</span>
-      </div>
-      <el-select v-model.number="cycle" @change="changeCycle" class="cycle-select">
-        <el-option label="1日内" :value="1" />
-        <el-option label="3日内" :value="3" />
-        <el-option label="7日内" :value="7" />
-        <el-option label="30日内" :value="30" />
-      </el-select>
-    </div>
-
-    <!-- 图表区域 -->
-    <el-card class="chart-card" shadow="never">
-      <div id="myChart" class="chart-container"></div>
-    </el-card>
   </div>
 </template>
 
 <script>
 import { onMounted, onActivated, onDeactivated, onBeforeUnmount, getCurrentInstance, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { Connection, DocumentCopy, Clock, Link, VideoPlay, TrendCharts } from '@element-plus/icons-vue'
+import { Connection, DocumentCopy, Clock, Link, VideoPlay, TrendCharts, Histogram, PieChart } from '@element-plus/icons-vue'
 import { useOverview } from '@/composables/useOverview'
 import { useEventBus } from '@/composables/useEventBus'
 import { useMainStore } from '@/store/index.js'
@@ -132,7 +154,9 @@ export default {
     Clock,
     Link,
     VideoPlay,
-    TrendCharts
+    TrendCharts,
+    Histogram,
+    PieChart
   },
   setup() {
     const instance = getCurrentInstance()
@@ -146,33 +170,29 @@ export default {
       return instance?.appContext.config.globalProperties.$echarts
     }
 
+    // 初始化全部图表（类型图/状态图先初始化，趋势图最后初始化并触发一次数据加载）
+    const initCharts = () => {
+      const echarts = getEcharts()
+      if (!echarts) return false
+
+      const trendDom = document.getElementById('myChart')
+      const typeDom = document.getElementById('taskTypeChart')
+      const stateDom = document.getElementById('taskStateChart')
+
+      if (typeDom) overview.initTaskTypeChart(typeDom, echarts)
+      if (stateDom) overview.initTaskStateChart(stateDom, echarts)
+      if (trendDom) overview.initChart(trendDom, echarts)
+
+      return true
+    }
+
     // 初始化
     onMounted(() => {
       nextTick(() => {
-        try {
-          const chartDom = document.getElementById('myChart')
-          const echarts = getEcharts()
-
-          if (chartDom && echarts) {
-            overview.initChart(chartDom, echarts)
-          } else {
-            setTimeout(() => {
-              const chartDom = document.getElementById('myChart')
-              const echarts = getEcharts()
-              if (chartDom && echarts) {
-                overview.initChart(chartDom, echarts)
-              }
-            }, 200)
-          }
-        } catch (error) {
-          console.error('图表初始化失败:', error)
+        if (!initCharts()) {
           setTimeout(() => {
-            const chartDom = document.getElementById('myChart')
-            const echarts = getEcharts()
-            if (chartDom && echarts) {
-              overview.initChart(chartDom, echarts)
-            }
-          }, 500)
+            initCharts()
+          }, 200)
         }
       })
 
@@ -187,12 +207,11 @@ export default {
 
     onActivated(() => {
       nextTick(() => {
-        const chartDom = document.getElementById('myChart')
-        const echarts = getEcharts()
-
         if (!overview.myChart.value || overview.myChart.value.isDisposed()) {
-          if (chartDom && echarts) {
-            overview.initChart(chartDom, echarts)
+          if (!initCharts()) {
+            setTimeout(() => {
+              initCharts()
+            }, 200)
           }
         } else {
           overview.resizeChart()
@@ -237,7 +256,7 @@ export default {
 
 /* 统计卡片 */
 .overview-cards {
-  margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .stat-card {
@@ -333,5 +352,29 @@ export default {
 .chart-container {
   width: 100%;
   height: 450px;
+}
+
+/* 任务维度统计卡片 */
+.dimension-card :deep(.el-card__body) {
+  padding: 20px;
+}
+
+.dimension-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 16px;
+}
+
+.dimension-title .el-icon {
+  color: var(--primary-color);
+}
+
+.dimension-chart {
+  width: 100%;
+  height: 320px;
 }
 </style>

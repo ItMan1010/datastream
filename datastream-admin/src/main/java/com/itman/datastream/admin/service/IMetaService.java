@@ -123,6 +123,10 @@ public interface IMetaService {
 
     List<StatDayCountEntity> statLinkTaskCountGroupByDay(Integer days) throws DataStreamException;
 
+    List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType() throws DataStreamException;
+
+    List<StatTaskStateCountEntity> statMoveTaskCountGroupByState() throws DataStreamException;
+
     void initDataStreamMetaDb() throws DataStreamException;
 
     Integer insertMetrics(List<MetricsEntity> metricsList) throws DataStreamException;

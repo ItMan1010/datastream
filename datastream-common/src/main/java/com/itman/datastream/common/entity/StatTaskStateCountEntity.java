@@ -18,17 +18,8 @@ package com.itman.datastream.common.entity;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class StatSystemInfoEntity {
-    private Integer dataSourceCount;
-    private Integer moveTaskSumCount;
-    private Integer moveTaskRunCount;
-    private Integer linkTaskSumCount;
-    private Integer linkTaskRunCount;
-    private List<StatDayCountEntity> moveTaskDayCountList;
-    private List<StatDayCountEntity> linkTaskDayCountList;
-    private List<StatTaskTypeCountEntity> taskTypeCountList;
-    private List<StatTaskStateCountEntity> taskStateCountList;
+public class StatTaskStateCountEntity {
+    private Integer state;
+    private Integer taskCount;
 }

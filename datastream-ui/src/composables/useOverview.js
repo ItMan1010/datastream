@@ -23,7 +23,27 @@ import constant from '@/comm/constants.js'
 import * as commMethod from '@/comm/commMethod.js'
 import { useMessage } from './useMessage'
 import { useEventBus } from './useEventBus'
+import { TASK_TYPE_MAP, TASK_STATE_MAP } from '@/constants/taskConstants'
 import dayjs from 'dayjs'
+
+// 任务类型图表配色（与概览卡片配色保持一致，增量迁移使用新增紫色）
+const TASK_TYPE_CHART_COLORS = {
+  1: '#35A3F6',
+  2: '#F6B352',
+  3: '#EF546C',
+  4: '#41C9C5',
+  5: '#91CC75',
+  6: '#7C6BF0'
+}
+
+// 任务状态图表配色（等待中与运行结束采用不同颜色以增强区分度）
+const TASK_STATE_CHART_COLORS = {
+  0: '#909399',
+  1: '#67C23A',
+  2: '#409EFF',
+  3: '#F56C6C',
+  4: '#E6A23C'
+}
 
 export function useOverview() {
   const { showError } = useMessage()
@@ -31,6 +51,8 @@ export function useOverview() {
 
   // 图表实例
   const myChart = ref(null)
+  const taskTypeChart = ref(null)
+  const taskStateChart = ref(null)
 
   // 周期选择
   const cycle = ref(30)
@@ -63,6 +85,30 @@ export function useOverview() {
     }
   }
 
+  // 初始化任务类型图表
+  const initTaskTypeChart = (chartDom, echarts) => {
+    try {
+      if (chartDom && echarts && !taskTypeChart.value) {
+        taskTypeChart.value = echarts.init(chartDom)
+      }
+    } catch (error) {
+      console.error('initTaskTypeChart失败:', error)
+      taskTypeChart.value = null
+    }
+  }
+
+  // 初始化任务状态图表
+  const initTaskStateChart = (chartDom, echarts) => {
+    try {
+      if (chartDom && echarts && !taskStateChart.value) {
+        taskStateChart.value = echarts.init(chartDom)
+      }
+    } catch (error) {
+      console.error('initTaskStateChart失败:', error)
+      taskStateChart.value = null
+    }
+  }
+
   // 查询概览信息
   const queryCanalInfo = async (routeName, el) => {
     // 检查是否在概览页面
@@ -81,8 +127,10 @@ export function useOverview() {
       return
     }
 
-    // 检查图表实例
-    if (!myChart.value || myChart.value.isDisposed()) {
+    // 检查图表实例（趋势图或维度图任一就绪即可拉取数据）
+    const hasReadyChart = [myChart.value, taskTypeChart.value, taskStateChart.value]
+      .some(chart => chart && !chart.isDisposed())
+    if (!hasReadyChart) {
       return
     }
 
@@ -128,6 +176,8 @@ export function useOverview() {
       })
 
       createChart(countInfo)
+      createTaskTypeChart(statSystemInfoEntity.taskTypeCountList || [])
+      createTaskStateChart(statSystemInfoEntity.taskStateCountList || [])
     } catch (err) {
       console.error('查询概览信息失败:', err)
     }
@@ -285,6 +335,130 @@ export function useOverview() {
     myChart.value.setOption(options)
   }
 
+  // 创建任务类型分布图表
+  const createTaskTypeChart = (taskTypeCountList) => {
+    if (!taskTypeChart.value || taskTypeChart.value.isDisposed()) {
+      return
+    }
+
+    const typeCountMap = {}
+    ;(taskTypeCountList || []).forEach(item => {
+      typeCountMap[item.taskType] = item.taskCount || 0
+    })
+
+    const names = []
+    const values = []
+    Object.keys(TASK_TYPE_MAP).forEach(key => {
+      names.push(TASK_TYPE_MAP[key])
+      values.push({
+        value: typeCountMap[key] || 0,
+        itemStyle: { color: TASK_TYPE_CHART_COLORS[key] }
+      })
+    })
+
+    const options = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        borderColor: 'rgba(0, 0, 0, 0.8)',
+        textStyle: { color: '#fff', fontSize: 12 }
+      },
+      grid: {
+        left: '3%',
+        right: '8%',
+        top: '6%',
+        bottom: '6%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'value',
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { lineStyle: { color: '#EBEEF5', type: 'dashed' } },
+        minInterval: 1,
+        axisLabel: { color: '#909399', fontSize: 11 }
+      },
+      yAxis: {
+        type: 'category',
+        data: names,
+        axisLine: { lineStyle: { color: '#EBEEF5' } },
+        axisTick: { show: false },
+        axisLabel: { color: '#606266', fontSize: 12 }
+      },
+      series: [
+        {
+          type: 'bar',
+          data: values,
+          barMaxWidth: 18,
+          label: {
+            show: true,
+            position: 'right',
+            color: '#606266',
+            fontSize: 12
+          }
+        }
+      ]
+    }
+
+    taskTypeChart.value.setOption(options)
+  }
+
+  // 创建任务状态分布图表
+  const createTaskStateChart = (taskStateCountList) => {
+    if (!taskStateChart.value || taskStateChart.value.isDisposed()) {
+      return
+    }
+
+    const stateCountMap = {}
+    ;(taskStateCountList || []).forEach(item => {
+      stateCountMap[item.state] = item.taskCount || 0
+    })
+
+    const data = Object.keys(TASK_STATE_MAP).map(key => {
+      const info = TASK_STATE_MAP[key]
+      return {
+        name: info.text,
+        value: stateCountMap[key] || 0,
+        itemStyle: { color: TASK_STATE_CHART_COLORS[key] }
+      }
+    })
+
+    const options = {
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        borderColor: 'rgba(0, 0, 0, 0.8)',
+        textStyle: { color: '#fff', fontSize: 12 },
+        formatter: '{b}: {c} ({d}%)'
+      },
+      legend: {
+        orient: 'vertical',
+        right: 16,
+        top: 'middle',
+        itemWidth: 12,
+        itemHeight: 12,
+        textStyle: { color: '#606266', fontSize: 12 }
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: ['46%', '70%'],
+          center: ['38%', '50%'],
+          avoidLabelOverlap: true,
+          itemStyle: { borderColor: '#fff', borderWidth: 2 },
+          label: { show: false },
+          emphasis: {
+            label: { show: true, fontSize: 16, fontWeight: 600, color: '#303133' }
+          },
+          data
+        }
+      ]
+    }
+
+    taskStateChart.value.setOption(options)
+  }
+
   // 获取图表数据
   const getData = (countInfo, moveCountList, linkCountList) => {
     const data = []
@@ -348,30 +522,42 @@ export function useOverview() {
 
   // 调整图表大小
   const resizeChart = () => {
-    if (myChart.value && !myChart.value.isDisposed()) {
-      myChart.value.resize()
-    }
+    [myChart.value, taskTypeChart.value, taskStateChart.value].forEach(chart => {
+      if (chart && !chart.isDisposed()) {
+        chart.resize()
+      }
+    })
   }
 
   // 清理图表
   const disposeChart = () => {
-    if (myChart.value && !myChart.value.isDisposed()) {
-      try {
-        myChart.value.dispose()
-      } catch (error) {
-        console.error('清理图表实例失败:', error)
+    [myChart.value, taskTypeChart.value, taskStateChart.value].forEach(chart => {
+      if (chart && !chart.isDisposed()) {
+        try {
+          chart.dispose()
+        } catch (error) {
+          console.error('清理图表实例失败:', error)
+        }
       }
-    }
+    })
     myChart.value = null
+    taskTypeChart.value = null
+    taskStateChart.value = null
   }
 
   return {
     myChart,
+    taskTypeChart,
+    taskStateChart,
     cycle,
     overviewInfo,
     initChart,
+    initTaskTypeChart,
+    initTaskStateChart,
     queryCanalInfo,
     createChart,
+    createTaskTypeChart,
+    createTaskStateChart,
     changeCycle,
     gotoDetail,
     getDateRange,

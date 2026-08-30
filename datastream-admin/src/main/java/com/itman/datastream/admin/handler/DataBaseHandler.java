@@ -201,6 +201,10 @@ public class DataBaseHandler {
         //查询迁移执行总数
         statSystemInfoEntity.setMoveTaskDayCountList(metaService.statMoveTaskCountGroupByDay(days));
         statSystemInfoEntity.setLinkTaskDayCountList(metaService.statLinkTaskCountGroupByDay(days));
+        //按任务类型统计迁移任务数
+        statSystemInfoEntity.setTaskTypeCountList(metaService.statMoveTaskCountGroupByType());
+        //按任务状态统计迁移任务数
+        statSystemInfoEntity.setTaskStateCountList(metaService.statMoveTaskCountGroupByState());
     }
 
     public void dataSearch(DataSearchRequest dataSearchRequest, DataSearchResponse dataSearchResponse) throws DataStreamException {

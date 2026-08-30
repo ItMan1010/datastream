@@ -946,6 +946,30 @@
         order by trunc(create_date)
     </select>
 
+    <select id="statMoveTaskCountGroupByType"
+            resultType="com.itman.datastream.common.entity.StatTaskTypeCountEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select task_type as taskType,
+               count(1)  as taskCount
+        from data_stream_move_task
+        group by task_type
+        order by task_type
+    </select>
+
+    <select id="statMoveTaskCountGroupByState"
+            resultType="com.itman.datastream.common.entity.StatTaskStateCountEntity">
+        <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">
+            /* !HINT({"balance":"0"})*/
+        </if>
+        select state,
+               count(1) as taskCount
+        from data_stream_move_task
+        group by state
+        order by state
+    </select>
+
 
     <select id="getBatchTaskCountByDate" resultType="java.lang.Integer">
         <if test="dbType == @com.itman.datastream.common.constant.DataStreamConstant@DATA_SOURCE_TYPE_SHARDING">

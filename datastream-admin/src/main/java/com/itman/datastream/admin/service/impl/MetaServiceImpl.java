@@ -518,6 +518,16 @@ public class MetaServiceImpl implements IMetaService {
     }
 
     @Override
+    public List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType() throws DataStreamException {
+        return dataStreamDao.statMoveTaskCountGroupByType();
+    }
+
+    @Override
+    public List<StatTaskStateCountEntity> statMoveTaskCountGroupByState() throws DataStreamException {
+        return dataStreamDao.statMoveTaskCountGroupByState();
+    }
+
+    @Override
     public void initDataStreamMetaDb() throws DataStreamException {
         List<String> sqlList = geMetaDbObject().makeInitDataStreamMetaDbSql();
         sqlList.forEach(x -> {

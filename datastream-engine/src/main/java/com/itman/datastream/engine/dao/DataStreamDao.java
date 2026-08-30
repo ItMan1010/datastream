@@ -634,6 +634,24 @@ public class DataStreamDao {
         }
     }
 
+    public List<StatTaskTypeCountEntity> statMoveTaskCountGroupByType() throws DataStreamException {
+        try {
+            return dataStreamMapper.statMoveTaskCountGroupByType(dataStreamConfig.getMetaTeledbType());
+        } catch (Exception e) {
+            log.error("error", e);
+            throw new DataStreamException(DAO_STAT_MOVE_TASK_COUNT_GROUP_BY_TYPE_ERROR);
+        }
+    }
+
+    public List<StatTaskStateCountEntity> statMoveTaskCountGroupByState() throws DataStreamException {
+        try {
+            return dataStreamMapper.statMoveTaskCountGroupByState(dataStreamConfig.getMetaTeledbType());
+        } catch (Exception e) {
+            log.error("error", e);
+            throw new DataStreamException(DAO_STAT_MOVE_TASK_COUNT_GROUP_BY_STATE_ERROR);
+        }
+    }
+
     public Integer executeMetaDbSql(String metaDbSql) throws DataStreamException {
         try {
             return dataStreamMapper.executeMetaDbSql(metaDbSql);

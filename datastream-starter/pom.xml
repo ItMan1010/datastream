@@ -66,6 +66,11 @@
         </dependency>
         <dependency>
             <groupId>com.itman</groupId>
+            <artifactId>connector-dameng</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itman</groupId>
             <artifactId>connector-postgres</artifactId>
             <version>${revision}</version>
         </dependency>

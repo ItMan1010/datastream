@@ -45,7 +45,7 @@ DataStream 是一款功能完善的数据处理平台，提供数据迁移、数
 - Pinia + Vue Router 4
 
 **支持的数据源**
-- 数据库：MySQL、Oracle、PostgreSQL、H2、Doris
+- 数据库：MySQL、Oracle、PostgreSQL、H2、Doris、达梦（DM8）
 - 文件：Text 文本文件、Excel 文件
 - 消息队列：Kafka、RocketMQ、RabbitMQ、ActiveMQ
 
@@ -102,6 +102,7 @@ datastream/
 │   ├── connector-mysql/       # MySQL 连接器
 │   ├── connector-oracle/      # Oracle 连接器
 │   ├── connector-postgres/    # PostgreSQL 连接器
+│   ├── connector-dameng/      # 达梦（DM8）连接器
 │   ├── connector-h2/          # H2 连接器
 │   ├── connector-kafka/       # Kafka 连接器
 │   └── connector-file/        # 文件连接器（Text/Excel）

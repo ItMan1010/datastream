@@ -57,6 +57,7 @@ public class CommUtils {
         jdbcUrlDataBaseTypeMap.put(DATA_SOURCE_TYPE_DORIS, "mysql");
         jdbcUrlDataBaseTypeMap.put(DATA_SOURCE_TYPE_MEM, "mysql");
         jdbcUrlDataBaseTypeMap.put(DATA_SOURCE_TYPE_H2, "h2");
+        jdbcUrlDataBaseTypeMap.put(DATA_SOURCE_TYPE_DAMENG, "dm");
 
         //todo 以后可以设计成可配置
         dataSourceCategoryMap.put(DATA_SOURCE_TYPE_SHARDING, DATA_SOURCE_CATEGORY_DATABASE);
@@ -66,6 +67,7 @@ public class CommUtils {
         dataSourceCategoryMap.put(DATA_SOURCE_TYPE_DORIS, DATA_SOURCE_CATEGORY_DATABASE);
         dataSourceCategoryMap.put(DATA_SOURCE_TYPE_MEM, DATA_SOURCE_CATEGORY_DATABASE);
         dataSourceCategoryMap.put(DATA_SOURCE_TYPE_H2, DATA_SOURCE_CATEGORY_DATABASE);
+        dataSourceCategoryMap.put(DATA_SOURCE_TYPE_DAMENG, DATA_SOURCE_CATEGORY_DATABASE);
         dataSourceCategoryMap.put(DATA_SOURCE_TYPE_TEXT, DATA_SOURCE_CATEGORY_FILE);
         dataSourceCategoryMap.put(DATA_SOURCE_TYPE_EXCEL, DATA_SOURCE_CATEGORY_FILE);
         dataSourceCategoryMap.put(DATA_SOURCE_TYPE_KAFKA, DATA_SOURCE_CATEGORY_MQ);
@@ -125,44 +127,38 @@ public class CommUtils {
     }
 
     public static String parseJdbcUrl(String url) {
-        for (DataBaseEnum type : DataBaseEnum.values()) {
-            Pattern namePattern = Pattern.compile(type.getUrlPattern());
-            Matcher dateMatcher = namePattern.matcher(url);
-            while (dateMatcher.find()) {
-                return dateMatcher.group("type");
-            }
-        }
-        return null;
+        return parseJdbcUrlGroup(url, "type");
     }
 
     public static String parseSchemaNameJdbcUrl(String url) {
-        for (DataBaseEnum type : DataBaseEnum.values()) {
-            Pattern namePattern = Pattern.compile(type.getUrlPattern());
-            Matcher dateMatcher = namePattern.matcher(url);
-            while (dateMatcher.find()) {
-                return dateMatcher.group("database");
-            }
-        }
-        return null;
+        return parseJdbcUrlGroup(url, "database");
     }
 
     public static String parseHostJdbcUrl(String url) {
-        for (DataBaseEnum type : DataBaseEnum.values()) {
-            Pattern namePattern = Pattern.compile(type.getUrlPattern());
-            Matcher dateMatcher = namePattern.matcher(url);
-            while (dateMatcher.find()) {
-                return dateMatcher.group("host");
-            }
-        }
-        return null;
+        return parseJdbcUrlGroup(url, "host");
     }
 
     public static String parsePortJdbcUrl(String url) {
+        return parseJdbcUrlGroup(url, "port");
+    }
+
+    /**
+     * 按命名分组解析 JDBC URL 的指定片段。
+     * <p>部分数据库（如 H2、SQL Server、达梦、GaussDB 等）的 URL 正则并非都定义了
+     * type/host/port/database 全部命名分组；匹配到未定义该分组的数据库时跳过并继续，
+     * 避免 H2 的宽松正则提前匹配达梦等 URL 时抛 IllegalArgumentException。</p>
+     */
+    private static String parseJdbcUrlGroup(String url, String groupName) {
         for (DataBaseEnum type : DataBaseEnum.values()) {
             Pattern namePattern = Pattern.compile(type.getUrlPattern());
             Matcher dateMatcher = namePattern.matcher(url);
             while (dateMatcher.find()) {
-                return dateMatcher.group("port");
+                try {
+                    return dateMatcher.group(groupName);
+                } catch (IllegalArgumentException e) {
+                    // 当前数据库正则未定义该命名分组，继续匹配下一个数据库
+                    break;
+                }
             }
         }
         return null;

@@ -59,7 +59,7 @@ public enum DataBaseEnum {
      * 达梦数据库
      */
     DAMENG(15, "dameng",
-            "jdbc:dm://(?<host>[a-zA-Z0-9-.]+):(?<port>[0-9]+)/(?<database>[a-zA-Z0-9_]+)"),
+            "jdbc:(?<type>dm)://(?<host>[a-zA-Z0-9-.]+):(?<port>[0-9]+)(/(?<database>[a-zA-Z0-9_]*))?"),
     /**
      * 人大金仓数据库
      */

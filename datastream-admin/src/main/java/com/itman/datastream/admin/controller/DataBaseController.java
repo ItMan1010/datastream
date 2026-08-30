@@ -100,7 +100,9 @@ public class DataBaseController {
 
             DataBaseEntity dataBase = new DataBaseEntity();
             BeanUtils.copyProperties(testDataBaseRequest, dataBase);
-            if (!testDataBaseRequest.getDataBaseType().equals(DATA_SOURCE_TYPE_ORACLE)) {
+            // Oracle/达梦 JDBC 无 socketTimeout 参数，不追加
+            if (!testDataBaseRequest.getDataBaseType().equals(DATA_SOURCE_TYPE_ORACLE)
+                    && !testDataBaseRequest.getDataBaseType().equals(DATA_SOURCE_TYPE_DAMENG)) {
                 dataBase.setUrl(CommUtils.appendUrlParam(dataBase.getUrl(), "socketTimeout", "5000"));
             }
 

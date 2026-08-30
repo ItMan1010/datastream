@@ -350,6 +350,201 @@ INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_
 INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
 (111, 20, 69, 3, NULL, NULL, 'JSON类型映射到CLOB', 0);  -- json -> CLOB (降级)
 
+
+-- ====================================================================
+-- 达梦（DM8）类型定义
+-- 说明: 达梦 SQL 方言高度兼容 Oracle，data_type 取自 all_tab_columns
+--       类型名统一小写，NUMBER 由 OracleNumberMapper 按精度动态映射
+-- ====================================================================
+
+-- 数值类型
+INSERT INTO data_stream_column_type_define (column_type_define_id, database_type, column_type_classify, column_type_name, column_standard_size, type_category, max_precision, max_scale, character_max_length, min_value, max_value, is_national_flag, require_length_param, remark) VALUES
+(400, 'dameng', 1, 'number', 22, 'NUMERIC_INTEGER', 38, 127, NULL, NULL, NULL, 0, 0, '通用数字类型 需根据精度动态映射'),
+(401, 'dameng', 1, 'int', 10, 'NUMERIC_INTEGER', 10, NULL, NULL, NULL, NULL, 0, 0, '整数'),
+(402, 'dameng', 1, 'bigint', 20, 'NUMERIC_INTEGER', 19, NULL, NULL, NULL, NULL, 0, 0, '大整数'),
+(403, 'dameng', 1, 'tinyint', 3, 'NUMERIC_INTEGER', 3, NULL, NULL, NULL, NULL, 0, 0, '极小整数'),
+(404, 'dameng', 1, 'smallint', 5, 'NUMERIC_INTEGER', 5, NULL, NULL, NULL, NULL, 0, 0, '小整数'),
+(405, 'dameng', 1, 'decimal', NULL, 'NUMERIC_FIXED_POINT', 38, 127, NULL, NULL, NULL, 0, 1, '精确小数'),
+(406, 'dameng', 1, 'float', NULL, 'NUMERIC_FLOATING_POINT', NULL, NULL, NULL, NULL, NULL, 0, 0, '单精度浮点数'),
+(407, 'dameng', 1, 'double', NULL, 'NUMERIC_FLOATING_POINT', NULL, NULL, NULL, NULL, NULL, 0, 0, '双精度浮点数');
+
+-- 字符串类型
+INSERT INTO data_stream_column_type_define (column_type_define_id, database_type, column_type_classify, column_type_name, column_standard_size, type_category, max_precision, max_scale, character_max_length, min_value, max_value, is_national_flag, require_length_param, remark) VALUES
+(408, 'dameng', 2, 'varchar2', NULL, 'STRING_SHORT', NULL, NULL, 8188, NULL, NULL, 0, 1, '可变字符串 最多8188字节'),
+(409, 'dameng', 2, 'varchar', NULL, 'STRING_SHORT', NULL, NULL, 8188, NULL, NULL, 0, 1, '可变字符串'),
+(410, 'dameng', 2, 'nvarchar2', NULL, 'STRING_SHORT', NULL, NULL, 8188, NULL, NULL, 1, 1, '可变UNICODE字符串'),
+(411, 'dameng', 2, 'char', NULL, 'STRING_SHORT', NULL, NULL, 2000, NULL, NULL, 0, 1, '定长字符串 最多2000字节'),
+(412, 'dameng', 2, 'clob', NULL, 'STRING_LONG', NULL, NULL, 4294967295, NULL, NULL, 0, 0, '字符大对象 最大4GB'),
+(413, 'dameng', 2, 'text', NULL, 'STRING_LONG', NULL, NULL, 2147483647, NULL, NULL, 0, 0, '大段文本内容');
+
+-- 二进制类型
+INSERT INTO data_stream_column_type_define (column_type_define_id, database_type, column_type_classify, column_type_name, column_standard_size, type_category, max_precision, max_scale, character_max_length, min_value, max_value, is_national_flag, require_length_param, remark) VALUES
+(414, 'dameng', 4, 'blob', NULL, 'BINARY', NULL, NULL, 4294967295, NULL, NULL, 0, 0, '二进制大对象 最大4GB'),
+(415, 'dameng', 4, 'varbinary', NULL, 'BINARY', NULL, NULL, 8188, NULL, NULL, 0, 1, '可变二进制'),
+(416, 'dameng', 4, 'binary', NULL, 'BINARY', NULL, NULL, 8188, NULL, NULL, 0, 1, '定长二进制'),
+(417, 'dameng', 4, 'image', NULL, 'BINARY', NULL, NULL, 2147483647, NULL, NULL, 0, 0, '大二进制对象');
+
+-- 日期时间类型
+INSERT INTO data_stream_column_type_define (column_type_define_id, database_type, column_type_classify, column_type_name, column_standard_size, type_category, max_precision, max_scale, character_max_length, min_value, max_value, is_national_flag, require_length_param, remark) VALUES
+(418, 'dameng', 3, 'date', 7, 'DATETIME_DATE', NULL, NULL, NULL, NULL, NULL, 0, 0, '日期 包含时分秒'),
+(419, 'dameng', 3, 'time', 8, 'DATETIME_TIME', NULL, NULL, NULL, NULL, NULL, 0, 0, '时间'),
+(420, 'dameng', 3, 'timestamp', 11, 'DATETIME_TIMESTAMP', NULL, 6, NULL, NULL, NULL, 0, 1, '时间戳 支持小数秒'),
+(421, 'dameng', 3, 'datetime', 19, 'DATETIME_TIMESTAMP', NULL, NULL, NULL, NULL, NULL, 0, 0, '日期时间');
+
+-- 其他类型
+INSERT INTO data_stream_column_type_define (column_type_define_id, database_type, column_type_classify, column_type_name, column_standard_size, type_category, max_precision, max_scale, character_max_length, min_value, max_value, is_national_flag, require_length_param, remark) VALUES
+(422, 'dameng', 5, 'boolean', 1, 'OTHER', NULL, NULL, NULL, NULL, NULL, 0, 0, '布尔类型'),
+(423, 'dameng', 5, 'bit', 1, 'OTHER', NULL, NULL, NULL, NULL, NULL, 0, 0, '位类型');
+
+-- ====================================================================
+-- 类型映射：达梦 -> MySQL
+-- ====================================================================
+
+-- 数值类型映射
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(400, 400, 4, 3, 'ORACLE_NUMBER_MAPPER', NULL, '由OracleNumberMapper根据精度动态映射', 0),  -- number -> int
+(401, 400, 5, 3, 'ORACLE_NUMBER_MAPPER', NULL, '由OracleNumberMapper根据精度动态映射', 0),  -- number -> bigint
+(402, 400, 8, 3, 'ORACLE_NUMBER_MAPPER', NULL, '由OracleNumberMapper根据精度动态映射', 0),  -- number -> decimal
+(403, 401, 4, 1, NULL, NULL, NULL, 1),  -- int -> int
+(404, 402, 5, 1, NULL, NULL, NULL, 1),  -- bigint -> bigint
+(405, 403, 1, 1, NULL, NULL, NULL, 1),  -- tinyint -> tinyint
+(406, 404, 2, 1, NULL, NULL, NULL, 1),  -- smallint -> smallint
+(407, 405, 8, 1, NULL, NULL, NULL, 1),  -- decimal -> decimal
+(408, 406, 6, 1, NULL, NULL, NULL, 1),  -- float -> float
+(409, 407, 7, 1, NULL, NULL, NULL, 1);  -- double -> double
+
+-- 字符串类型映射
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(410, 408, 14, 1, NULL, 'min(len, 65535)', NULL, 1),  -- varchar2 -> varchar
+(411, 409, 14, 1, NULL, 'min(len, 65535)', NULL, 1),  -- varchar -> varchar
+(412, 410, 14, 1, NULL, 'min(len, 65535)', NULL, 1),  -- nvarchar2 -> varchar
+(413, 411, 15, 1, NULL, 'min(len, 255)', NULL, 1),  -- char -> char
+(414, 412, 19, 1, NULL, NULL, NULL, 1),  -- clob -> longtext
+(415, 413, 19, 1, NULL, NULL, NULL, 1);  -- text -> longtext
+
+-- 二进制类型映射
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(416, 414, 109, 1, NULL, NULL, NULL, 1),  -- blob -> longblob
+(417, 415, 105, 1, NULL, NULL, NULL, 1),  -- varbinary -> varbinary
+(418, 416, 104, 1, NULL, NULL, NULL, 1),  -- binary -> binary
+(419, 417, 109, 1, NULL, NULL, NULL, 1);  -- image -> longblob
+
+-- 日期时间类型映射
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(420, 418, 12, 1, NULL, NULL, '达梦DATE包含时间', 1),  -- date -> datetime
+(421, 419, 10, 1, NULL, NULL, NULL, 1),  -- time -> time
+(422, 420, 12, 1, NULL, NULL, NULL, 1),  -- timestamp -> datetime
+(423, 421, 12, 1, NULL, NULL, NULL, 1);  -- datetime -> datetime
+
+-- 其他类型映射
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(424, 422, 1, 2, NULL, NULL, '布尔映射为tinyint', 0),  -- boolean -> tinyint
+(425, 423, 100, 2, NULL, NULL, '位类型映射为bit', 0);  -- bit -> bit
+
+-- ====================================================================
+-- 类型映射：MySQL -> 达梦
+-- ====================================================================
+
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(426, 1, 400, 3, 'ORACLE_NUMBER_MAPPER', NULL, '由OracleNumberMapper处理', 0),  -- tinyint -> number
+(427, 2, 400, 3, 'ORACLE_NUMBER_MAPPER', NULL, '由OracleNumberMapper处理', 0),  -- smallint -> number
+(428, 4, 401, 1, NULL, NULL, NULL, 1),  -- int -> int
+(429, 5, 402, 1, NULL, NULL, NULL, 1),  -- bigint -> bigint
+(430, 8, 405, 1, NULL, NULL, NULL, 1),  -- decimal -> decimal
+(431, 6, 406, 1, NULL, NULL, NULL, 1),  -- float -> float
+(432, 7, 407, 1, NULL, NULL, NULL, 1),  -- double -> double
+(433, 14, 408, 1, NULL, 'min(len, 8188)', NULL, 1),  -- varchar -> varchar2
+(434, 15, 411, 1, NULL, 'min(len, 2000)', NULL, 1),  -- char -> char
+(435, 16, 412, 1, NULL, NULL, NULL, 1),  -- tinytext -> clob
+(436, 17, 412, 1, NULL, NULL, NULL, 1),  -- text -> clob
+(437, 18, 412, 1, NULL, NULL, NULL, 1),  -- mediumtext -> clob
+(438, 19, 412, 1, NULL, NULL, NULL, 1),  -- longtext -> clob
+(439, 107, 414, 1, NULL, NULL, NULL, 1),  -- blob -> blob
+(440, 105, 415, 1, NULL, NULL, NULL, 1),  -- varbinary -> varbinary
+(441, 104, 416, 1, NULL, NULL, NULL, 1),  -- binary -> binary
+(442, 9, 418, 1, NULL, NULL, 'MySQL仅日期 vs 达梦含时间', 0),  -- date -> date
+(443, 10, 419, 1, NULL, NULL, NULL, 1),  -- time -> time
+(444, 11, 420, 1, NULL, NULL, NULL, 1),  -- timestamp -> timestamp
+(445, 12, 420, 1, NULL, NULL, NULL, 1);  -- datetime -> timestamp
+
+-- ====================================================================
+-- 类型映射：达梦 -> PostgreSQL
+-- ====================================================================
+
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(446, 400, 26, 3, 'ORACLE_NUMBER_MAPPER', NULL, '由OracleNumberMapper根据精度动态映射', 0),  -- number -> numeric
+(447, 401, 22, 1, NULL, NULL, NULL, 1),  -- int -> int4
+(448, 402, 23, 1, NULL, NULL, NULL, 1),  -- bigint -> int8
+(449, 403, 21, 1, NULL, NULL, NULL, 1),  -- tinyint -> int2
+(450, 404, 21, 1, NULL, NULL, NULL, 1),  -- smallint -> int2
+(451, 405, 26, 1, NULL, NULL, NULL, 1),  -- decimal -> numeric
+(452, 406, 29, 2, NULL, NULL, '精度可能损失', 0),  -- float -> float4
+(453, 407, 30, 1, NULL, NULL, NULL, 1),  -- double -> float8
+(454, 408, 37, 1, NULL, NULL, NULL, 1),  -- varchar2 -> varchar
+(455, 409, 37, 1, NULL, NULL, NULL, 1),  -- varchar -> varchar
+(456, 411, 38, 1, NULL, NULL, NULL, 1),  -- char -> char
+(457, 412, 40, 1, NULL, NULL, NULL, 1),  -- clob -> text
+(458, 413, 40, 1, NULL, NULL, NULL, 1),  -- text -> text
+(459, 414, 200, 1, NULL, NULL, NULL, 1),  -- blob -> bytea
+(460, 415, 200, 1, NULL, NULL, NULL, 1),  -- varbinary -> bytea
+(461, 416, 200, 1, NULL, NULL, NULL, 1),  -- binary -> bytea
+(462, 417, 200, 1, NULL, NULL, NULL, 1),  -- image -> bytea
+(463, 418, 31, 1, NULL, NULL, '达梦DATE含时间映射为date', 0),  -- date -> date
+(464, 420, 34, 1, NULL, NULL, NULL, 1),  -- timestamp -> timestamp
+(465, 422, 201, 1, NULL, NULL, NULL, 1);  -- boolean -> boolean
+
+-- ====================================================================
+-- 类型映射：PostgreSQL -> 达梦
+-- ====================================================================
+
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(466, 21, 404, 1, NULL, NULL, NULL, 1),  -- int2 -> smallint
+(467, 22, 401, 1, NULL, NULL, NULL, 1),  -- int4 -> int
+(468, 23, 402, 1, NULL, NULL, NULL, 1),  -- int8 -> bigint
+(469, 26, 405, 1, NULL, NULL, NULL, 1),  -- numeric -> decimal
+(470, 27, 405, 1, NULL, NULL, NULL, 1),  -- decimal -> decimal
+(471, 29, 406, 2, NULL, NULL, '精度可能损失', 0),  -- float4 -> float
+(472, 30, 407, 1, NULL, NULL, NULL, 1),  -- float8 -> double
+(473, 37, 408, 1, NULL, 'min(len, 8188)', NULL, 1),  -- varchar -> varchar2
+(474, 38, 411, 1, NULL, 'min(len, 2000)', NULL, 1),  -- char -> char
+(475, 40, 412, 1, NULL, NULL, NULL, 1),  -- text -> clob
+(476, 200, 414, 1, NULL, NULL, NULL, 1),  -- bytea -> blob
+(477, 31, 418, 1, NULL, NULL, NULL, 1),  -- date -> date
+(478, 34, 420, 1, NULL, NULL, NULL, 1),  -- timestamp -> timestamp
+(479, 201, 422, 1, NULL, NULL, NULL, 1);  -- boolean -> boolean
+
+-- ====================================================================
+-- 类型映射：达梦 -> Oracle（达梦与 Oracle 类型近同构）
+-- ====================================================================
+
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(480, 400, 60, 1, NULL, NULL, NULL, 1),  -- number -> NUMBER
+(481, 401, 60, 3, 'ORACLE_NUMBER_MAPPER', NULL, '由OracleNumberMapper处理', 0),  -- int -> NUMBER
+(482, 402, 60, 3, 'ORACLE_NUMBER_MAPPER', NULL, '由OracleNumberMapper处理', 0),  -- bigint -> NUMBER
+(483, 408, 65, 1, NULL, 'min(len, 4000)', NULL, 1),  -- varchar2 -> VARCHAR2
+(484, 409, 65, 1, NULL, 'min(len, 4000)', NULL, 1),  -- varchar -> VARCHAR2
+(485, 411, 67, 1, NULL, 'min(len, 2000)', NULL, 1),  -- char -> CHAR
+(486, 412, 69, 1, NULL, NULL, NULL, 1),  -- clob -> CLOB
+(487, 413, 69, 1, NULL, NULL, NULL, 1),  -- text -> CLOB
+(488, 414, 71, 1, NULL, NULL, NULL, 1),  -- blob -> BLOB
+(489, 415, 73, 1, NULL, NULL, NULL, 1),  -- varbinary -> RAW
+(490, 416, 73, 1, NULL, NULL, NULL, 1),  -- binary -> RAW
+(491, 418, 63, 1, NULL, NULL, NULL, 1),  -- date -> DATE
+(492, 420, 64, 1, NULL, NULL, NULL, 1);  -- timestamp -> TIMESTAMP
+
+-- ====================================================================
+-- 类型映射：Oracle -> 达梦
+-- ====================================================================
+
+INSERT INTO data_stream_column_type_map (column_type_map_id, column_type_define_id_a, column_type_define_id_b, match_level, precision_conversion_rule, length_conversion_rule, conversion_warning, is_reversible) VALUES
+(493, 60, 400, 1, NULL, NULL, NULL, 1),  -- NUMBER -> number
+(494, 65, 408, 1, NULL, 'min(len, 8188)', NULL, 1),  -- VARCHAR2 -> varchar2
+(495, 67, 411, 1, NULL, 'min(len, 2000)', NULL, 1),  -- CHAR -> char
+(496, 69, 412, 1, NULL, NULL, NULL, 1),  -- CLOB -> clob
+(497, 71, 414, 1, NULL, NULL, NULL, 1),  -- BLOB -> blob
+(498, 63, 418, 1, NULL, NULL, NULL, 1),  -- DATE -> date
+(499, 64, 420, 1, NULL, NULL, NULL, 1);  -- TIMESTAMP -> timestamp
+
 -- ====================================================================
 -- 验证查询
 -- ====================================================================

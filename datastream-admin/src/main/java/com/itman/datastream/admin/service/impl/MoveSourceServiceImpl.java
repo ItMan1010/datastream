@@ -17,6 +17,7 @@
 package com.itman.datastream.admin.service.impl;
 
 import com.itman.datastream.common.api.DataSourceFactory;
+import com.itman.datastream.common.constant.DataBaseEnum;
 import com.itman.datastream.common.entity.TableInfoEntity;
 import com.itman.datastream.engine.dao.DataStreamDao;
 import com.itman.datastream.common.errcode.DataStreamException;
@@ -81,6 +82,11 @@ public class MoveSourceServiceImpl implements IMoveSourceService {
 
     @Override
     public TableInfoEntity fetchTableMetadata(Long dataSourceId, DataBaseEntity dataSource, String tableName) throws DataStreamException {
-        return dataSourceFactory.matchTableMeta(dataSource.getDataBaseType()).fetchTableMetadata(dataSource.getSchemaName(), tableName);
+        // Oracle/达梦 schema 由连接用户名（owner）确定，其余数据库使用 URL 解析出的 schemaName
+        Integer type = dataSource.getDataBaseType();
+        String schemaName = (type != null && (type == DataBaseEnum.ORACLE.getId() || type == DataBaseEnum.DAMENG.getId()))
+                ? dataSource.getUserName()
+                : dataSource.getSchemaName();
+        return dataSourceFactory.matchTableMeta(dataSource.getDataBaseType()).fetchTableMetadata(schemaName, tableName);
     }
 }

@@ -38,10 +38,7 @@ public class TableInfoServiceImpl implements ITableInfoService {
 
     @Override
     public List<TableInfoEntity> getTableInfo(Long dataSourceId, DataBaseEntity dataSource) throws DataStreamException {
-        // Oracle: schemaName 是服务名/SID，需要使用 userName（即 schema owner）代替
-        String schemaParam = dataSource.getDataBaseType() == DataBaseEnum.ORACLE.getId()
-                ? dataSource.getUserName()
-                : dataSource.getSchemaName();
+        String schemaParam = resolveSchemaName(dataSource);
         return dataSourceFactory.matchTableMeta(dataSource.getDataBaseType()).getTableInfo(dataSource.getDataBaseType(), schemaParam);
     }
 
@@ -52,6 +49,18 @@ public class TableInfoServiceImpl implements ITableInfoService {
 
     @Override
     public TableInfoEntity fetchTableMetadata(Long dataSourceId, DataBaseEntity dataSource, String tableName) throws DataStreamException {
-        return dataSourceFactory.matchTableMeta(dataSource.getDataBaseType()).fetchTableMetadata(dataSource.getSchemaName(), tableName);
+        return dataSourceFactory.matchTableMeta(dataSource.getDataBaseType()).fetchTableMetadata(resolveSchemaName(dataSource), tableName);
+    }
+
+    /**
+     * Oracle/达梦的 JDBC URL 不含 database 路径，schema 由连接用户名（owner）确定；
+     * 其余数据库使用 URL 中解析出的 schemaName。
+     */
+    private String resolveSchemaName(DataBaseEntity dataSource) {
+        Integer type = dataSource.getDataBaseType();
+        if (type != null && (type == DataBaseEnum.ORACLE.getId() || type == DataBaseEnum.DAMENG.getId())) {
+            return dataSource.getUserName();
+        }
+        return dataSource.getSchemaName();
     }
 }

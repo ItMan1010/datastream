@@ -31,6 +31,7 @@ public class DataStreamConstant {
     public static final Integer DATA_SOURCE_TYPE_ROCKETMQ = 11;
     public static final Integer DATA_SOURCE_TYPE_RABBITMQ = 12;
     public static final Integer DATA_SOURCE_TYPE_ACTIVEMQ = 13;
+    public static final Integer DATA_SOURCE_TYPE_DAMENG = 15;
 
     //数据源基本分类：1数据库、2文件、3MQ消息队列
     public static final Integer DATA_SOURCE_CATEGORY_DATABASE=1;

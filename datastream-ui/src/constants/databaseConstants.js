@@ -24,7 +24,8 @@ export const DATABASE_TYPE_MAP = {
   2: 'MySQL',
   3: 'Oracle',
   4: 'PostgreSQL',
-  5: 'Doris'
+  5: 'Doris',
+  15: '达梦'
 }
 
 // 数据库类型选项
@@ -33,7 +34,8 @@ export const DATABASE_TYPE_OPTIONS = [
   { label: 'MySQL', value: '2' },
   { label: 'Oracle', value: '3' },
   { label: 'PostgreSQL', value: '4' },
-  { label: 'Doris', value: '5' }
+  { label: 'Doris', value: '5' },
+  { label: '达梦', value: '15' }
 ]
 
 // 数据库类型颜色
@@ -42,7 +44,8 @@ export const DATABASE_TYPE_COLORS = {
   2: 'success',
   3: 'warning',
   4: 'primary',
-  5: 'danger'
+  5: 'danger',
+  15: 'info'
 }
 
 // 数据库状态映射

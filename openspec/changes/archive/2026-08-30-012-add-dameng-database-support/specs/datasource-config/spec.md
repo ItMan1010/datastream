@@ -1,10 +1,4 @@
-# datasource-config Specification
-
-## Purpose
-
-约束数据源配置管理中 JDBC URL 的处理行为：系统在向 URL 追加连接参数时必须生成语法合法的 URL，且元数据库必须能完整存储常规长度的 JDBC URL。
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: JDBC URL 参数追加必须保持 URL 合法
 
@@ -41,15 +35,3 @@
 #### Scenario: 达梦 URL 不追加 socketTimeout
 - **WHEN** 数据库类型为达梦
 - **THEN** 连接测试场景下系统不向其 URL 追加 `socketTimeout` 参数
-
-### Requirement: 数据源 URL 必须能完整存储常规 JDBC URL
-
-元数据库 `data_stream_data_base.url` 列 MUST 支持 512 个字符，使带常规连接参数（useSSL、characterEncoding、serverTimezone、allowPublicKeyRetrieval 等）的 JDBC URL 能完整保存。
-
-#### Scenario: 新增长 URL 数据源成功
-- **WHEN** 用户新增数据源，URL 为 130~160 字符的带参 MySQL JDBC URL
-- **THEN** 保存成功，列表回显地址与用户输入一致，不出现 "Data too long for column 'url'" 错误
-
-#### Scenario: 存量环境升级后兼容已有数据
-- **WHEN** 对已存在数据源的存量元数据库执行 url 列扩容升级脚本
-- **THEN** 升级后原有短 URL 数据源全部可正常查询、修改与使用

@@ -39,7 +39,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
         "com.itman.datastream.engine.mapper",
         "com.itman.datastream.connectors.oracle.dao",
         "com.itman.datastream.connectors.postgres.dao",
-        "com.itman.datastream.connectors.mysql.dao"})
+        "com.itman.datastream.connectors.mysql.dao",
+        "com.itman.datastream.connectors.dameng.dao"})
 @EnableAsync
 public class DataStreamApplication {
     public static void main(String[] args) {

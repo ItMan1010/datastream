@@ -42,6 +42,7 @@ local.properties
 /datastream-connectors/connector-h2/pom-xml-flattened
 /datastream-connectors/connector-file/pom-xml-flattened
 /datastream-connectors/connector-common/pom-xml-flattened
+/datastream-connectors/connector-dameng/pom-xml-flattened
 /datastream-ui/package-lock.json
 /h2db/testdb.trace.db
 datastream-admin/.classpath

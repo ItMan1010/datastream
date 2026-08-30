@@ -32,6 +32,7 @@
             <el-option label="PostgreSQL" :value="4"></el-option>
             <el-option label="Oracle" :value="3"></el-option>
             <el-option label="Doris" :value="5"></el-option>
+            <el-option label="达梦" :value="15"></el-option>
           </el-select>
         </el-form-item>
 

@@ -388,7 +388,7 @@ INSERT INTO data_stream_column_type_define (column_type_define_id, database_type
 INSERT INTO data_stream_column_type_define (column_type_define_id, database_type, column_type_classify, column_type_name, column_standard_size, type_category, max_precision, max_scale, character_max_length, min_value, max_value, is_national_flag, require_length_param, remark) VALUES
 (418, 'dameng', 3, 'date', 7, 'DATETIME_DATE', NULL, NULL, NULL, NULL, NULL, 0, 0, '日期 包含时分秒'),
 (419, 'dameng', 3, 'time', 8, 'DATETIME_TIME', NULL, NULL, NULL, NULL, NULL, 0, 0, '时间'),
-(420, 'dameng', 3, 'timestamp', 11, 'DATETIME_TIMESTAMP', NULL, 6, NULL, NULL, NULL, 0, 1, '时间戳 支持小数秒'),
+(420, 'dameng', 3, 'timestamp', 11, 'DATETIME_TIMESTAMP', NULL, 6, NULL, NULL, NULL, 0, 0, '时间戳 支持小数秒'),
 (421, 'dameng', 3, 'datetime', 19, 'DATETIME_TIMESTAMP', NULL, NULL, NULL, NULL, NULL, 0, 0, '日期时间');
 
 -- 其他类型

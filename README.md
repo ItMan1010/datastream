@@ -5,6 +5,10 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.1.4-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Vue](https://img.shields.io/badge/Vue-3.3-brightgreen.svg)](https://vuejs.org/)
 
+## 文档索引
+
+项目文档统一归置在 [`doc/`](doc/) 目录，完整索引见 [doc/README.md](doc/README.md)。
+
 ## 功能简介
 
 DataStream 是一款功能完善的数据处理平台，提供数据迁移、数据清理、数据稽核、结构迁移、增量迁移、链表迁移、数据检索、配置管理等核心功能。
